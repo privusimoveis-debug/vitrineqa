@@ -65,7 +65,7 @@ const itemVariants = {
 };
 
 // --- Main Page Component ---
-export default function Home() {
+export default function ScraperPage() {
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<PropertyData | null>(null);
