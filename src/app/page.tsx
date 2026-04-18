@@ -239,6 +239,13 @@ export default function ScraperPage() {
     const bairro = data.address.split(',').pop()?.trim() || data.city;
     const price = data.prices.isForSale ? formatCurrency(data.prices.salePrice) : formatCurrency(data.prices.rent);
     
+    const bairroTag = bairro.replace(/\s+/g, '');
+    const cityTag = data.city.replace(/\s+/g, '');
+    const typeTag = data.type.replace(/\s+/g, '');
+    
+    // Profile-based tags
+    const profileTags = ["#luxo", "#moderno", "#oportunidade", "#investimento", "#design", "#conforto"];
+
     const lines = [
       `${bairro} - ${data.title}`,
       "",
@@ -255,7 +262,7 @@ export default function ScraperPage() {
       "",
       "Agende sua visita e venha conhecer este imóvel incrível. 🚀",
       "",
-      `#imobiliaria #corretor #imoveis #quintoandar #vitrineqa #${data.city.replace(/\s+/g, '')} #${data.type.replace(/\s+/g, '')}`
+      `#imobiliaria #corretor #imoveis #${bairroTag} #${cityTag} #${typeTag} ${profileTags.join(' ')}`
     ];
 
     setCaption(lines.join('\n'));
