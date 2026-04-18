@@ -69,36 +69,44 @@ const itemVariants = {
   }
 };
 
-// --- Carousel Themes ---
-const CAROUSEL_THEMES = {
-  azure: { name: 'Azure', from: 'from-blue-600', via: 'via-blue-800', to: 'to-black', accent: 'text-blue-400', bg: 'bg-blue-600', shadow: 'shadow-blue-500/20' },
-  gold: { name: 'Gold', from: 'from-amber-500', via: 'via-amber-800', to: 'to-black', accent: 'text-amber-400', bg: 'bg-amber-500', shadow: 'shadow-amber-500/20' },
-  emerald: { name: 'Emerald', from: 'from-emerald-600', via: 'via-emerald-900', to: 'to-black', accent: 'text-emerald-400', bg: 'bg-emerald-600', shadow: 'shadow-emerald-500/20' },
-  ruby: { name: 'Ruby', from: 'from-red-600', via: 'via-red-900', to: 'to-black', accent: 'text-red-400', bg: 'bg-red-600', shadow: 'shadow-red-500/20' },
-  obsidian: { name: 'Obsidian', from: 'from-zinc-700', via: 'via-zinc-900', to: 'to-black', accent: 'text-zinc-400', bg: 'bg-zinc-700', shadow: 'shadow-zinc-500/20' },
+// --- Carousel Themes (Elite 2026 Dynamic) ---
+const ELITE_GRADIENTS = [
+  { name: 'Midnight', from: 'from-blue-900', via: 'via-indigo-950', to: 'to-black', accent: 'text-blue-400', glass: 'bg-white/5 border-white/10' },
+  { name: 'Emerald', from: 'from-emerald-900', via: 'via-teal-950', to: 'to-black', accent: 'text-emerald-400', glass: 'bg-white/5 border-white/10' },
+  { name: 'Rose', from: 'from-rose-900', via: 'via-pink-950', to: 'to-black', accent: 'text-rose-400', glass: 'bg-white/5 border-white/10' },
+  { name: 'Amber', from: 'from-amber-900', via: 'via-orange-950', to: 'to-black', accent: 'text-amber-400', glass: 'bg-white/5 border-white/10' },
+  { name: 'Violet', from: 'from-violet-900', via: 'via-purple-950', to: 'to-black', accent: 'text-violet-400', glass: 'bg-white/5 border-white/10' },
+  { name: 'Slate', from: 'from-slate-800', via: 'via-slate-950', to: 'to-black', accent: 'text-slate-300', glass: 'bg-white/5 border-white/10' },
+];
+
+const cleanImageUrl = (url: string) => {
+  if (!url) return "";
+  // Removes resize parameters like /1024x1024 or query params to get original quality
+  return url.replace(/\/\d+x\d+$/, '').split('?')[0];
 };
 
-type ThemeKey = keyof typeof CAROUSEL_THEMES;
-
-// --- Slide Component ---
+// --- Elite Slide Component ---
 const InstagramSlide = ({ theme, children, watermark, className }: { theme: any, children: React.ReactNode, watermark: string, className?: string }) => (
   <div 
     className={cn(
-      "w-[1080px] h-[1350px] relative overflow-hidden flex flex-col text-white bg-zinc-950 shrink-0 select-none",
-      theme.from && "bg-gradient-to-br " + theme.from + " " + theme.via + " " + theme.to,
+      "w-[1080px] h-[1350px] relative overflow-hidden flex flex-col text-white bg-black shrink-0 select-none",
+      theme.from && `bg-gradient-to-tr ${theme.from} ${theme.via} ${theme.to}`,
       className
     )}
-    style={{ fontFamily: "'Inter', sans-serif" }}
   >
-    <div className="absolute inset-0 bg-black/50" />
-    <div className="relative z-10 flex-1 flex flex-col p-24">
+    {/* Noise Texture Overlay for that premium feel */}
+    <div className="absolute inset-0 opacity-[0.03] mix-blend-overlay pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+    
+    <div className="relative z-10 flex-1 flex flex-col p-20">
       {children}
     </div>
     
-    {/* Watermark with better contrast */}
-    <div className="absolute bottom-12 right-12 z-20 flex items-center gap-3 bg-black/80 backdrop-blur-3xl px-10 py-5 rounded-full border border-white/20 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
-      <Instagram className="w-8 h-8 text-white" />
-      <span className="text-3xl font-black tracking-tighter uppercase italic" style={{ fontFamily: "'Montserrat', sans-serif" }}>{watermark}</span>
+    {/* Watermark - Minimalist 2026 Style */}
+    <div className="absolute bottom-10 right-10 z-20 flex items-center gap-2 bg-black/40 backdrop-blur-xl px-8 py-3 rounded-full border border-white/5">
+      <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+      <span className="text-xl font-medium tracking-[0.2em] uppercase text-white/70" style={{ fontFamily: "'Inter', sans-serif" }}>
+        {watermark}
+      </span>
     </div>
   </div>
 );
@@ -170,7 +178,7 @@ export default function ScraperPage() {
   const [isCopied, setIsCopied] = useState(false);
   
   // Carousel Specific
-  const [currentTheme, setCurrentTheme] = useState<ThemeKey>('azure');
+  const [gradientIndex, setGradientIndex] = useState(0);
   const [isRenderingCarousel, setIsRenderingCarousel] = useState(false);
   const [renderProgress, setRenderProgress] = useState(0);
   const [activeCaptureIndex, setActiveCaptureIndex] = useState<number | null>(null);
@@ -179,10 +187,9 @@ export default function ScraperPage() {
 
   useEffect(() => {
     if (data) {
-      // Pick a theme based on property ID to ensure variety
-      const keys = Object.keys(CAROUSEL_THEMES) as ThemeKey[];
-      const index = parseInt(data.id.slice(-1)) % keys.length;
-      setCurrentTheme(keys[index]);
+      handleGenerateCaption();
+      // Pick a random gradient for variety
+      setGradientIndex(Math.floor(Math.random() * ELITE_GRADIENTS.length));
     }
   }, [data]);
 
@@ -336,10 +343,12 @@ export default function ScraperPage() {
       
       for (let i = 0; i < 8; i++) {
         setStatusMessage(`Baixando foto ${i + 1} de 8...`);
-        let imgUrl = "";
-        if (i === 0) imgUrl = data.images[0].url; // Capa
-        else if (i === 7) imgUrl = data.images[0].url; // CTA background (can be redundant but let's be safe)
-        else imgUrl = data.images[i]?.url || data.images[0].url;
+        let rawUrl = "";
+        if (i === 0) rawUrl = data.images[0].url; // Capa
+        else if (i === 7) rawUrl = data.images[0].url; 
+        else rawUrl = data.images[i]?.url || data.images[0].url;
+
+        const imgUrl = cleanImageUrl(rawUrl);
 
         // Use proxy to get a clean blob
         const proxyUrl = `/api/proxy-image?url=${encodeURIComponent(imgUrl)}`;
@@ -737,14 +746,14 @@ export default function ScraperPage() {
                                    <Instagram className="w-8 h-8 text-pink-500" />
                                 </div>
                                 <div className="flex gap-2">
-                                  {Object.keys(CAROUSEL_THEMES).map((k) => (
+                                  {ELITE_GRADIENTS.map((g, idx) => (
                                     <button 
-                                      key={k}
-                                      onClick={() => setCurrentTheme(k as ThemeKey)}
+                                      key={g.name}
+                                      onClick={() => setGradientIndex(idx)}
                                       className={cn(
-                                        "w-4 h-4 rounded-full border border-white/20 transition-all",
-                                        currentTheme === k ? "scale-125 border-white" : "opacity-30",
-                                        CAROUSEL_THEMES[k as ThemeKey].bg
+                                        "w-6 h-6 rounded-full border border-white/20 transition-all shadow-lg",
+                                        gradientIndex === idx ? "scale-125 border-white ring-2 ring-blue-500/50" : "opacity-40 hover:opacity-100",
+                                        g.from.replace('from-', 'bg-')
                                       )}
                                     />
                                   ))}
@@ -757,99 +766,124 @@ export default function ScraperPage() {
                                 {/* REAL-TIME CAPTURE PORTAL (Hidden from view but visible to engine) */}
                                 <div className="fixed -left-[2000px] top-0 pointer-events-none origin-top-left">
                                   {data && activeCaptureIndex !== null && (
-                                    <div id="capture-target">
-                                      {activeCaptureIndex === 0 ? (
-                                        <InstagramSlide theme={CAROUSEL_THEMES[currentTheme]} watermark="brunofernandes.corporativo">
-                                           <div className="absolute inset-0 z-0 scale-110">
-                                              <img 
-                                                src={preloadedImages[0]} 
-                                                className="w-full h-full object-cover blur-[2px]" 
-                                                crossOrigin="anonymous"
-                                              />
-                                              <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/30 to-black/95" />
-                                           </div>
-                                           <div className="relative z-10 h-full flex flex-col justify-between items-center text-center px-10">
-                                              <div className={cn("px-16 py-6 rounded-full border-4 font-black uppercase tracking-[0.6em] text-4xl shadow-2xl", "border-white " + CAROUSEL_THEMES[currentTheme].bg)} style={{ fontFamily: "'Montserrat', sans-serif" }}>
-                                                {data.prices.isForSale ? "Oportunidade" : "Disponível"}
-                                              </div>
-                                              
-                                              <div className="w-full flex flex-col gap-4">
-                                                <p className="text-4xl md:text-5xl font-black uppercase tracking-[0.4em] text-white/50 italic mb-2 drop-shadow-lg" style={{ fontFamily: "'Montserrat', sans-serif" }}>
-                                                  {data.address.split(',').pop()?.trim() || data.city}
-                                                </p>
-                                                <h1 className="text-[112px] font-[900] uppercase italic leading-[0.85] tracking-tighter block drop-shadow-[0_20px_50px_rgba(0,0,0,1)]" style={{ fontFamily: "'Montserrat', sans-serif" }}>
-                                                  {data.title.split(' ').slice(0, 1).join(' ')}<br />
-                                                  <span className={CAROUSEL_THEMES[currentTheme].accent}>{data.title.split(' ').slice(1, 4).join(' ')}</span><br />
-                                                  <span className="text-white/90">{data.title.split(' ').slice(4, 10).join(' ')}</span>
-                                                </h1>
+                                    <div id="capture-target" className="bg-black">
+                                       <InstagramSlide theme={ELITE_GRADIENTS[gradientIndex]} watermark="brunofernandes.corporativo">
+                                          {activeCaptureIndex === 0 ? (
+                                            <div className="h-full flex flex-col justify-between">
+                                              {/* Background Photo with High-End Blend */}
+                                              <div className="absolute inset-0 z-0">
+                                                <img 
+                                                  src={preloadedImages[0]} 
+                                                  className="w-full h-full object-cover brightness-[0.75] contrast-[1.1]" 
+                                                />
+                                                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
                                               </div>
 
-                                              <div className="w-full bg-white/5 backdrop-blur-3xl border border-white/10 rounded-[5rem] p-16 space-y-12 shadow-2xl">
-                                                <div className="flex justify-around items-center gap-4 text-5xl font-black uppercase italic text-white" style={{ fontFamily: "'Montserrat', sans-serif" }}>
-                                                  <div className="flex flex-col items-center gap-4">
-                                                    <Maximize2 className="w-12 h-12 text-white/30" />
-                                                    <span>{data.area}m²</span>
+                                              {/* Content Overlays */}
+                                              <div className="relative z-10 flex flex-col h-full justify-between py-10 px-4">
+                                                <div className="flex flex-col gap-4">
+                                                  <div className="inline-flex self-start px-8 py-3 bg-blue-600/90 text-white font-black uppercase tracking-[0.4em] text-3xl italic shadow-2xl">
+                                                    {data.prices.isForSale ? "Oportunidade" : "Aluguel VIP"}
                                                   </div>
-                                                  <div className="w-[3px] h-20 bg-white/10" />
-                                                  <div className="flex flex-col items-center gap-4">
-                                                    <Bed className="w-12 h-12 text-white/30" />
-                                                    <span>{data.bedrooms} Qts</span>
+                                                  <p className="text-4xl font-black uppercase tracking-[0.3em] text-white/60 italic drop-shadow-lg" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+                                                    {data.address.split(',').pop()?.trim() || data.city}
+                                                  </p>
+                                                </div>
+
+                                                <div className="flex flex-col gap-12">
+                                                  <div className="space-y-4">
+                                                    <h1 className="text-[120px] font-[900] uppercase italic leading-[0.85] tracking-tighter drop-shadow-[0_20px_60px_rgba(0,0,0,1)] text-white" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+                                                      {data.title.split(' ').slice(0, 1).join(' ')}<br />
+                                                      <span className={ELITE_GRADIENTS[gradientIndex].accent}>{data.title.split(' ').slice(1, 4).join(' ')}</span><br />
+                                                      <span className="text-white/90">{data.title.split(' ').slice(4, 10).join(' ')}</span>
+                                                    </h1>
                                                   </div>
-                                                  <div className="w-[3px] h-20 bg-white/10" />
-                                                  <div className="flex flex-col items-center gap-4">
-                                                    <Car className="w-12 h-12 text-white/30" />
-                                                    <span>{data.parking} Vagas</span>
+
+                                                  <div className="w-full bg-white/5 backdrop-blur-[40px] border border-white/10 p-16 space-y-12 shadow-2xl">
+                                                    <div className="flex justify-between items-center text-5xl font-black uppercase italic text-white" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+                                                      <div className="flex flex-col items-center gap-3">
+                                                        <Maximize2 className="w-12 h-12 text-white/40" />
+                                                        <span>{data.area}m²</span>
+                                                      </div>
+                                                      <div className="w-[2px] h-20 bg-white/10" />
+                                                      <div className="flex flex-col items-center gap-3">
+                                                        <Bed className="w-12 h-12 text-white/40" />
+                                                        <span>{data.bedrooms} Qts</span>
+                                                      </div>
+                                                      <div className="w-[2px] h-20 bg-white/10" />
+                                                      <div className="flex flex-col items-center gap-3">
+                                                        <Car className="w-12 h-12 text-white/40" />
+                                                        <span>{data.parking} Vagas</span>
+                                                      </div>
+                                                    </div>
+                                                    
+                                                    <div className="flex items-center gap-8 pt-4">
+                                                      <div className="h-1 flex-1 bg-white/10 rounded-full" />
+                                                      <p className="text-[105px] font-black italic tracking-tighter leading-none text-white drop-shadow-2xl" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+                                                        {data.prices.isForSale ? formatCurrency(data.prices.salePrice) : formatCurrency(data.prices.rent)}
+                                                      </p>
+                                                      <div className="h-1 flex-1 bg-white/10 rounded-full" />
+                                                    </div>
                                                   </div>
                                                 </div>
-                                                
-                                                <div className={cn("h-1 w-32 bg-white/20 mx-auto rounded-full")} />
-                                                
-                                                <p className="text-[105px] font-black italic tracking-tighter leading-none drop-shadow-[0_15px_30px_rgba(0,0,0,0.5)]" style={{ fontFamily: "'Montserrat', sans-serif" }}>
-                                                  {data.prices.isForSale ? formatCurrency(data.prices.salePrice) : formatCurrency(data.prices.rent)}
+                                              </div>
+                                            </div>
+                                          ) : activeCaptureIndex === 7 ? (
+                                            <div className="h-full flex flex-col justify-center items-center text-center space-y-32 relative z-10 px-10">
+                                              <div className="w-64 h-64 bg-white/5 backdrop-blur-3xl border border-white/10 rounded-full flex items-center justify-center shadow-2xl relative overflow-hidden group">
+                                                <div className={cn("absolute inset-0 opacity-20 bg-gradient-to-tr", ELITE_GRADIENTS[gradientIndex].from, ELITE_GRADIENTS[gradientIndex].to)} />
+                                                <Building2 className={cn("w-32 h-32 relative z-10", ELITE_GRADIENTS[gradientIndex].accent)} />
+                                              </div>
+                                              
+                                              <div className="space-y-12">
+                                                <h2 className="text-[110px] font-black uppercase italic leading-[0.85] tracking-tighter drop-shadow-[0_20px_50px_rgba(0,0,0,0.8)]" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+                                                  Gostou deste<br /> <span className={ELITE_GRADIENTS[gradientIndex].accent}>Imóvel?</span>
+                                                </h2>
+                                                <p className="text-6xl text-white/60 font-medium uppercase tracking-[0.2em] leading-relaxed max-w-4xl mx-auto">
+                                                  Toque no botão abaixo e fale direto comigo no WhatsApp!
                                                 </p>
                                               </div>
-                                           </div>
-                                        </InstagramSlide>
-                                      ) : activeCaptureIndex === 7 ? (
-                                        <InstagramSlide theme={CAROUSEL_THEMES[currentTheme]} watermark="brunofernandes.corporativo">
-                                          <div className="h-full flex flex-col justify-center items-center text-center space-y-32">
-                                            <div className="w-64 h-64 bg-white/5 border border-white/10 rounded-[6rem] flex items-center justify-center shadow-2xl">
-                                              <Building2 className={cn("w-32 h-32", CAROUSEL_THEMES[currentTheme].accent)} />
+
+                                              <div className="space-y-16 w-full">
+                                                 <div className="bg-white text-black px-24 py-14 rounded-full shadow-[0_30px_60px_rgba(0,0,0,0.5)] flex items-center justify-center gap-10 hover:scale-105 transition-transform">
+                                                   <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center">
+                                                     <Instagram className="w-10 h-10 text-white" />
+                                                   </div>
+                                                   <span className="text-8xl font-black uppercase tracking-tighter" style={{ fontFamily: "'Montserrat', sans-serif" }}>WhatsApp</span>
+                                                 </div>
+                                                 
+                                                 <p className="text-[110px] font-black italic tracking-tighter text-white/90 bg-white/5 border border-white/10 px-12 py-4 rounded-3xl inline-block" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+                                                   31 97336 2545
+                                                 </p>
+                                              </div>
                                             </div>
-                                            <div className="space-y-12 px-12">
-                                              <h2 className="text-[110px] font-black uppercase italic leading-[0.85] tracking-tighter drop-shadow-[0_15px_40px_rgba(0,0,0,1)]" style={{ fontFamily: "'Montserrat', sans-serif" }}>
-                                                Gostou deste<br /> <span className={CAROUSEL_THEMES[currentTheme].accent}>Imóvel?</span>
-                                              </h2>
-                                              <div className="h-2 w-48 bg-white/20 mx-auto rounded-full" />
-                                              <p className="text-6xl text-white/50 font-medium uppercase tracking-[0.2em] leading-relaxed drop-shadow-lg">
-                                                Toque no botão e fale direto comigo!
-                                              </p>
-                                            </div>
-                                            <div className="space-y-16">
-                                               <div className="flex flex-col items-center gap-4">
-                                                <div className="flex items-center gap-10 bg-white text-black px-20 py-12 rounded-[5rem] shadow-2xl">
-                                                  <Instagram className="w-16 h-16" />
-                                                  <span className="text-7xl font-black uppercase tracking-tight" style={{ fontFamily: "'Montserrat', sans-serif" }}>WhatsApp</span>
-                                                </div>
+                                          ) : (
+                                            <div className="h-full relative px-10 py-10 flex flex-col justify-end">
+                                               {/* Full Bleed Image */}
+                                               <div className="absolute inset-0 z-0">
+                                                  <img 
+                                                    src={preloadedImages[activeCaptureIndex]} 
+                                                    className="w-full h-full object-cover brightness-[0.85] contrast-[1.05]" 
+                                                  />
+                                                  <div className="absolute inset-0 shadow-[inset_0_0_500px_rgba(0,0,0,0.6)]" />
+                                                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-80" />
                                                </div>
-                                               <p className="text-[110px] font-black italic tracking-tight text-white border-b-8 border-blue-500 pb-4 inline-block shadow-blue-500/20" style={{ fontFamily: "'Montserrat', sans-serif" }}>
-                                                 31 97336 2545
-                                               </p>
+                                               
+                                               {/* Elegant Minimal Info Overlay */}
+                                               <div className="relative z-10 flex justify-between items-end border-t border-white/10 pt-10">
+                                                  <div className="flex flex-col gap-2">
+                                                    <span className="text-2xl font-black uppercase tracking-[0.5em] text-white/40 italic">Exclusividade</span>
+                                                    <span className="text-5xl font-black uppercase italic tracking-tighter text-white">
+                                                      {data.city} • <span className={ELITE_GRADIENTS[gradientIndex].accent}>{data.address.split(',').pop()?.trim()}</span>
+                                                    </span>
+                                                  </div>
+                                                  <div className="px-10 py-4 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl text-4xl font-black italic">
+                                                    {activeCaptureIndex + 1} / 8
+                                                  </div>
+                                               </div>
                                             </div>
-                                          </div>
-                                        </InstagramSlide>
-                                      ) : (
-                                        <InstagramSlide theme={CAROUSEL_THEMES[currentTheme]} watermark="brunofernandes.corporativo">
-                                          <div className="absolute inset-0">
-                                            <img 
-                                              src={preloadedImages[activeCaptureIndex]} 
-                                              className="w-full h-full object-cover" 
-                                              crossOrigin="anonymous"
-                                            />
-                                            <div className="absolute inset-0 bg-black/5 shadow-[inset_0_0_400px_rgba(0,0,0,0.7)]" />
-                                          </div>
-                                        </InstagramSlide>
-                                      )}
+                                          )}
+                                       </InstagramSlide>
                                     </div>
                                   )}
                                 </div>
@@ -857,7 +891,7 @@ export default function ScraperPage() {
                                 <div className="absolute inset-0 flex items-center justify-center scale-[0.22] origin-center -translate-y-[280px]">
                                    {/* STATIC PREVIEW FOR USER ONLY */}
                                    <div className="flex flex-col gap-40 opacity-50 grayscale pointer-events-none">
-                                      <InstagramSlide theme={CAROUSEL_THEMES[currentTheme]} watermark="brunofernandes.corporativo">
+                                      <InstagramSlide theme={ELITE_GRADIENTS[gradientIndex]} watermark="brunofernandes.corporativo">
                                          <div className="h-full flex flex-col justify-center items-center text-center">
                                            <h1 className="text-[140px] font-black italic uppercase">Preview</h1>
                                          </div>
