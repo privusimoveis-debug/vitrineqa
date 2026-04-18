@@ -731,7 +731,7 @@ export default function ScraperPage() {
                                 <div className="fixed -left-[2000px] top-0 pointer-events-none origin-top-left">
                                   {data && activeCaptureIndex !== null && (
                                     <div id="capture-target">
-                                      {activeCaptureIndex === 0 ? (
+                                       {activeCaptureIndex === 0 ? (
                                         <InstagramSlide theme={CAROUSEL_THEMES[currentTheme]} watermark="brunofernandes.corporativo">
                                            <div className="absolute inset-0 z-0 scale-110">
                                               <img 
@@ -746,14 +746,14 @@ export default function ScraperPage() {
                                                 {data.prices.isForSale ? "Oportunidade" : "Disponível"}
                                               </div>
                                               
-                                              <div className="w-full flex flex-col gap-6">
-                                                <p className="text-6xl font-black uppercase tracking-[0.4em] text-white/50 italic mb-4" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+                                              <div className="w-full flex flex-col gap-4">
+                                                <p className="text-4xl md:text-5xl font-black uppercase tracking-[0.4em] text-white/50 italic mb-2" style={{ fontFamily: "'Montserrat', sans-serif" }}>
                                                   {data.address.split(',').pop()?.trim() || data.city}
                                                 </p>
-                                                <h1 className="text-[145px] font-[900] uppercase italic leading-[0.75] tracking-tighter block drop-shadow-[0_20px_40px_rgba(0,0,0,0.8)]" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+                                                <h1 className="text-[112px] font-[900] uppercase italic leading-[0.85] tracking-tighter block drop-shadow-[0_20px_50px_rgba(0,0,0,1)]" style={{ fontFamily: "'Montserrat', sans-serif" }}>
                                                   {data.title.split(' ').slice(0, 1).join(' ')}<br />
-                                                  <span className={CAROUSEL_THEMES[currentTheme].accent}>{data.title.split(' ').slice(1, 3).join(' ')}</span><br />
-                                                  {data.title.split(' ').slice(3, 5).join(' ')}
+                                                  <span className={CAROUSEL_THEMES[currentTheme].accent}>{data.title.split(' ').slice(1, 4).join(' ')}</span><br />
+                                                  <span className="text-white/90">{data.title.split(' ').slice(4, 10).join(' ')}</span>
                                                 </h1>
                                               </div>
 
@@ -777,7 +777,7 @@ export default function ScraperPage() {
                                                 
                                                 <div className={cn("h-1 w-32 bg-white/20 mx-auto rounded-full")} />
                                                 
-                                                <p className="text-[120px] font-black italic tracking-tighter leading-none" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+                                                <p className="text-[102px] font-black italic tracking-tighter leading-none drop-shadow-[0_15px_30px_rgba(0,0,0,0.5)]" style={{ fontFamily: "'Montserrat', sans-serif" }}>
                                                   {data.prices.isForSale ? formatCurrency(data.prices.salePrice) : formatCurrency(data.prices.rent)}
                                                 </p>
                                               </div>
@@ -790,7 +790,7 @@ export default function ScraperPage() {
                                               <Building2 className={cn("w-32 h-32", CAROUSEL_THEMES[currentTheme].accent)} />
                                             </div>
                                             <div className="space-y-12 px-12">
-                                              <h2 className="text-[120px] font-black uppercase italic leading-[0.8] tracking-tighter" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+                                              <h2 className="text-[110px] font-black uppercase italic leading-[0.85] tracking-tighter drop-shadow-[0_15px_30px_rgba(0,0,0,0.8)]" style={{ fontFamily: "'Montserrat', sans-serif" }}>
                                                 Gostou deste<br /> <span className={CAROUSEL_THEMES[currentTheme].accent}>Imóvel?</span>
                                               </h2>
                                               <div className="h-2 w-48 bg-white/20 mx-auto rounded-full" />
