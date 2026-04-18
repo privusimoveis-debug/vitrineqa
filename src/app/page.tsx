@@ -166,7 +166,10 @@ export default function ScraperPage() {
     try {
       const downloadPromises = selectedIndices.map(async (index, i) => {
         const img = data.images[index];
-        const response = await fetch(img.url);
+        // Use proxy to avoid CORS issues
+        const proxyUrl = `/api/proxy-image?url=${encodeURIComponent(img.url)}`;
+        const response = await fetch(proxyUrl);
+        if (!response.ok) throw new Error('Proxy fetch failed');
         const blob = await response.blob();
         folder?.file(`foto-${i + 1}.jpg`, blob);
       });
