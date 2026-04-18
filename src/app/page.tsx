@@ -88,16 +88,17 @@ const InstagramSlide = ({ id, theme, children, watermark }: { id: string, theme:
       "w-[1080px] h-[1350px] relative overflow-hidden flex flex-col font-sans text-white bg-black shrink-0",
       theme.from && "bg-gradient-to-br " + theme.from + " " + theme.via + " " + theme.to
     )}
+    style={{ fontFamily: "'Inter', sans-serif" }}
   >
     <div className="absolute inset-0 bg-black/40" />
-    <div className="relative z-10 flex-1 flex flex-col p-16">
+    <div className="relative z-10 flex-1 flex flex-col p-20">
       {children}
     </div>
     
     {/* Watermark */}
-    <div className="absolute bottom-10 right-10 z-20 flex items-center gap-2 bg-black/50 backdrop-blur-md px-6 py-3 rounded-full border border-white/10">
-      <Instagram className="w-5 h-5" />
-      <span className="text-xl font-black tracking-tighter uppercase italic">{watermark}</span>
+    <div className="absolute bottom-12 right-12 z-20 flex items-center gap-3 bg-black/60 backdrop-blur-xl px-8 py-4 rounded-full border border-white/20 shadow-2xl">
+      <Instagram className="w-6 h-6 text-white" />
+      <span className="text-2xl font-black tracking-tighter uppercase italic" style={{ fontFamily: "'Montserrat', sans-serif" }}>{watermark}</span>
     </div>
   </div>
 );
@@ -329,13 +330,30 @@ export default function ScraperPage() {
       
       for (let i = 0; i < slideIds.length; i++) {
         setRenderProgress(Math.round(((i) / slideIds.length) * 100));
+        
+        // Wait for potential UI updates
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
         const element = document.getElementById(slideIds[i]);
         if (!element) continue;
 
+        // Force a brief check for images inside
+        const imgs = element.querySelectorAll('img');
+        await Promise.all(Array.from(imgs).map(img => {
+          if (img.complete) return Promise.resolve();
+          return new Promise(resolve => {
+            img.onload = resolve;
+            img.onerror = resolve;
+          });
+        }));
+
         const blob = await htmlToImage.toBlob(element, { 
-          quality: 1,
-          pixelRatio: 1, // Final 1080x1350
-          cacheBust: true
+          quality: 0.95,
+          pixelRatio: 2, // High DPI for Instagram (2160x2700)
+          cacheBust: true,
+          style: {
+            transform: 'scale(1)',
+          }
         });
         
         if (blob) {
@@ -790,34 +808,51 @@ export default function ScraperPage() {
                                          <div className="absolute inset-0 z-0">
                                             <img 
                                               src={`/api/proxy-image?url=${encodeURIComponent(data.images[0].url)}`} 
-                                              className="w-full h-full object-cover grayscale-[0.2]" 
+                                              className="w-full h-full object-cover scale-105" 
                                               alt="" 
+                                              crossOrigin="anonymous"
                                             />
-                                            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+                                            <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/40 to-black/90" />
                                          </div>
-                                         <div className="relative z-10 h-full flex flex-col justify-center items-center text-center space-y-16">
-                                            <div className={cn("px-10 py-4 rounded-full border-2 font-black uppercase tracking-[0.4em] text-3xl", "border-white " + CAROUSEL_THEMES[currentTheme].bg)}>
+                                         <div className="relative z-10 h-full flex flex-col justify-between items-center text-center py-10">
+                                            <div className={cn("px-12 py-5 rounded-full border-4 font-black uppercase tracking-[0.5em] text-4xl shadow-2xl", "border-white " + CAROUSEL_THEMES[currentTheme].bg)} style={{ fontFamily: "'Montserrat', sans-serif" }}>
                                               {data.prices.isForSale ? "Oportunidade" : "Disponível"}
                                             </div>
-                                            <div className="space-y-4">
-                                              <p className="text-5xl font-black uppercase tracking-widest text-white/60 italic">{data.address.split(',').pop()?.trim() || data.city}</p>
-                                              <h1 className="text-[120px] font-black uppercase italic leading-[0.8] tracking-items block [text-shadow:0_10px_30px_rgba(0,0,0,0.5)]">
-                                                {data.title.split(' ').slice(0, 2).join(' ')}<br />
-                                                <span className={CAROUSEL_THEMES[currentTheme].accent}>{data.title.split(' ').slice(2, 4).join(' ')}</span>
+                                            
+                                            <div className="space-y-6">
+                                              <p className="text-6xl font-black uppercase tracking-[0.3em] text-white/70 italic" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+                                                {data.address.split(',').pop()?.trim() || data.city}
+                                              </p>
+                                              <h1 className="text-[140px] font-[900] uppercase italic leading-[0.75] tracking-tighter block [text-shadow:0_20px_50px_rgba(0,0,0,0.8)]" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+                                                {data.title.split(' ').slice(0, 1).join(' ')}<br />
+                                                <span className={CAROUSEL_THEMES[currentTheme].accent}>{data.title.split(' ').slice(1, 3).join(' ')}</span><br />
+                                                {data.title.split(' ').slice(3, 5).join(' ')}
                                               </h1>
                                             </div>
-                                            <div className="flex flex-col items-center gap-8">
-                                              <div className="h-2 w-48 bg-white/20 rounded-full overflow-hidden">
-                                                <div className={cn("h-full w-2/3", CAROUSEL_THEMES[currentTheme].bg)} />
+
+                                            <div className="w-full space-y-12">
+                                              <div className="flex justify-center items-center gap-16 text-5xl font-black uppercase italic text-white" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+                                                <div className="flex flex-col items-center gap-2">
+                                                  <span className="text-white/40 text-2xl tracking-widest">Área</span>
+                                                  <span>{data.area}m²</span>
+                                                </div>
+                                                <div className="w-[2px] h-16 bg-white/20" />
+                                                <div className="flex flex-col items-center gap-2">
+                                                  <span className="text-white/40 text-2xl tracking-widest">Quartos</span>
+                                                  <span>{data.bedrooms}</span>
+                                                </div>
+                                                <div className="w-[2px] h-16 bg-white/20" />
+                                                <div className="flex flex-col items-center gap-2">
+                                                  <span className="text-white/40 text-2xl tracking-widest">Vagas</span>
+                                                  <span>{data.parking}</span>
+                                                </div>
                                               </div>
-                                              <div className="flex gap-12 text-4xl font-black uppercase italic text-white/50">
-                                                <span>{data.area}m²</span>
-                                                <span>{data.bedrooms} Quartos</span>
-                                                <span>{data.parking} Vagas</span>
+                                              
+                                              <div className={cn("inline-block px-16 py-8 rounded-[3rem] shadow-[0_30px_60px_rgba(0,0,0,0.5)] border-t border-white/20", CAROUSEL_THEMES[currentTheme].bg)}>
+                                                <p className="text-[100px] font-black italic tracking-tighter leading-none" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+                                                  {data.prices.isForSale ? formatCurrency(data.prices.salePrice) : formatCurrency(data.prices.rent)}
+                                                </p>
                                               </div>
-                                              <p className="text-8xl font-black italic tracking-tighter">
-                                                {data.prices.isForSale ? formatCurrency(data.prices.salePrice) : formatCurrency(data.prices.rent)}
-                                              </p>
                                             </div>
                                          </div>
                                       </InstagramSlide>
@@ -830,8 +865,9 @@ export default function ScraperPage() {
                                               src={`/api/proxy-image?url=${encodeURIComponent(data.images[idx]?.url || data.images[0].url)}`} 
                                               className="w-full h-full object-cover" 
                                               alt="" 
+                                              crossOrigin="anonymous"
                                             />
-                                            <div className="absolute inset-0 bg-black/10 shadow-[inset_0_0_200px_rgba(0,0,0,0.8)]" />
+                                            <div className="absolute inset-0 bg-black/10 shadow-[inset_0_0_300px_rgba(0,0,0,0.6)]" />
                                           </div>
                                         </InstagramSlide>
                                       ))}
@@ -839,26 +875,26 @@ export default function ScraperPage() {
                                       {/* SLIDE 8: CTA */}
                                       <InstagramSlide id="slide-8" theme={CAROUSEL_THEMES[currentTheme]} watermark="brunofernandes.corporativo">
                                          <div className="h-full flex flex-col justify-center items-center text-center space-y-24">
-                                            <div className="w-48 h-48 bg-white/5 border border-white/10 rounded-[4rem] flex items-center justify-center mb-10">
-                                              <Building2 className={cn("w-24 h-24", CAROUSEL_THEMES[currentTheme].accent)} />
-                                            </div>
-                                            <div className="space-y-8">
-                                              <h2 className="text-[90px] font-black uppercase italic leading-[0.9] tracking-tighter px-10">
-                                                Gostou deste<br /> <span className={CAROUSEL_THEMES[currentTheme].accent}>Imóvel?</span>
-                                              </h2>
-                                              <div className="h-1 w-32 bg-white/20 mx-auto rounded-full" />
-                                              <p className="text-4xl text-white/60 px-24 font-medium uppercase tracking-widest leading-relaxed">
-                                                Não perca tempo, entre em contato agora mesmo!
-                                              </p>
+                                            <div className="w-56 h-56 bg-white/5 border border-white/10 rounded-[5rem] flex items-center justify-center mb-10 shadow-2xl">
+                                              <Building2 className={cn("w-28 h-28", CAROUSEL_THEMES[currentTheme].accent)} />
                                             </div>
                                             <div className="space-y-10">
+                                              <h2 className="text-[110px] font-black uppercase italic leading-[0.85] tracking-tighter px-10" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+                                                Gostou deste<br /> <span className={CAROUSEL_THEMES[currentTheme].accent}>Imóvel?</span>
+                                              </h2>
+                                              <div className="h-2 w-48 bg-white/20 mx-auto rounded-full" />
+                                              <p className="text-5xl text-white/50 px-24 font-medium uppercase tracking-[0.2em] leading-relaxed">
+                                                Toque no botão e fale direto comigo!
+                                              </p>
+                                            </div>
+                                            <div className="space-y-12">
                                                <div className="flex flex-col items-center gap-4">
-                                                <div className="flex items-center gap-6 bg-white text-black px-12 py-8 rounded-[3rem] shadow-2xl">
-                                                  <Instagram className="w-10 h-10" />
-                                                  <span className="text-5xl font-black">WhatsApp</span>
+                                                <div className="flex items-center gap-8 bg-white text-black px-16 py-10 rounded-[4rem] shadow-2xl">
+                                                  <Instagram className="w-12 h-12" />
+                                                  <span className="text-6xl font-black uppercase tracking-tight" style={{ fontFamily: "'Montserrat', sans-serif" }}>WhatsApp</span>
                                                 </div>
                                                </div>
-                                               <p className="text-[70px] font-black italic tracking-tight underline decoratio-blue-500">
+                                               <p className="text-[90px] font-black italic tracking-tight text-white border-b-8 border-blue-500 pb-4 inline-block" style={{ fontFamily: "'Montserrat', sans-serif" }}>
                                                  31 97336 2545
                                                </p>
                                             </div>

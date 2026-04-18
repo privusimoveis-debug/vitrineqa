@@ -9,6 +9,8 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@fontsource/inter": "^5.2.8",
+    "@fontsource/montserrat": "^5.2.8",
     "@supabase/supabase-js": "^2.103.3",
     "axios": "^1.15.0",
     "clsx": "^2.1.1",
