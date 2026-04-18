@@ -769,72 +769,116 @@ export default function ScraperPage() {
                                     <div id="capture-target" className="bg-black">
                                        <InstagramSlide theme={ELITE_GRADIENTS[gradientIndex]} watermark="brunofernandes.corporativo">
                                           {activeCaptureIndex === 0 ? (
-                                            <div className="h-full flex flex-col justify-between">
-                                              {/* Background Photo with High-End Blend */}
-                                              <div className="absolute inset-0 z-0">
-                                                <img 
-                                                  src={preloadedImages[0]} 
-                                                  className="w-full h-full object-cover brightness-[0.75] contrast-[1.1]" 
-                                                />
-                                                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
-                                              </div>
+                                                             <div style={{ width: '100%', height: '100%', position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', overflow: 'hidden' }}>
+                                              {/* BG Photo */}
+                                              <img
+                                                src={preloadedImages[0]}
+                                                style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
+                                              />
+                                              {/* Warm Overlay - gradient per theme */}
+                                              {(() => {
+                                                const overlays = [
+                                                  'rgba(220,38,38,0.72)',   // Midnight → Red
+                                                  'rgba(5,150,105,0.72)',   // Emerald
+                                                  'rgba(190,18,60,0.72)',   // Rose
+                                                  'rgba(217,119,6,0.72)',   // Amber
+                                                  'rgba(109,40,217,0.72)',  // Violet
+                                                  'rgba(51,65,85,0.72)',    // Slate
+                                                ];
+                                                return <div style={{ position: 'absolute', inset: 0, background: overlays[gradientIndex], zIndex: 1 }} />;
+                                              })()}
 
-                                              {/* Content Overlays */}
-                                              <div className="relative z-10 flex flex-col h-full justify-between py-10 px-4">
-                                                <div className="flex flex-col gap-4">
-                                                  <div className="inline-flex self-start px-8 py-3 bg-blue-600/90 text-white font-black uppercase tracking-[0.4em] text-3xl italic shadow-2xl">
-                                                    {data.prices.isForSale ? "Oportunidade" : "Aluguel VIP"}
+                                              {/* ALL CONTENT - centered column */}
+                                              <div style={{ position: 'relative', zIndex: 2, width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '60px', padding: '80px 70px', boxSizing: 'border-box' }}>
+
+                                                {/* 1. PILL BADGE - Bairro */}
+                                                {(() => {
+                                                  const pillGradients = [
+                                                    'linear-gradient(90deg, #f59e0b, #ef4444)',   // Midnight
+                                                    'linear-gradient(90deg, #fbbf24, #f59e0b)',   // Emerald
+                                                    'linear-gradient(90deg, #f59e0b, #a21caf)',   // Rose
+                                                    'linear-gradient(90deg, #ef4444, #f97316)',   // Amber
+                                                    'linear-gradient(90deg, #8b5cf6, #ec4899)',   // Violet
+                                                    'linear-gradient(90deg, #f59e0b, #f97316)',   // Slate
+                                                  ];
+                                                  const neighborhood = data.address.split(',').length > 1
+                                                    ? data.address.split(',')[data.address.split(',').length - 2].trim()
+                                                    : data.city;
+                                                  return (
+                                                    <div style={{ background: pillGradients[gradientIndex], borderRadius: '100px', padding: '28px 80px', border: '6px solid rgba(255,255,255,0.3)', boxShadow: '0 20px 60px rgba(0,0,0,0.4)' }}>
+                                                      <span style={{ fontFamily: "'Montserrat', sans-serif", fontSize: '68px', fontWeight: 900, color: '#1a1a1a', letterSpacing: '0.05em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
+                                                        {neighborhood.toUpperCase()}
+                                                      </span>
+                                                    </div>
+                                                  );
+                                                })()}
+
+                                                {/* 2. MAIN TITLE */}
+                                                <div style={{ textAlign: 'center', lineHeight: 1.0 }}>
+                                                  <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: '195px', fontWeight: 900, color: '#ffffff', textTransform: 'uppercase', letterSpacing: '-0.02em', textShadow: '0 8px 40px rgba(0,0,0,0.8)', lineHeight: 0.9 }}>
+                                                    {data.prices.isForSale ? 'Apartamento' : 'Apartamento'}
                                                   </div>
-                                                  <p className="text-4xl font-black uppercase tracking-[0.3em] text-white/60 italic drop-shadow-lg" style={{ fontFamily: "'Montserrat', sans-serif" }}>
-                                                    {data.address.split(',').pop()?.trim() || data.city}
-                                                  </p>
+                                                  <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: '195px', fontWeight: 900, color: '#fde68a', textTransform: 'uppercase', letterSpacing: '-0.02em', textShadow: '0 8px 40px rgba(0,0,0,0.8)', lineHeight: 0.9 }}>
+                                                    {data.prices.isForSale ? 'à Venda' : 'Disponível'}
+                                                  </div>
                                                 </div>
 
-                                                <div className="flex flex-col gap-12">
-                                                  <div className="space-y-4">
-                                                    <h1 className="text-[120px] font-[900] uppercase italic leading-[0.85] tracking-tighter drop-shadow-[0_20px_60px_rgba(0,0,0,1)] text-white" style={{ fontFamily: "'Montserrat', sans-serif" }}>
-                                                      {data.title.split(' ').slice(0, 1).join(' ')}<br />
-                                                      <span className={ELITE_GRADIENTS[gradientIndex].accent}>{data.title.split(' ').slice(1, 4).join(' ')}</span><br />
-                                                      <span className="text-white/90">{data.title.split(' ').slice(4, 10).join(' ')}</span>
-                                                    </h1>
-                                                  </div>
-
-                                                  <div className="w-full bg-white/5 backdrop-blur-[40px] border border-white/10 p-16 space-y-12 shadow-2xl">
-                                                    <div className="flex justify-between items-center text-5xl font-black uppercase italic text-white" style={{ fontFamily: "'Montserrat', sans-serif" }}>
-                                                      <div className="flex flex-col items-center gap-3">
-                                                        <Maximize2 className="w-12 h-12 text-white/40" />
-                                                        <span>{data.area}m²</span>
+                                                {/* 3. INFO BOX */}
+                                                {(() => {
+                                                  const infoBg = [
+                                                    'linear-gradient(135deg, #b91c1c, #7f1d1d)',
+                                                    'linear-gradient(135deg, #065f46, #064e3b)',
+                                                    'linear-gradient(135deg, #9d174d, #4c0519)',
+                                                    'linear-gradient(135deg, #92400e, #78350f)',
+                                                    'linear-gradient(135deg, #5b21b6, #3b0764)',
+                                                    'linear-gradient(135deg, #1e293b, #0f172a)',
+                                                  ];
+                                                  return (
+                                                    <div style={{ background: infoBg[gradientIndex], borderRadius: '40px', padding: '50px 70px', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-around', border: '5px solid rgba(255,255,255,0.2)', boxShadow: '0 30px 80px rgba(0,0,0,0.5)', gap: '20px' }}>
+                                                      <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+                                                        <span style={{ fontSize: '80px' }}>📏</span>
+                                                        <span style={{ fontFamily: "'Montserrat', sans-serif", fontSize: '80px', fontWeight: 900, color: '#fde68a', whiteSpace: 'nowrap' }}>{data.area}m²</span>
                                                       </div>
-                                                      <div className="w-[2px] h-20 bg-white/10" />
-                                                      <div className="flex flex-col items-center gap-3">
-                                                        <Bed className="w-12 h-12 text-white/40" />
-                                                        <span>{data.bedrooms} Qts</span>
+                                                      <div style={{ width: '6px', height: '100px', background: 'rgba(255,255,255,0.2)', borderRadius: '3px', flexShrink: 0 }} />
+                                                      <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+                                                        <span style={{ fontSize: '80px' }}>🛏</span>
+                                                        <span style={{ fontFamily: "'Montserrat', sans-serif", fontSize: '80px', fontWeight: 900, color: '#fde68a', whiteSpace: 'nowrap' }}>{data.bedrooms} Qts</span>
                                                       </div>
-                                                      <div className="w-[2px] h-20 bg-white/10" />
-                                                      <div className="flex flex-col items-center gap-3">
-                                                        <Car className="w-12 h-12 text-white/40" />
-                                                        <span>{data.parking} Vagas</span>
+                                                      <div style={{ width: '6px', height: '100px', background: 'rgba(255,255,255,0.2)', borderRadius: '3px', flexShrink: 0 }} />
+                                                      <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+                                                        <span style={{ fontSize: '80px' }}>🚗</span>
+                                                        <span style={{ fontFamily: "'Montserrat', sans-serif", fontSize: '80px', fontWeight: 900, color: '#fde68a', whiteSpace: 'nowrap' }}>{data.parking} Vaga{data.parking !== 1 ? 's' : ''}</span>
                                                       </div>
                                                     </div>
-                                                    
-                                                    <div className="flex items-center gap-8 pt-4">
-                                                      <div className="h-1 flex-1 bg-white/10 rounded-full" />
-                                                      <p className="text-[105px] font-black italic tracking-tighter leading-none text-white drop-shadow-2xl" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+                                                  );
+                                                })()}
+
+                                                {/* 4. PRICE BOX */}
+                                                {(() => {
+                                                  const priceBg = [
+                                                    'linear-gradient(135deg, #4c1d95, #1e1b4b)',
+                                                    'linear-gradient(135deg, #14532d, #052e16)',
+                                                    'linear-gradient(135deg, #4a044e, #1a0533)',
+                                                    'linear-gradient(135deg, #7c2d12, #431407)',
+                                                    'linear-gradient(135deg, #2d1b69, #12054a)',
+                                                    'linear-gradient(135deg, #0f172a, #020617)',
+                                                  ];
+                                                  return (
+                                                    <div style={{ background: priceBg[gradientIndex], borderRadius: '40px', padding: '45px 80px', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '5px solid rgba(255,255,255,0.15)', boxShadow: '0 30px 80px rgba(0,0,0,0.6)' }}>
+                                                      <span style={{ fontFamily: "'Montserrat', sans-serif", fontSize: '140px', fontWeight: 900, color: '#fde68a', letterSpacing: '-0.04em', textShadow: '0 4px 20px rgba(0,0,0,0.5)', whiteSpace: 'nowrap' }}>
                                                         {data.prices.isForSale ? formatCurrency(data.prices.salePrice) : formatCurrency(data.prices.rent)}
-                                                      </p>
-                                                      <div className="h-1 flex-1 bg-white/10 rounded-full" />
+                                                      </span>
                                                     </div>
-                                                  </div>
-                                                </div>
+                                                  );
+                                                })()}
+
                                               </div>
-                                            </div>
+                                             </div>
                                           ) : activeCaptureIndex === 7 ? (
                                             <div className="h-full flex flex-col justify-center items-center text-center space-y-32 relative z-10 px-10">
-                                              <div className="w-64 h-64 bg-white/5 backdrop-blur-3xl border border-white/10 rounded-full flex items-center justify-center shadow-2xl relative overflow-hidden group">
-                                                <div className={cn("absolute inset-0 opacity-20 bg-gradient-to-tr", ELITE_GRADIENTS[gradientIndex].from, ELITE_GRADIENTS[gradientIndex].to)} />
-                                                <Building2 className={cn("w-32 h-32 relative z-10", ELITE_GRADIENTS[gradientIndex].accent)} />
+                                              <div className="w-64 h-64 bg-white/5 backdrop-blur-3xl border border-white/10 rounded-full flex items-center justify-center shadow-2xl">
+                                                <Building2 className={cn("w-32 h-32", ELITE_GRADIENTS[gradientIndex].accent)} />
                                               </div>
-                                              
                                               <div className="space-y-12">
                                                 <h2 className="text-[110px] font-black uppercase italic leading-[0.85] tracking-tighter drop-shadow-[0_20px_50px_rgba(0,0,0,0.8)]" style={{ fontFamily: "'Montserrat', sans-serif" }}>
                                                   Gostou deste<br /> <span className={ELITE_GRADIENTS[gradientIndex].accent}>Imóvel?</span>
@@ -843,15 +887,13 @@ export default function ScraperPage() {
                                                   Toque no botão abaixo e fale direto comigo no WhatsApp!
                                                 </p>
                                               </div>
-
                                               <div className="space-y-16 w-full">
-                                                 <div className="bg-white text-black px-24 py-14 rounded-full shadow-[0_30px_60px_rgba(0,0,0,0.5)] flex items-center justify-center gap-10 hover:scale-105 transition-transform">
+                                                 <div className="bg-white text-black px-24 py-14 rounded-full shadow-[0_30px_60px_rgba(0,0,0,0.5)] flex items-center justify-center gap-10">
                                                    <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center">
                                                      <Instagram className="w-10 h-10 text-white" />
                                                    </div>
                                                    <span className="text-8xl font-black uppercase tracking-tighter" style={{ fontFamily: "'Montserrat', sans-serif" }}>WhatsApp</span>
                                                  </div>
-                                                 
                                                  <p className="text-[110px] font-black italic tracking-tighter text-white/90 bg-white/5 border border-white/10 px-12 py-4 rounded-3xl inline-block" style={{ fontFamily: "'Montserrat', sans-serif" }}>
                                                    31 97336 2545
                                                  </p>
