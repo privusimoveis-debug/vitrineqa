@@ -6,7 +6,8 @@ import {
   Search, MapPin, Maximize2, Bed, Bath, Car, 
   ArrowRight, Loader2, Image as ImageIcon, 
   CheckCircle2, Building2, 
-  Share2, Heart, ExternalLink, TrendingUp, Tag
+  Share2, Heart, ExternalLink, TrendingUp, Tag,
+  Info, ShieldCheck, Home
 } from 'lucide-react';
 import axios from 'axios';
 import { clsx, type ClassValue } from 'clsx';
@@ -38,7 +39,8 @@ interface PropertyData {
     total: number;
     isForSale: boolean;
   };
-  amenities: string[];
+  unitAmenities: string[];
+  buildingAmenities: string[];
 }
 
 // --- Animations ---
@@ -224,44 +226,42 @@ export default function Home() {
                 </div>
               </motion.div>
 
-              {/* Grid System */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-                {/* Left: Info Grid */}
-                <div className="lg:col-span-12 grid grid-cols-1 md:grid-cols-3 gap-10">
-                  
-                  {/* Bento - Specification */}
-                  <div className="md:col-span-2 grid grid-cols-2 lg:grid-cols-4 gap-6">
-                    <div className="bg-white/5 border border-white/10 p-8 rounded-[2.5rem] flex flex-col justify-between group hover:border-blue-500/50 transition-all duration-500 shadow-inner">
-                      <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center group-hover:bg-blue-500 transition-all duration-500">
-                        <Building2 className="w-6 h-6 text-blue-500 group-hover:text-white transition-colors" />
+              {/* Stats Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                 <div className="bg-white/5 border border-white/10 p-8 rounded-[2rem] flex flex-col justify-between group hover:border-blue-500/50 transition-all duration-500">
+                    <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-blue-500">
+                      <Home className="w-5 h-5" />
+                    </div>
+                    <div className="mt-6">
+                      <p className="text-white/30 text-[10px] font-black uppercase tracking-widest">Imóvel</p>
+                      <p className="text-xl font-black mt-1 tracking-tighter uppercase">{data.type}</p>
+                    </div>
+                  </div>
+                  {[
+                    { icon: Maximize2, label: 'Área', value: `${data.area} m²` },
+                    { icon: Bed, label: 'Quartos', value: data.bedrooms },
+                    { icon: Bath, label: 'Banheiros', value: data.bathrooms },
+                    { icon: Car, label: 'Vagas', value: data.parking },
+                  ].map((stat, i) => (
+                    <div key={i} className="bg-white/5 border border-white/10 p-8 rounded-[2rem] flex flex-col justify-between group hover:border-blue-500/50 transition-all duration-500">
+                      <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-blue-500">
+                        <stat.icon className="w-5 h-5" />
                       </div>
-                      <div className="mt-8">
-                        <p className="text-white/30 text-[10px] font-black uppercase tracking-widest">Imóvel</p>
-                        <p className="text-2xl font-black mt-2 tracking-tighter uppercase">{data.type}</p>
+                      <div className="mt-6">
+                        <p className="text-white/30 text-[10px] font-black uppercase tracking-widest">{stat.label}</p>
+                        <p className="text-3xl font-black mt-1 tracking-tighter">{stat.value}</p>
                       </div>
                     </div>
-                    {[
-                      { icon: Maximize2, label: 'Área', value: `${data.area} m²` },
-                      { icon: Bed, label: 'Quartos', value: data.bedrooms },
-                      // If it's more than 1 bath or garage, pluralize is handled by value anyway
-                      { icon: Bath, label: 'Banheiros', value: data.bathrooms },
-                      { icon: Car, label: 'Vagas', value: data.parking },
-                    ].map((stat, i) => (
-                      <div key={i} className="bg-white/5 border border-white/10 p-8 rounded-[2.5rem] flex flex-col justify-between group hover:border-blue-500/50 transition-all duration-500 shadow-inner">
-                        <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center group-hover:bg-blue-500 transition-all duration-500">
-                          <stat.icon className="w-6 h-6 text-blue-500 group-hover:text-white transition-colors" />
-                        </div>
-                        <div className="mt-8">
-                          <p className="text-white/30 text-[10px] font-black uppercase tracking-widest">{stat.label}</p>
-                          <p className="text-3xl font-black mt-2 tracking-tighter">{stat.value}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                  ))}
+              </div>
 
-                  {/* Bento - Investment Card */}
-                  <div className="md:col-span-1 bg-gradient-to-br from-blue-700 to-blue-900 border border-blue-500/30 p-10 rounded-[3rem] flex flex-col justify-between shadow-2xl relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 blur-3xl rounded-full -mr-20 -mt-20 group-hover:bg-white/20 transition-all duration-1000"></div>
+              {/* Main Content: Investment + Description + Amenities */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+                
+                {/* Investment Side Card */}
+                <div className="lg:col-span-4 h-fit sticky top-24">
+                   <div className="bg-gradient-to-br from-blue-700 to-blue-900 border border-blue-500/30 p-10 rounded-[3rem] flex flex-col justify-between shadow-2xl relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 blur-3xl rounded-full -mr-20 -mt-20"></div>
                     <div className="relative space-y-8">
                       <div className="flex justify-between items-center">
                         <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center">
@@ -295,61 +295,91 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* Bottom Part: Short Info & Gallery */}
-                <div className="lg:col-span-4 space-y-10">
-                  <div className="bg-white/5 border border-white/10 p-10 rounded-[3rem] space-y-10 shadow-inner">
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center text-blue-500">
-                        <TrendingUp className="w-5 h-5" />
-                      </div>
-                      <h3 className="text-xl font-black uppercase tracking-tighter italic">Descrição</h3>
-                    </div>
-                    <p className="text-white/50 text-lg leading-relaxed font-medium italic">
-                      "{data.description || 'Nenhuma descrição fornecida.'}"
-                    </p>
-                    <div className="grid grid-cols-1 gap-4 pt-4">
-                      {data.amenities.slice(0, 10).map((amenity, i) => (
-                        <div key={i} className="flex items-center gap-4 text-white/60 group">
-                          <CheckCircle2 className="w-5 h-5 text-blue-500 group-hover:scale-110 transition-transform" />
-                          <span className="text-sm font-bold tracking-tight">{amenity}</span>
+                {/* Info Blocks Side */}
+                <div className="lg:col-span-8 space-y-12">
+                  
+                  {/* Descrição Section */}
+                  <div className="bg-white/5 border border-white/10 p-10 rounded-[3rem] space-y-8">
+                     <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center text-blue-500">
+                          <TrendingUp className="w-5 h-5" />
                         </div>
+                        <h3 className="text-2xl font-black uppercase tracking-tighter">Descrição</h3>
+                     </div>
+                     <p className="text-white/60 text-lg leading-relaxed font-medium whitespace-pre-wrap">
+                        {data.description || 'Nenhuma descrição detalhada disponível.'}
+                     </p>
+                  </div>
+
+                  {/* Imóvel Amenities Section */}
+                  <div className="bg-white/5 border border-white/10 p-10 rounded-[3rem] space-y-8">
+                     <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center text-blue-500">
+                          <Info className="w-5 h-5" />
+                        </div>
+                        <h3 className="text-2xl font-black uppercase tracking-tighter">Imóvel</h3>
+                     </div>
+                     <div className="flex flex-wrap gap-3">
+                        {data.unitAmenities.length > 0 ? data.unitAmenities.map((amenity, i) => (
+                           <div key={i} className="bg-white/5 border border-white/10 px-5 py-2 rounded-2xl text-sm font-bold text-white/70">
+                              {amenity}
+                           </div>
+                        )) : <p className="text-white/30 italic">Nenhuma característica específica listada.</p>}
+                     </div>
+                  </div>
+
+                  {/* Condomínio Amenities Section */}
+                  <div className="bg-white/5 border border-white/10 p-10 rounded-[3rem] space-y-8">
+                     <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center text-blue-500">
+                          <ShieldCheck className="w-5 h-5" />
+                        </div>
+                        <h3 className="text-2xl font-black uppercase tracking-tighter">Condomínio</h3>
+                     </div>
+                     <div className="flex flex-wrap gap-3">
+                        {data.buildingAmenities.length > 0 ? data.buildingAmenities.map((amenity, i) => (
+                           <div key={i} className="bg-white/5 border border-white/10 px-5 py-2 rounded-2xl text-sm font-bold text-white/70">
+                              {amenity}
+                           </div>
+                        )) : <p className="text-white/30 italic">Características do condomínio não informadas.</p>}
+                     </div>
+                  </div>
+
+                  {/* Gallery */}
+                  <div className="space-y-12 pt-10">
+                    <div className="flex items-center gap-6">
+                        <h3 className="text-4xl font-black tracking-tight uppercase italic mix-blend-difference">Galeria de Fotos</h3>
+                        <div className="h-[2px] flex-1 bg-white/10"></div>
+                        <span className="text-white/20 font-black text-xs tracking-[0.3em]">{data.images.length} FOTOS</span>
+                    </div>
+                    
+                    <div className="columns-1 md:columns-2 gap-8 space-y-8">
+                      {data.images.map((img, i) => (
+                        <motion.div 
+                          key={i} 
+                          initial={{ opacity: 0, scale: 0.95 }}
+                          whileInView={{ opacity: 1, scale: 1 }}
+                          viewport={{ once: true }}
+                          className="relative group overflow-hidden rounded-[2.5rem] border border-white/10 shadow-2xl cursor-zoom-in"
+                        >
+                          <img 
+                            src={img.url} 
+                            alt={img.subtitle || 'Foto do imóvel'}
+                            className="w-full h-auto object-cover transition-transform duration-1000 group-hover:scale-110"
+                            loading="lazy"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 p-8 flex flex-col justify-end">
+                              <span className="text-blue-500 text-[10px] font-black uppercase tracking-widest mb-2">Ambiente • {i + 1}</span>
+                              <p className="text-white font-black text-xl tracking-tight leading-none uppercase italic">
+                                {img.subtitle || 'Detalhe do Imóvel'}
+                              </p>
+                          </div>
+                        </motion.div>
                       ))}
                     </div>
                   </div>
                 </div>
 
-                <div className="lg:col-span-8 space-y-12">
-                   <div className="flex items-center gap-6">
-                      <h3 className="text-4xl font-black tracking-tight uppercase italic mix-blend-difference">Galeria de Fotos</h3>
-                      <div className="h-[2px] flex-1 bg-white/10"></div>
-                      <span className="text-white/20 font-black text-xs tracking-[0.3em]">{data.images.length} FOTOS</span>
-                   </div>
-                   
-                   <div className="columns-1 md:columns-2 gap-8 space-y-8">
-                     {data.images.map((img, i) => (
-                       <motion.div 
-                         key={i} 
-                         initial={{ opacity: 0, scale: 0.95 }}
-                         whileInView={{ opacity: 1, scale: 1 }}
-                         viewport={{ once: true }}
-                         className="relative group overflow-hidden rounded-[2.5rem] border border-white/10 shadow-2xl cursor-zoom-in"
-                       >
-                         <img 
-                           src={img.url} 
-                           alt={img.subtitle || 'Foto do imóvel'}
-                           className="w-full h-auto object-cover transition-transform duration-1000 group-hover:scale-110"
-                           loading="lazy"
-                         />
-                         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 p-8 flex flex-col justify-end">
-                            <span className="text-blue-500 text-[10px] font-black uppercase tracking-widest mb-2">Ambiente • {i + 1}</span>
-                            <p className="text-white font-black text-xl tracking-tight leading-none uppercase italic">
-                              {img.subtitle || 'Detalhe do Imóvel'}
-                            </p>
-                         </div>
-                       </motion.div>
-                     ))}
-                   </div>
-                </div>
               </div>
             </motion.div>
           ) : (

@@ -33,12 +33,12 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Property data not found in page' }, { status: 404 });
     }
 
-    // Process and clean the data
-    const isForSale = !!propertyData.salePrice && propertyData.salePrice > 0;
-    const type = propertyData.type || 'Imóvel';
-    
-    // Construct descriptive title in PT-BR
-    const dynamicTitle = `${type} à ${isForSale ? 'venda' : 'aluguel'} com ${propertyData.totalArea}m², ${propertyData.bedrooms} quartos e ${propertyData.parkingSlots} vagas`;
+    // Helper function to find groups by title
+    const findGroup = (title: string) => propertyData.descriptions?.find((g: any) => g.title?.toLowerCase() === title.toLowerCase());
+
+    const descriptionGroup = findGroup('Descrição');
+    const unitGroup = findGroup('Imóvel');
+    const buildingGroup = findGroup('Condominio') || findGroup('Condomínio');
 
     const cleanedData = {
       id: propertyData.id,
@@ -52,7 +52,7 @@ export async function POST(req: Request) {
       bedrooms: propertyData.bedrooms,
       bathrooms: propertyData.bathrooms,
       parking: propertyData.parkingSlots,
-      description: propertyData.description,
+      description: typeof descriptionGroup?.item === 'string' ? descriptionGroup.item : (propertyData.description || ''),
       images: propertyData.images?.map((img: any) => ({
         url: img.url.startsWith('//') ? `https:${img.url}` : img.url,
         subtitle: img.subtitle
@@ -65,7 +65,9 @@ export async function POST(req: Request) {
         total: propertyData.totalCost || propertyData.total || 0,
         isForSale: isForSale
       },
-      amenities: propertyData.amenities || []
+      // Segmented amenities
+      unitAmenities: unitGroup?.item?.filter((i: any) => i.value === 'SIM').map((i: any) => i.text) || [],
+      buildingAmenities: buildingGroup?.item?.filter((i: any) => i.value === 'SIM').map((i: any) => i.text) || []
     };
 
     return NextResponse.json(cleanedData);
