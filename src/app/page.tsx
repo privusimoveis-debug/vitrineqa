@@ -129,6 +129,11 @@ export default function ScraperPage() {
   const [isUnitExpanded, setIsUnitExpanded] = useState(false);
   const [isBuildingExpanded, setIsBuildingExpanded] = useState(false);
 
+  // Stage 3 Specific
+  const [caption, setCaption] = useState('');
+  const [isGeneratingCaption, setIsGeneratingCaption] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
+
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
@@ -151,6 +156,10 @@ export default function ScraperPage() {
     setIsDescExpanded(false);
     setIsUnitExpanded(false);
     setIsBuildingExpanded(false);
+
+    // Reset Stage 3
+    setCaption('');
+    setIsCopied(false);
 
     try {
       const response = await axios.post('/api/scrape', { url });
@@ -211,6 +220,46 @@ export default function ScraperPage() {
         ? prev.filter(i => i !== index) 
         : [...prev, index]
     );
+  };
+
+  const handleCopyCaption = () => {
+    navigator.clipboard.writeText(caption);
+    setIsCopied(true);
+    setTimeout(() => setIsCopied(false), 2000);
+  };
+
+  const handleGenerateCaption = async () => {
+    if (!data) return;
+
+    setIsGeneratingCaption(true);
+    
+    // Simulate complex AI thinking
+    await new Promise(resolve => setTimeout(resolve, 1500));
+
+    const bairro = data.address.split(',').pop()?.trim() || data.city;
+    const price = data.prices.isForSale ? formatCurrency(data.prices.salePrice) : formatCurrency(data.prices.rent);
+    
+    const lines = [
+      `${bairro} - ${data.title}`,
+      "",
+      `Oportunidade exclusiva de ${data.prices.isForSale ? 'Venda' : 'Aluguel'} em ${data.city}! 🏠✨`,
+      "",
+      `📐 ${data.area}m² privativos`,
+      `🛏️ ${data.bedrooms} Dormitórios`,
+      `🛁 ${data.bathrooms} Banheiros`,
+      `🚗 ${data.parking} Vagas de garagem`,
+      "",
+      `💰 Investimento: ${price}`,
+      "",
+      data.description.length > 100 ? data.description.substring(0, 150) + "..." : data.description,
+      "",
+      "Agende sua visita e venha conhecer este imóvel incrível. 🚀",
+      "",
+      `#imobiliaria #corretor #imoveis #quintoandar #vitrineqa #${data.city.replace(/\s+/g, '')} #${data.type.replace(/\s+/g, '')}`
+    ];
+
+    setCaption(lines.join('\n'));
+    setIsGeneratingCaption(false);
   };
 
   const formatCurrency = (value: number) => {
@@ -575,20 +624,60 @@ export default function ScraperPage() {
                     >
                       <motion.div 
                         variants={itemVariants}
-                        className="bg-white/5 border border-white/10 rounded-3xl md:rounded-[4rem] p-8 md:p-16 flex flex-col md:flex-row items-center justify-between gap-8 md:gap-12 group hover:border-blue-500/30 transition-all duration-700"
+                        className="grid grid-cols-1 lg:grid-cols-12 gap-10"
                       >
-                        <div className="space-y-4 md:space-y-6 text-center md:text-left">
-                          <div className="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-tr from-pink-500/20 to-purple-500/20 border border-pink-500/30 rounded-2xl md:rounded-[2rem] flex items-center justify-center group-hover:scale-110 transition-transform duration-700 mx-auto md:mx-0">
-                             <Instagram className="w-8 h-8 md:w-10 md:h-10 text-pink-500" />
+                        {/* Caption Editor */}
+                        <div className="lg:col-span-7 bg-white/5 border border-white/10 rounded-[3rem] p-10 flex flex-col gap-8">
+                          <div className="flex justify-between items-center">
+                            <h4 className="text-2xl font-black tracking-tighter uppercase italic flex items-center gap-3">
+                              <Sparkles className="w-6 h-6 text-blue-500" /> Legenda do Post
+                            </h4>
+                            <button 
+                              onClick={handleGenerateCaption}
+                              disabled={isGeneratingCaption}
+                              className="bg-blue-600 hover:bg-blue-500 disabled:opacity-30 text-white px-6 py-3 rounded-2xl font-black uppercase text-[10px] tracking-widest transition-all flex items-center gap-2"
+                            >
+                              {isGeneratingCaption ? <Loader2 className="w-4 h-4 animate-spin" /> : "Gerar com IA"}
+                            </button>
                           </div>
-                          <h4 className="text-2xl md:text-4xl font-black tracking-tighter uppercase italic">Postagem Instagram</h4>
-                          <p className="text-white/40 text-base md:text-xl font-medium max-w-lg">
-                            Transforme automaticamente os dados deste imóvel em Stories e Feed de alta conversão.
-                          </p>
+
+                          <div className="relative group flex-1 min-h-[300px]">
+                            <textarea
+                              value={caption}
+                              onChange={(e) => setCaption(e.target.value)}
+                              placeholder="Clique em 'Gerar com IA' para criar sua legenda perfeita..."
+                              className="w-full h-full bg-black/40 border border-white/5 rounded-[2rem] p-8 text-white/70 text-base font-medium resize-none focus:outline-none focus:border-blue-500/50 transition-all custom-scrollbar"
+                            />
+                            {caption && (
+                              <button 
+                                onClick={handleCopyCaption}
+                                className={cn(
+                                  "absolute bottom-6 right-6 px-6 py-4 rounded-xl font-black uppercase text-[10px] tracking-widest transition-all flex items-center gap-2 shadow-2xl",
+                                  isCopied ? "bg-green-500 text-white" : "bg-white text-black hover:bg-zinc-200"
+                                )}
+                              >
+                                {isCopied ? <Check className="w-4 h-4" /> : <Share2 className="w-4 h-4" />}
+                                {isCopied ? "Copiado!" : "Copiar Legenda"}
+                              </button>
+                            )}
+                          </div>
                         </div>
-                        <button className="w-full md:w-auto bg-white/5 border border-white/10 text-white/40 px-8 md:px-12 py-6 md:py-8 rounded-2xl md:rounded-[2rem] font-black uppercase text-xs md:text-sm tracking-widest flex items-center justify-center gap-4 cursor-not-allowed group-hover:bg-white group-hover:text-black transition-all">
-                          Configurar Postagem <Sparkles className="w-4 h-4 md:w-5 md:h-5" />
-                        </button>
+
+                        {/* Carousel Placeholder (Future Step) */}
+                        <div className="lg:col-span-5 bg-white/5 border border-white/10 rounded-[3rem] p-10 flex flex-col justify-between group hover:border-blue-500/30 transition-all duration-700">
+                           <div className="space-y-6">
+                              <div className="w-16 h-16 bg-gradient-to-tr from-pink-500/20 to-purple-500/20 border border-pink-500/30 rounded-[1.5rem] flex items-center justify-center group-hover:scale-110 transition-transform duration-700">
+                                 <Instagram className="w-8 h-8 text-pink-500" />
+                              </div>
+                              <h4 className="text-2xl font-black tracking-tighter uppercase italic">Imagens do Carrossel</h4>
+                              <p className="text-white/40 text-sm font-medium">
+                                Próxima Fase: Gerar automaticamente os slides profissionais para o seu feed.
+                              </p>
+                           </div>
+                           <button className="w-full bg-white/5 border border-white/10 text-white/20 px-8 py-6 rounded-2xl font-black uppercase text-xs tracking-widest cursor-not-allowed">
+                             Em breve <Sparkles className="w-4 h-4" />
+                           </button>
+                        </div>
                       </motion.div>
                     </motion.div>
                   )}
