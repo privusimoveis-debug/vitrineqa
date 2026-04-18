@@ -16,6 +16,7 @@ import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
+import * as htmlToImage from 'html-to-image';
 
 // --- Utility ---
 function cn(...inputs: ClassValue[]) {
@@ -67,6 +68,39 @@ const itemVariants = {
     transition: { type: 'spring' as const, damping: 25, stiffness: 100 }
   }
 };
+
+// --- Carousel Themes ---
+const CAROUSEL_THEMES = {
+  azure: { name: 'Azure', from: 'from-blue-600', via: 'via-blue-800', to: 'to-black', accent: 'text-blue-400', bg: 'bg-blue-600', shadow: 'shadow-blue-500/20' },
+  gold: { name: 'Gold', from: 'from-amber-500', via: 'via-amber-800', to: 'to-black', accent: 'text-amber-400', bg: 'bg-amber-500', shadow: 'shadow-amber-500/20' },
+  emerald: { name: 'Emerald', from: 'from-emerald-600', via: 'via-emerald-900', to: 'to-black', accent: 'text-emerald-400', bg: 'bg-emerald-600', shadow: 'shadow-emerald-500/20' },
+  ruby: { name: 'Ruby', from: 'from-red-600', via: 'via-red-900', to: 'to-black', accent: 'text-red-400', bg: 'bg-red-600', shadow: 'shadow-red-500/20' },
+  obsidian: { name: 'Obsidian', from: 'from-zinc-700', via: 'via-zinc-900', to: 'to-black', accent: 'text-zinc-400', bg: 'bg-zinc-700', shadow: 'shadow-zinc-500/20' },
+};
+
+type ThemeKey = keyof typeof CAROUSEL_THEMES;
+
+// --- Slide Component ---
+const InstagramSlide = ({ id, theme, children, watermark }: { id: string, theme: any, children: React.ReactNode, watermark: string }) => (
+  <div 
+    id={id}
+    className={cn(
+      "w-[1080px] h-[1350px] relative overflow-hidden flex flex-col font-sans text-white bg-black shrink-0",
+      theme.from && "bg-gradient-to-br " + theme.from + " " + theme.via + " " + theme.to
+    )}
+  >
+    <div className="absolute inset-0 bg-black/40" />
+    <div className="relative z-10 flex-1 flex flex-col p-16">
+      {children}
+    </div>
+    
+    {/* Watermark */}
+    <div className="absolute bottom-10 right-10 z-20 flex items-center gap-2 bg-black/50 backdrop-blur-md px-6 py-3 rounded-full border border-white/10">
+      <Instagram className="w-5 h-5" />
+      <span className="text-xl font-black tracking-tighter uppercase italic">{watermark}</span>
+    </div>
+  </div>
+);
 
 // --- Small Components ---
 const StepIndicator = ({ 
@@ -133,6 +167,20 @@ export default function ScraperPage() {
   const [caption, setCaption] = useState('');
   const [isGeneratingCaption, setIsGeneratingCaption] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
+  
+  // Carousel Specific
+  const [currentTheme, setCurrentTheme] = useState<ThemeKey>('azure');
+  const [isRenderingCarousel, setIsRenderingCarousel] = useState(false);
+  const [renderProgress, setRenderProgress] = useState(0);
+
+  useEffect(() => {
+    if (data) {
+      // Pick a theme based on property ID to ensure variety
+      const keys = Object.keys(CAROUSEL_THEMES) as ThemeKey[];
+      const index = parseInt(data.id.slice(-2)) % keys.length;
+      setCurrentTheme(keys[index]);
+    }
+  }, [data]);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -267,6 +315,44 @@ export default function ScraperPage() {
 
     setCaption(lines.join('\n'));
     setIsGeneratingCaption(false);
+  };
+
+  const handleDownloadCarousel = async () => {
+    if (!data) return;
+
+    setIsRenderingCarousel(true);
+    setRenderProgress(0);
+    const zip = new JSZip();
+
+    try {
+      const slideIds = ['slide-1', 'slide-2', 'slide-3', 'slide-4', 'slide-5', 'slide-6', 'slide-7', 'slide-8'];
+      
+      for (let i = 0; i < slideIds.length; i++) {
+        setRenderProgress(Math.round(((i) / slideIds.length) * 100));
+        const element = document.getElementById(slideIds[i]);
+        if (!element) continue;
+
+        const blob = await htmlToImage.toBlob(element, { 
+          quality: 1,
+          pixelRatio: 1, // Final 1080x1350
+          cacheBust: true
+        });
+        
+        if (blob) {
+          zip.file(`${i + 1}.jpg`, blob);
+        }
+      }
+
+      setRenderProgress(100);
+      const content = await zip.generateAsync({ type: "blob" });
+      saveAs(content, `${data.id}-carrossel.zip`);
+    } catch (err) {
+      console.error('Carousel generation failed', err);
+      alert('Erro ao gerar carrossel. Tente novamente.');
+    } finally {
+      setIsRenderingCarousel(false);
+      setRenderProgress(0);
+    }
   };
 
   const formatCurrency = (value: number) => {
@@ -670,19 +756,149 @@ export default function ScraperPage() {
                           </div>
                         </div>
 
-                        {/* Carousel Placeholder (Future Step) */}
+                        {/* Carousel Generator & Preview */}
                         <div className="lg:col-span-5 bg-white/5 border border-white/10 rounded-[3rem] p-10 flex flex-col justify-between group hover:border-blue-500/30 transition-all duration-700">
                            <div className="space-y-6">
-                              <div className="w-16 h-16 bg-gradient-to-tr from-pink-500/20 to-purple-500/20 border border-pink-500/30 rounded-[1.5rem] flex items-center justify-center group-hover:scale-110 transition-transform duration-700">
-                                 <Instagram className="w-8 h-8 text-pink-500" />
+                              <div className="flex justify-between items-start">
+                                <div className="w-16 h-16 bg-gradient-to-tr from-pink-500/20 to-purple-500/20 border border-pink-500/30 rounded-[1.5rem] flex items-center justify-center group-hover:scale-110 transition-transform duration-700">
+                                   <Instagram className="w-8 h-8 text-pink-500" />
+                                </div>
+                                <div className="flex gap-2">
+                                  {Object.keys(CAROUSEL_THEMES).map((k) => (
+                                    <button 
+                                      key={k}
+                                      onClick={() => setCurrentTheme(k as ThemeKey)}
+                                      className={cn(
+                                        "w-4 h-4 rounded-full border border-white/20 transition-all",
+                                        currentTheme === k ? "scale-125 border-white" : "opacity-30",
+                                        CAROUSEL_THEMES[k as ThemeKey].bg
+                                      )}
+                                    />
+                                  ))}
+                                </div>
                               </div>
+                              
                               <h4 className="text-2xl font-black tracking-tighter uppercase italic">Imagens do Carrossel</h4>
-                              <p className="text-white/40 text-sm font-medium">
-                                Próxima Fase: Gerar automaticamente os slides profissionais para o seu feed.
+                              
+                              {/* Preview Area (Scaled down) */}
+                              <div className="relative aspect-[4/5] bg-black rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
+                                <div className="absolute inset-0 flex items-center justify-center scale-[0.22] origin-center -translate-y-[350px]">
+                                   {/* RENDER HIDDEN SLIDES HERE FOR PREVIEW AND CAPTURE */}
+                                   <div className="flex flex-col gap-40">
+                                      {/* SLIDE 1: CAPA */}
+                                      <InstagramSlide id="slide-1" theme={CAROUSEL_THEMES[currentTheme]} watermark="brunofernandes.corporativo">
+                                         <div className="absolute inset-0 z-0">
+                                            <img 
+                                              src={`/api/proxy-image?url=${encodeURIComponent(data.images[0].url)}`} 
+                                              className="w-full h-full object-cover grayscale-[0.2]" 
+                                              alt="" 
+                                            />
+                                            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+                                         </div>
+                                         <div className="relative z-10 h-full flex flex-col justify-center items-center text-center space-y-16">
+                                            <div className={cn("px-10 py-4 rounded-full border-2 font-black uppercase tracking-[0.4em] text-3xl", "border-white " + CAROUSEL_THEMES[currentTheme].bg)}>
+                                              {data.prices.isForSale ? "Oportunidade" : "Disponível"}
+                                            </div>
+                                            <div className="space-y-4">
+                                              <p className="text-5xl font-black uppercase tracking-widest text-white/60 italic">{data.address.split(',').pop()?.trim() || data.city}</p>
+                                              <h1 className="text-[120px] font-black uppercase italic leading-[0.8] tracking-items block [text-shadow:0_10px_30px_rgba(0,0,0,0.5)]">
+                                                {data.title.split(' ').slice(0, 2).join(' ')}<br />
+                                                <span className={CAROUSEL_THEMES[currentTheme].accent}>{data.title.split(' ').slice(2, 4).join(' ')}</span>
+                                              </h1>
+                                            </div>
+                                            <div className="flex flex-col items-center gap-8">
+                                              <div className="h-2 w-48 bg-white/20 rounded-full overflow-hidden">
+                                                <div className={cn("h-full w-2/3", CAROUSEL_THEMES[currentTheme].bg)} />
+                                              </div>
+                                              <div className="flex gap-12 text-4xl font-black uppercase italic text-white/50">
+                                                <span>{data.area}m²</span>
+                                                <span>{data.bedrooms} Quartos</span>
+                                                <span>{data.parking} Vagas</span>
+                                              </div>
+                                              <p className="text-8xl font-black italic tracking-tighter">
+                                                {data.prices.isForSale ? formatCurrency(data.prices.salePrice) : formatCurrency(data.prices.rent)}
+                                              </p>
+                                            </div>
+                                         </div>
+                                      </InstagramSlide>
+
+                                      {/* SLIDES 2-7: PHOTOS */}
+                                      {[1, 2, 3, 4, 5, 6].map((idx) => (
+                                        <InstagramSlide key={idx} id={`slide-${idx + 1}`} theme={CAROUSEL_THEMES[currentTheme]} watermark="brunofernandes.corporativo">
+                                          <div className="absolute inset-0">
+                                             <img 
+                                              src={`/api/proxy-image?url=${encodeURIComponent(data.images[idx]?.url || data.images[0].url)}`} 
+                                              className="w-full h-full object-cover" 
+                                              alt="" 
+                                            />
+                                            <div className="absolute inset-0 bg-black/10 shadow-[inset_0_0_200px_rgba(0,0,0,0.8)]" />
+                                          </div>
+                                        </InstagramSlide>
+                                      ))}
+
+                                      {/* SLIDE 8: CTA */}
+                                      <InstagramSlide id="slide-8" theme={CAROUSEL_THEMES[currentTheme]} watermark="brunofernandes.corporativo">
+                                         <div className="h-full flex flex-col justify-center items-center text-center space-y-24">
+                                            <div className="w-48 h-48 bg-white/5 border border-white/10 rounded-[4rem] flex items-center justify-center mb-10">
+                                              <Building2 className={cn("w-24 h-24", CAROUSEL_THEMES[currentTheme].accent)} />
+                                            </div>
+                                            <div className="space-y-8">
+                                              <h2 className="text-[90px] font-black uppercase italic leading-[0.9] tracking-tighter px-10">
+                                                Gostou deste<br /> <span className={CAROUSEL_THEMES[currentTheme].accent}>Imóvel?</span>
+                                              </h2>
+                                              <div className="h-1 w-32 bg-white/20 mx-auto rounded-full" />
+                                              <p className="text-4xl text-white/60 px-24 font-medium uppercase tracking-widest leading-relaxed">
+                                                Não perca tempo, entre em contato agora mesmo!
+                                              </p>
+                                            </div>
+                                            <div className="space-y-10">
+                                               <div className="flex flex-col items-center gap-4">
+                                                <div className="flex items-center gap-6 bg-white text-black px-12 py-8 rounded-[3rem] shadow-2xl">
+                                                  <Instagram className="w-10 h-10" />
+                                                  <span className="text-5xl font-black">WhatsApp</span>
+                                                </div>
+                                               </div>
+                                               <p className="text-[70px] font-black italic tracking-tight underline decoratio-blue-500">
+                                                 31 97336 2545
+                                               </p>
+                                            </div>
+                                         </div>
+                                      </InstagramSlide>
+                                   </div>
+                                </div>
+                                
+                                {/* Overlay while rendering */}
+                                <AnimatePresence>
+                                  {isRenderingCarousel && (
+                                    <motion.div 
+                                      initial={{ opacity: 0 }}
+                                      animate={{ opacity: 1 }}
+                                      exit={{ opacity: 0 }}
+                                      className="absolute inset-0 bg-black/80 backdrop-blur-md flex flex-col items-center justify-center p-10 z-50"
+                                    >
+                                      <Loader2 className="w-12 h-12 text-blue-500 animate-spin mb-6" />
+                                      <div className="w-full bg-white/10 h-2 rounded-full overflow-hidden max-w-[200px]">
+                                        <motion.div 
+                                          className="h-full bg-blue-500"
+                                          animate={{ width: `${renderProgress}%` }}
+                                        />
+                                      </div>
+                                      <p className="mt-4 text-[10px] font-black uppercase tracking-widest text-white/40">Renderizando Slides...</p>
+                                    </motion.div>
+                                  )}
+                                </AnimatePresence>
+                              </div>
+
+                              <p className="text-white/40 text-xs font-medium">
+                                Design dinâmico inspirado em campanhas de alta conversão.
                               </p>
                            </div>
-                           <button className="w-full bg-white/5 border border-white/10 text-white/20 px-8 py-6 rounded-2xl font-black uppercase text-xs tracking-widest cursor-not-allowed">
-                             Em breve <Sparkles className="w-4 h-4" />
+                           <button 
+                            onClick={handleDownloadCarousel}
+                            disabled={isRenderingCarousel}
+                            className="w-full bg-blue-600 hover:bg-blue-500 disabled:opacity-30 text-white px-8 py-6 rounded-2xl font-black uppercase text-xs tracking-widest transition-all shadow-xl shadow-blue-600/20 mt-6"
+                           >
+                              {isRenderingCarousel ? "Preparando..." : "Baixar Carrossel (ZIP)"}
                            </button>
                         </div>
                       </motion.div>
