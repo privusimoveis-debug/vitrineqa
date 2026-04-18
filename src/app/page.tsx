@@ -174,6 +174,8 @@ export default function ScraperPage() {
   const [isRenderingCarousel, setIsRenderingCarousel] = useState(false);
   const [renderProgress, setRenderProgress] = useState(0);
   const [activeCaptureIndex, setActiveCaptureIndex] = useState<number | null>(null);
+  const [preloadedImages, setPreloadedImages] = useState<Record<number, string>>({});
+  const [statusMessage, setStatusMessage] = useState('');
 
   useEffect(() => {
     if (data) {
@@ -324,42 +326,65 @@ export default function ScraperPage() {
 
     setIsRenderingCarousel(true);
     setRenderProgress(0);
+    setStatusMessage('Iniciando motor...');
     const zip = new JSZip();
 
     try {
-      // Ensure fonts are loaded
+      // 1. Pre-load all assets to memory (Base64) to avoid race conditions
+      setStatusMessage('Preparando fotos (0/8)...');
+      const loaded: Record<number, string> = {};
+      
+      for (let i = 0; i < 8; i++) {
+        setStatusMessage(`Baixando foto ${i + 1} de 8...`);
+        let imgUrl = "";
+        if (i === 0) imgUrl = data.images[0].url; // Capa
+        else if (i === 7) imgUrl = data.images[0].url; // CTA background (can be redundant but let's be safe)
+        else imgUrl = data.images[i]?.url || data.images[0].url;
+
+        // Use proxy to get a clean blob
+        const proxyUrl = `/api/proxy-image?url=${encodeURIComponent(imgUrl)}`;
+        const response = await fetch(proxyUrl);
+        if (!response.ok) throw new Error(`Falha ao baixar imagem ${i + 1}`);
+        const blob = await response.blob();
+        
+        // Convert to Base64
+        const base64 = await new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.readAsDataURL(blob);
+        });
+        
+        loaded[i] = base64;
+        setRenderProgress(Math.round(((i + 1) / 16) * 100)); // First half is pre-load
+      }
+      
+      setPreloadedImages(loaded);
+      setStatusMessage('Ativos em memória. Iniciando captura...');
       await document.fonts.ready;
 
       // Sequential capture: 1 to 8
       for (let i = 0; i < 8; i++) {
-        setRenderProgress(Math.round((i / 8) * 100));
+        setRenderProgress(50 + Math.round((i / 8) * 50)); // Second half is capture
+        setStatusMessage(`Capturando slide ${i + 1}...`);
         
         // 1. Set the active slide to render
         setActiveCaptureIndex(i);
         
-        // 2. Wait for React to render and images to load
-        await new Promise(resolve => setTimeout(resolve, 800));
+        // 2. Wait for React to render and browser to paint
+        // Use double frame wait + extra settle time
+        await new Promise(resolve => setTimeout(resolve, 1200));
         
         const element = document.getElementById('capture-target');
         if (!element) continue;
 
-        // Force image load check
-        const imgs = element.querySelectorAll('img');
-        await Promise.all(Array.from(imgs).map(img => {
-          if (img.complete) return Promise.resolve();
-          return new Promise(resolve => {
-            img.onload = resolve;
-            img.onerror = resolve;
-          });
-        }));
-
-        // 3. Capture with high quality
+        // 3. Capture with High Fidelity
         const blob = await htmlToImage.toBlob(element, { 
-          quality: 0.98,
-          pixelRatio: 3, // Ultra High Quality (3240x4050)
+          quality: 1,
+          pixelRatio: 4, // Ultra-High Quality (4320x5400)
           cacheBust: true,
           style: {
             transform: 'scale(1)',
+            imageRendering: 'high-quality',
           }
         });
         
@@ -368,17 +393,19 @@ export default function ScraperPage() {
         }
       }
 
+      setStatusMessage('Finalizando ZIP...');
       setRenderProgress(100);
       const content = await zip.generateAsync({ type: "blob" });
-      saveAs(content, `${data.id}-instagram-premium.zip`);
-      setIsDownloadModalOpen(false);
+      saveAs(content, `${data.id}-instagram-elite.zip`);
     } catch (err) {
       console.error('Carousel generation failed', err);
-      alert('Houve um erro técnico na geração. Tente mudar o navegador ou recarregar a página.');
+      alert('Houve um erro técnico. Tente fechar outras abas para liberar memória.');
     } finally {
       setIsRenderingCarousel(false);
       setRenderProgress(0);
       setActiveCaptureIndex(null);
+      setPreloadedImages({});
+      setStatusMessage('');
     }
   };
 
@@ -731,23 +758,23 @@ export default function ScraperPage() {
                                 <div className="fixed -left-[2000px] top-0 pointer-events-none origin-top-left">
                                   {data && activeCaptureIndex !== null && (
                                     <div id="capture-target">
-                                       {activeCaptureIndex === 0 ? (
+                                      {activeCaptureIndex === 0 ? (
                                         <InstagramSlide theme={CAROUSEL_THEMES[currentTheme]} watermark="brunofernandes.corporativo">
                                            <div className="absolute inset-0 z-0 scale-110">
                                               <img 
-                                                src={`/api/proxy-image?url=${encodeURIComponent(data.images[0].url)}`} 
+                                                src={preloadedImages[0]} 
                                                 className="w-full h-full object-cover blur-[2px]" 
                                                 crossOrigin="anonymous"
                                               />
                                               <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/30 to-black/95" />
                                            </div>
-                                           <div className="relative z-10 h-full flex flex-col justify-between items-center text-center">
+                                           <div className="relative z-10 h-full flex flex-col justify-between items-center text-center px-10">
                                               <div className={cn("px-16 py-6 rounded-full border-4 font-black uppercase tracking-[0.6em] text-4xl shadow-2xl", "border-white " + CAROUSEL_THEMES[currentTheme].bg)} style={{ fontFamily: "'Montserrat', sans-serif" }}>
                                                 {data.prices.isForSale ? "Oportunidade" : "Disponível"}
                                               </div>
                                               
                                               <div className="w-full flex flex-col gap-4">
-                                                <p className="text-4xl md:text-5xl font-black uppercase tracking-[0.4em] text-white/50 italic mb-2" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+                                                <p className="text-4xl md:text-5xl font-black uppercase tracking-[0.4em] text-white/50 italic mb-2 drop-shadow-lg" style={{ fontFamily: "'Montserrat', sans-serif" }}>
                                                   {data.address.split(',').pop()?.trim() || data.city}
                                                 </p>
                                                 <h1 className="text-[112px] font-[900] uppercase italic leading-[0.85] tracking-tighter block drop-shadow-[0_20px_50px_rgba(0,0,0,1)]" style={{ fontFamily: "'Montserrat', sans-serif" }}>
@@ -757,7 +784,7 @@ export default function ScraperPage() {
                                                 </h1>
                                               </div>
 
-                                              <div className="w-full bg-white/5 backdrop-blur-3xl border border-white/10 rounded-[5rem] p-16 space-y-12">
+                                              <div className="w-full bg-white/5 backdrop-blur-3xl border border-white/10 rounded-[5rem] p-16 space-y-12 shadow-2xl">
                                                 <div className="flex justify-around items-center gap-4 text-5xl font-black uppercase italic text-white" style={{ fontFamily: "'Montserrat', sans-serif" }}>
                                                   <div className="flex flex-col items-center gap-4">
                                                     <Maximize2 className="w-12 h-12 text-white/30" />
@@ -777,7 +804,7 @@ export default function ScraperPage() {
                                                 
                                                 <div className={cn("h-1 w-32 bg-white/20 mx-auto rounded-full")} />
                                                 
-                                                <p className="text-[102px] font-black italic tracking-tighter leading-none drop-shadow-[0_15px_30px_rgba(0,0,0,0.5)]" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+                                                <p className="text-[105px] font-black italic tracking-tighter leading-none drop-shadow-[0_15px_30px_rgba(0,0,0,0.5)]" style={{ fontFamily: "'Montserrat', sans-serif" }}>
                                                   {data.prices.isForSale ? formatCurrency(data.prices.salePrice) : formatCurrency(data.prices.rent)}
                                                 </p>
                                               </div>
@@ -790,11 +817,11 @@ export default function ScraperPage() {
                                               <Building2 className={cn("w-32 h-32", CAROUSEL_THEMES[currentTheme].accent)} />
                                             </div>
                                             <div className="space-y-12 px-12">
-                                              <h2 className="text-[110px] font-black uppercase italic leading-[0.85] tracking-tighter drop-shadow-[0_15px_30px_rgba(0,0,0,0.8)]" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+                                              <h2 className="text-[110px] font-black uppercase italic leading-[0.85] tracking-tighter drop-shadow-[0_15px_40px_rgba(0,0,0,1)]" style={{ fontFamily: "'Montserrat', sans-serif" }}>
                                                 Gostou deste<br /> <span className={CAROUSEL_THEMES[currentTheme].accent}>Imóvel?</span>
                                               </h2>
                                               <div className="h-2 w-48 bg-white/20 mx-auto rounded-full" />
-                                              <p className="text-6xl text-white/50 font-medium uppercase tracking-[0.2em] leading-relaxed">
+                                              <p className="text-6xl text-white/50 font-medium uppercase tracking-[0.2em] leading-relaxed drop-shadow-lg">
                                                 Toque no botão e fale direto comigo!
                                               </p>
                                             </div>
@@ -805,7 +832,7 @@ export default function ScraperPage() {
                                                   <span className="text-7xl font-black uppercase tracking-tight" style={{ fontFamily: "'Montserrat', sans-serif" }}>WhatsApp</span>
                                                 </div>
                                                </div>
-                                               <p className="text-[110px] font-black italic tracking-tight text-white border-b-8 border-blue-500 pb-4 inline-block" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+                                               <p className="text-[110px] font-black italic tracking-tight text-white border-b-8 border-blue-500 pb-4 inline-block shadow-blue-500/20" style={{ fontFamily: "'Montserrat', sans-serif" }}>
                                                  31 97336 2545
                                                </p>
                                             </div>
@@ -815,7 +842,7 @@ export default function ScraperPage() {
                                         <InstagramSlide theme={CAROUSEL_THEMES[currentTheme]} watermark="brunofernandes.corporativo">
                                           <div className="absolute inset-0">
                                             <img 
-                                              src={`/api/proxy-image?url=${encodeURIComponent(data.images[activeCaptureIndex]?.url || data.images[0].url)}`} 
+                                              src={preloadedImages[activeCaptureIndex]} 
                                               className="w-full h-full object-cover" 
                                               crossOrigin="anonymous"
                                             />
@@ -852,16 +879,21 @@ export default function ScraperPage() {
                                           {renderProgress}%
                                         </div>
                                       </div>
-                                      <h5 className="text-xl font-black uppercase italic tracking-tighter mb-4">Capturando Slides</h5>
-                                      <div className="w-full bg-white/10 h-3 rounded-full overflow-hidden max-w-[240px]">
+                                      <h5 className="text-xl font-black uppercase italic tracking-tighter mb-4">Exportando Motor Elite</h5>
+                                      <div className="w-full bg-white/10 h-3 rounded-full overflow-hidden max-w-[240px] mb-8">
                                         <motion.div 
                                           className="h-full bg-gradient-to-r from-blue-600 to-indigo-600"
                                           animate={{ width: `${renderProgress}%` }}
                                         />
                                       </div>
-                                      <p className="mt-8 text-[12px] font-medium text-white/40 max-w-[200px] leading-relaxed">
-                                        Garantindo nitidez máxima e carregamento de cada foto...
-                                      </p>
+                                      <div className="flex flex-col items-center gap-2">
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-blue-500 animate-pulse">
+                                          {statusMessage}
+                                        </p>
+                                        <p className="text-[10px] font-medium text-white/30 max-w-[200px] leading-relaxed">
+                                          Não feche a página durante o processamento.
+                                        </p>
+                                      </div>
                                     </motion.div>
                                   )}
                                 </AnimatePresence>
