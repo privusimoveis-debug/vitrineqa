@@ -120,9 +120,14 @@ export default function ScraperPage() {
   const [selectedIndices, setSelectedIndices] = useState<number[]>([]);
   const [isZipping, setIsZipping] = useState(false);
 
-  // Collapse States
+  // Collapse States (Sections)
   const [isStep2Expanded, setIsStep2Expanded] = useState(true);
   const [isStep3Expanded, setIsStep3Expanded] = useState(true);
+  
+  // Content "Show More" States
+  const [isDescExpanded, setIsDescExpanded] = useState(false);
+  const [isUnitExpanded, setIsUnitExpanded] = useState(false);
+  const [isBuildingExpanded, setIsBuildingExpanded] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -141,6 +146,11 @@ export default function ScraperPage() {
     setIsStep2Expanded(true);
     setIsStep3Expanded(true);
     setSelectedIndices([]);
+    
+    // Reset content expansion
+    setIsDescExpanded(false);
+    setIsUnitExpanded(false);
+    setIsBuildingExpanded(false);
 
     try {
       const response = await axios.post('/api/scrape', { url });
@@ -351,20 +361,21 @@ export default function ScraperPage() {
 
                     {/* Stats & Financial Grid */}
                     <div className="grid grid-cols-1 md:grid-cols-12 gap-10">
-                      <div className="md:col-span-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+                      <div className="md:col-span-8 grid grid-cols-2 lg:grid-cols-5 gap-4">
                          <div className="bg-white/5 border border-white/10 p-6 md:p-8 rounded-2xl md:rounded-[2rem] flex flex-col justify-between group hover:border-blue-500/50 transition-all duration-500">
                             <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-blue-500">
                               <HomeIcon className="w-5 h-5" />
                             </div>
                             <div className="mt-4 md:mt-6">
                               <p className="text-white/30 text-[10px] font-black uppercase tracking-widest">Imóvel</p>
-                              <p className="text-lg md:text-xl font-black mt-1 tracking-tighter uppercase">{data.type}</p>
+                              <p className="text-xs md:text-sm font-black mt-1 tracking-tighter uppercase line-clamp-1">{data.type}</p>
                             </div>
                           </div>
                           {[
-                            { icon: Maximize2, label: 'Área', value: `${data.area} m²` },
+                            { icon: Maximize2, label: 'Área', value: `${data.area}m²` },
                             { icon: Bed, label: 'Quartos', value: data.bedrooms },
                             { icon: Bath, label: 'Banheiros', value: data.bathrooms },
+                            { icon: Car, label: 'Vagas', value: data.parking },
                           ].map((stat, i) => (
                             <div key={i} className="bg-white/5 border border-white/10 p-6 md:p-8 rounded-2xl md:rounded-[2rem] flex flex-col justify-between group hover:border-blue-500/50 transition-all duration-500">
                               <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-blue-500">
@@ -372,7 +383,7 @@ export default function ScraperPage() {
                               </div>
                               <div className="mt-4 md:mt-6">
                                 <p className="text-white/30 text-[10px] font-black uppercase tracking-widest">{stat.label}</p>
-                                <p className="text-2xl md:text-3xl font-black mt-1 tracking-tighter">{stat.value}</p>
+                                <p className="text-xl md:text-2xl font-black mt-1 tracking-tighter">{stat.value}</p>
                               </div>
                             </div>
                           ))}
@@ -403,13 +414,27 @@ export default function ScraperPage() {
 
                     {/* Description & Gallery Toggle */}
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-                      <div className="lg:col-span-1 bg-white/5 border border-white/10 p-10 rounded-[3rem] h-fit">
+                      <div className="lg:col-span-1 bg-white/5 border border-white/10 p-10 rounded-[3rem] h-fit relative">
                          <h3 className="text-xl font-black uppercase tracking-tighter mb-8 italic flex items-center gap-3">
                            <TrendingUp className="w-5 h-5 text-blue-500" /> Descrição
                          </h3>
-                         <p className="text-white/60 text-lg leading-relaxed font-medium">
-                            {data.description || 'Nenhuma descrição detalhada disponível.'}
-                         </p>
+                         <div className={cn(
+                           "relative transition-all duration-700 overflow-hidden",
+                           isDescExpanded ? "max-h-[2000px]" : "max-h-[200px]"
+                         )}>
+                           <p className="text-white/60 text-lg leading-relaxed font-medium pb-10">
+                              {data.description || 'Nenhuma descrição detalhada disponível.'}
+                           </p>
+                           {!isDescExpanded && (
+                             <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#0d0d0d] to-transparent pointer-events-none" />
+                           )}
+                         </div>
+                         <button 
+                          onClick={() => setIsDescExpanded(!isDescExpanded)}
+                          className="mt-4 text-blue-500 text-[10px] font-black underline uppercase tracking-widest hover:text-white transition-colors"
+                         >
+                           {isDescExpanded ? "Ver Menos" : "Ver Tudo"}
+                         </button>
                       </div>
 
                       <div className="lg:col-span-2 space-y-8 md:space-y-10">
@@ -455,6 +480,73 @@ export default function ScraperPage() {
                                </div>
                             )}
                          </div>
+                      </div>
+                    </div>
+
+                    {/* AMENITIES ROW */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                      {/* UNIT AMENITIES */}
+                      <div className="bg-white/5 border border-white/10 p-10 rounded-[3rem] h-fit relative">
+                         <h3 className="text-xl font-black uppercase tracking-tighter mb-8 italic flex items-center gap-3">
+                           <Info className="w-5 h-5 text-blue-500" /> Do Imóvel
+                         </h3>
+                         <div className={cn(
+                           "relative transition-all duration-700 overflow-hidden",
+                           isUnitExpanded ? "max-h-[2000px]" : "max-h-[200px]"
+                         )}>
+                            <div className="flex flex-wrap gap-3 pb-10">
+                              {data.unitAmenities?.length > 0 ? data.unitAmenities.map((item, i) => (
+                                <div key={i} className="bg-white/5 border border-white/10 px-4 py-2 rounded-xl text-xs font-bold text-white/40 group-hover:text-white transition-all">
+                                  {item}
+                                </div>
+                              )) : (
+                                <p className="text-white/20 text-xs italic">Não informado</p>
+                              )}
+                            </div>
+                           {!isUnitExpanded && data.unitAmenities?.length > 10 && (
+                             <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#0d0d0d] to-transparent pointer-events-none" />
+                           )}
+                         </div>
+                         {data.unitAmenities?.length > 10 && (
+                           <button 
+                            onClick={() => setIsUnitExpanded(!isUnitExpanded)}
+                            className="mt-4 text-blue-500 text-[10px] font-black underline uppercase tracking-widest hover:text-white transition-colors"
+                           >
+                             {isUnitExpanded ? "Ver Menos" : "Ver Tudo"}
+                           </button>
+                         )}
+                      </div>
+
+                      {/* BUILDING AMENITIES */}
+                      <div className="bg-white/5 border border-white/10 p-10 rounded-[3rem] h-fit relative">
+                         <h3 className="text-xl font-black uppercase tracking-tighter mb-8 italic flex items-center gap-3">
+                           <ShieldCheck className="w-5 h-5 text-blue-500" /> Do Condomínio
+                         </h3>
+                         <div className={cn(
+                           "relative transition-all duration-700 overflow-hidden",
+                           isBuildingExpanded ? "max-h-[2000px]" : "max-h-[200px]"
+                         )}>
+                            <div className="flex flex-wrap gap-3 pb-10">
+                              {data.buildingAmenities?.length > 0 ? data.buildingAmenities.map((item, i) => (
+                                <div key={i} className="bg-white/5 border border-white/10 px-4 py-2 rounded-xl text-xs font-bold text-white/40 transition-all">
+                                  {item}
+                                </div>
+                              )) : (
+                                <p className="text-white/20 text-xs italic">Não informado</p>
+                              )}
+                            </div>
+                           {!isBuildingExpanded && data.buildingAmenities?.length > 10 && (
+                             <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#0d0d0d] to-transparent pointer-events-none" />
+                           )}
+                         </div>
+                         {data.buildingAmenities?.length > 10 && (
+                           <button 
+                            onClick={() => setIsBuildingExpanded(!isBuildingExpanded)}
+                            className="mt-4 text-blue-500 text-[10px] font-black underline uppercase tracking-widest hover:text-white transition-colors"
+                           >
+                             {isBuildingExpanded ? "Ver Menos" : "Ver Tudo"}
+                           </button>
+                         )}
                       </div>
                     </div>
                   </motion.div>
