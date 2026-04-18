@@ -34,10 +34,16 @@ export async function POST(req: Request) {
     }
 
     // Process and clean the data
+    const isForSale = !!propertyData.salePrice && propertyData.salePrice > 0;
+    const type = propertyData.type || 'Imóvel';
+    
+    // Construct descriptive title in PT-BR
+    const dynamicTitle = `${type} à ${isForSale ? 'venda' : 'aluguel'} com ${propertyData.totalArea}m², ${propertyData.bedrooms} quartos e ${propertyData.parkingSlots} vagas`;
+
     const cleanedData = {
       id: propertyData.id,
-      title: propertyData.type || 'Imóvel',
-      // Fix address: join object properties
+      title: dynamicTitle,
+      type: type,
       address: typeof propertyData.address === 'object' 
         ? `${propertyData.address.address}, ${propertyData.address.neighborhood}`
         : propertyData.address,
@@ -51,14 +57,13 @@ export async function POST(req: Request) {
         url: img.url.startsWith('//') ? `https:${img.url}` : img.url,
         subtitle: img.subtitle
       })) || [],
-      // Fix prices: Handle Sale vs Rent
       prices: {
         salePrice: propertyData.salePrice || 0,
         rent: propertyData.rentValue || propertyData.rent || 0,
         iptu: propertyData.iptu?.amount || propertyData.iptu || 0,
         condo: propertyData.condominium || propertyData.condo || 0,
         total: propertyData.totalCost || propertyData.total || 0,
-        isForSale: !!propertyData.salePrice && propertyData.salePrice > 0
+        isForSale: isForSale
       },
       amenities: propertyData.amenities || []
     };

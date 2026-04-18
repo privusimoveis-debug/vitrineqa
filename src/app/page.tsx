@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Search, MapPin, Maximize2, Bed, Bath, Car, 
   ArrowRight, Loader2, Image as ImageIcon, 
-  CheckCircle2, Sparkles, Building2, 
+  CheckCircle2, Building2, 
   Share2, Heart, ExternalLink, TrendingUp, Tag
 } from 'lucide-react';
 import axios from 'axios';
@@ -21,6 +21,7 @@ function cn(...inputs: ClassValue[]) {
 interface PropertyData {
   id: string;
   title: string;
+  type: string;
   address: string;
   city: string;
   area: number;
@@ -118,47 +119,29 @@ export default function Home() {
             <div className="w-10 h-10 bg-gradient-to-tr from-blue-700 to-blue-500 rounded-xl flex items-center justify-center shadow-lg shadow-blue-600/20 group-hover:scale-110 transition-transform duration-500">
               <Building2 className="text-white w-6 h-6" />
             </div>
-            <span className="text-2xl font-black tracking-tighter">
-              VITRINE<span className="text-blue-500">QA</span>
+            <span className="text-2xl font-black tracking-tighter uppercase">
+              Vitrine<span className="text-blue-500">QA</span>
             </span>
           </div>
           <div className="hidden md:flex items-center gap-10 text-xs font-bold uppercase tracking-widest text-white/40">
-            <a href="#" className="hover:text-white transition-colors">Explorer</a>
-            <a href="#" className="hover:text-white transition-colors">History</a>
+            <a href="#" className="hover:text-white transition-colors">Explorar</a>
+            <a href="#" className="hover:text-white transition-colors">Histórico</a>
             <button className="bg-white/5 hover:bg-white/10 border border-white/10 px-6 py-2.5 rounded-full text-white transition-all">
-              Join Workspace
+              Entrar
             </button>
           </div>
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <section className="relative pt-48 pb-32 overflow-hidden">
-        <div className="max-w-5xl mx-auto px-6 text-center space-y-12">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-          >
-            <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white/5 border border-white/10 text-blue-400 text-xs font-bold uppercase tracking-widest mb-8 backdrop-blur-sm">
-              <Sparkles className="w-4 h-4" />
-              Intelligence Engine v2.6
-            </div>
-            <h1 className="text-7xl md:text-9xl font-black tracking-tight mb-8 leading-[0.8] mix-blend-difference">
-              VITRINIZAR <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-white/20 italic">IMÓVEIS</span>
-            </h1>
-            <p className="text-white/40 text-xl md:text-2xl font-medium max-w-2xl mx-auto leading-relaxed">
-              Alta fidelidade em extração de dados para corretores de elite. Cole o link, gere o valor.
-            </p>
-          </motion.div>
-
+      {/* Hero Section Simplified */}
+      <section className="relative pt-48 pb-20 overflow-hidden text-center">
+        <div className="max-w-3xl mx-auto px-6 space-y-12">
           {/* Search Bar Premium */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="relative max-w-3xl mx-auto group"
+            transition={{ duration: 0.8 }}
+            className="relative group"
           >
             <div className="absolute -inset-2 bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-[2.5rem] blur-2xl opacity-0 group-focus-within:opacity-100 transition duration-1000"></div>
             <form onSubmit={handleScrape} className="relative bg-[#0d0d0d]/80 backdrop-blur-3xl border border-white/10 rounded-[2rem] flex items-center p-2.5 shadow-2xl">
@@ -169,7 +152,7 @@ export default function Home() {
                 type="text"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
-                placeholder="Cole a URL do Vitrine QuintoAndar..."
+                placeholder="Cole o link do imóvel aqui..."
                 className="flex-1 bg-transparent border-none py-5 px-5 text-lg focus:outline-none placeholder:text-white/20 text-white font-medium"
               />
               <button
@@ -182,8 +165,8 @@ export default function Home() {
               >
                 {loading ? "Processando..." : (
                   <>
-                    Gerar
-                    <ArrowRight className="w-5 h-5" />
+                    Coletar Dados
+                    <ArrowRight className="w-5 h-5 font-bold" />
                   </>
                 )}
               </button>
@@ -219,9 +202,9 @@ export default function Home() {
                 <div className="space-y-6 flex-1">
                   <div className="flex items-center gap-3 text-blue-500 bg-blue-500/10 border border-blue-500/20 px-4 py-1.5 rounded-full w-fit">
                     <MapPin className="w-4 h-4" />
-                    <span className="font-bold tracking-widest uppercase text-[10px]">{data.city} • {data.id}</span>
+                    <span className="font-bold tracking-widest uppercase text-[10px]">{data.city} • ID: {data.id}</span>
                   </div>
-                  <h2 className="text-5xl md:text-7xl font-black tracking-tight leading-none uppercase">{data.title}</h2>
+                  <h2 className="text-4xl md:text-6xl font-black tracking-tight leading-[1.1] uppercase">{data.title}</h2>
                   <p className="text-white/40 text-xl font-medium tracking-tight whitespace-pre-wrap">{data.address}</p>
                 </div>
                 <div className="flex flex-wrap gap-4">
@@ -248,11 +231,21 @@ export default function Home() {
                   
                   {/* Bento - Specification */}
                   <div className="md:col-span-2 grid grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div className="bg-white/5 border border-white/10 p-8 rounded-[2.5rem] flex flex-col justify-between group hover:border-blue-500/50 transition-all duration-500 shadow-inner">
+                      <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center group-hover:bg-blue-500 transition-all duration-500">
+                        <Building2 className="w-6 h-6 text-blue-500 group-hover:text-white transition-colors" />
+                      </div>
+                      <div className="mt-8">
+                        <p className="text-white/30 text-[10px] font-black uppercase tracking-widest">Imóvel</p>
+                        <p className="text-2xl font-black mt-2 tracking-tighter uppercase">{data.type}</p>
+                      </div>
+                    </div>
                     {[
-                      { icon: Maximize2, label: 'Area', value: `${data.area} m²` },
-                      { icon: Bed, label: 'Rooms', value: data.bedrooms },
-                      { icon: Bath, label: 'Baths', value: data.bathrooms },
-                      { icon: Car, label: 'Garage', value: data.parking },
+                      { icon: Maximize2, label: 'Área', value: `${data.area} m²` },
+                      { icon: Bed, label: 'Quartos', value: data.bedrooms },
+                      // If it's more than 1 bath or garage, pluralize is handled by value anyway
+                      { icon: Bath, label: 'Banheiros', value: data.bathrooms },
+                      { icon: Car, label: 'Vagas', value: data.parking },
                     ].map((stat, i) => (
                       <div key={i} className="bg-white/5 border border-white/10 p-8 rounded-[2.5rem] flex flex-col justify-between group hover:border-blue-500/50 transition-all duration-500 shadow-inner">
                         <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center group-hover:bg-blue-500 transition-all duration-500">
@@ -275,7 +268,7 @@ export default function Home() {
                           <Tag className="w-6 h-6 text-white" />
                         </div>
                         <span className="bg-white text-blue-700 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-xl">
-                          {data.prices.isForSale ? "Oportunidade" : "Disponível"}
+                          {data.prices.isForSale ? "Venda" : "Aluguel"}
                         </span>
                       </div>
                       
@@ -283,18 +276,18 @@ export default function Home() {
                         <p className="text-white/60 text-[10px] font-black uppercase tracking-widest">
                           {data.prices.isForSale ? "Valor de Venda" : "Aluguel Mensal"}
                         </p>
-                        <h3 className="text-6xl font-black tracking-tighter text-white leading-none">
+                        <h3 className="text-5xl font-black tracking-tighter text-white leading-none">
                           {data.prices.isForSale ? formatCurrency(data.prices.salePrice) : formatCurrency(data.prices.rent)}
                         </h3>
                       </div>
 
                       <div className="pt-8 border-t border-white/20 space-y-4">
-                        <div className="flex justify-between items-center text-xs font-bold uppercase tracking-widest text-white/60">
+                        <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-white/60">
                           <span>Total Mensal</span>
                           <span className="text-white">{formatCurrency(data.prices.total)}</span>
                         </div>
-                        <div className="flex justify-between items-center text-xs font-bold uppercase tracking-widest text-white/40">
-                          <span>Condo + Taxes</span>
+                        <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-white/40">
+                          <span>Condomínio + IPTU</span>
                           <span className="text-white/70">{formatCurrency(data.prices.condo + data.prices.iptu)}</span>
                         </div>
                       </div>
@@ -302,20 +295,20 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* Bottom Part: Description & Gallery */}
+                {/* Bottom Part: Short Info & Gallery */}
                 <div className="lg:col-span-4 space-y-10">
                   <div className="bg-white/5 border border-white/10 p-10 rounded-[3rem] space-y-10 shadow-inner">
                     <div className="flex items-center gap-4">
                       <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center text-blue-500">
                         <TrendingUp className="w-5 h-5" />
                       </div>
-                      <h3 className="text-xl font-black uppercase tracking-tighter italic">Destaques</h3>
+                      <h3 className="text-xl font-black uppercase tracking-tighter italic">Descrição</h3>
                     </div>
                     <p className="text-white/50 text-lg leading-relaxed font-medium italic">
-                      "{data.description || 'Nenhuma descrição fornecida pelo proprietário.'}"
+                      "{data.description || 'Nenhuma descrição fornecida.'}"
                     </p>
                     <div className="grid grid-cols-1 gap-4 pt-4">
-                      {data.amenities.slice(0, 12).map((amenity, i) => (
+                      {data.amenities.slice(0, 10).map((amenity, i) => (
                         <div key={i} className="flex items-center gap-4 text-white/60 group">
                           <CheckCircle2 className="w-5 h-5 text-blue-500 group-hover:scale-110 transition-transform" />
                           <span className="text-sm font-bold tracking-tight">{amenity}</span>
@@ -327,9 +320,9 @@ export default function Home() {
 
                 <div className="lg:col-span-8 space-y-12">
                    <div className="flex items-center gap-6">
-                      <h3 className="text-4xl font-black tracking-tight uppercase italic mix-blend-difference">Galeria Elite</h3>
+                      <h3 className="text-4xl font-black tracking-tight uppercase italic mix-blend-difference">Galeria de Fotos</h3>
                       <div className="h-[2px] flex-1 bg-white/10"></div>
-                      <span className="text-white/20 font-black text-xs tracking-[0.3em]">{data.images.length} FORMATOS</span>
+                      <span className="text-white/20 font-black text-xs tracking-[0.3em]">{data.images.length} FOTOS</span>
                    </div>
                    
                    <div className="columns-1 md:columns-2 gap-8 space-y-8">
@@ -343,12 +336,12 @@ export default function Home() {
                        >
                          <img 
                            src={img.url} 
-                           alt={img.subtitle || 'Property photo'}
+                           alt={img.subtitle || 'Foto do imóvel'}
                            className="w-full h-auto object-cover transition-transform duration-1000 group-hover:scale-110"
                            loading="lazy"
                          />
                          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 p-8 flex flex-col justify-end">
-                            <span className="text-blue-500 text-[10px] font-black uppercase tracking-widest mb-2">Space • {i + 1}</span>
+                            <span className="text-blue-500 text-[10px] font-black uppercase tracking-widest mb-2">Ambiente • {i + 1}</span>
                             <p className="text-white font-black text-xl tracking-tight leading-none uppercase italic">
                               {img.subtitle || 'Detalhe do Imóvel'}
                             </p>
@@ -370,7 +363,7 @@ export default function Home() {
                   <ImageIcon className="w-12 h-12" />
                 </div>
                 <div className="space-y-4">
-                  <h3 className="text-3xl font-black tracking-tighter text-white/20 uppercase italic">Aguardando Extração</h3>
+                  <h3 className="text-3xl font-black tracking-tighter text-white/20 uppercase italic">Aguardando Coleta</h3>
                   <p className="text-white/10 max-w-sm font-bold uppercase tracking-widest text-[10px]">Utilize o campo superior para processar um link do QuintoAndar</p>
                 </div>
               </motion.div>
@@ -384,14 +377,14 @@ export default function Home() {
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-10">
           <div className="flex items-center gap-3 opacity-20">
              <div className="w-8 h-8 bg-white/50 rounded-lg"></div>
-             <span className="font-black tracking-tighter text-xl">PRO SCRAPER</span>
+             <span className="font-black tracking-tighter text-xl">VITRINE QA</span>
           </div>
           <div className="flex gap-12 text-[10px] font-black uppercase tracking-[0.2em] text-white/20">
-            <a href="#" className="hover:text-blue-500 transition-colors">Safety</a>
-            <a href="#" className="hover:text-blue-500 transition-colors">API Keys</a>
-            <a href="#" className="hover:text-blue-500 transition-colors">Open Source</a>
+            <a href="#" className="hover:text-blue-500 transition-colors">Privacidade</a>
+            <a href="#" className="hover:text-blue-500 transition-colors">Histórico</a>
+            <a href="#" className="hover:text-blue-500 transition-colors">Github</a>
           </div>
-          <p className="text-white/10 text-[10px] font-black uppercase tracking-widest">© 2026 VitrineQA • Developed by Elite Agents</p>
+          <p className="text-white/10 text-[10px] font-black uppercase tracking-widest">© 2026 VitrineQA • Desenvolvido para Agentes de Elite</p>
         </div>
       </footer>
     </div>
