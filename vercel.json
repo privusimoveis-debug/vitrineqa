@@ -1,6 +1,0 @@
-{
-  "name": "vitrine-quinto-andar",
-  "buildCommand": "bun run build",
-  "installCommand": "bun install",
-  "framework": "nextjs"
-}

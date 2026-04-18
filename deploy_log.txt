@@ -1,0 +1,69 @@
+Retrieving project…
+Deploying brunofp01-6014s-projects/vitrine-quinto-andar
+Uploading [--------------------] (0.0B/78B)
+Uploading [====================] (78.0B/78B)
+Inspect: https://vercel.com/brunofp01-6014s-projects/vitrine-quinto-andar/CJbWsgcTAPdtutEzRNtS6gm1tSZY [3s]
+Production: https://vitrine-quinto-andar-gokyw3zu5-brunofp01-6014s-projects.vercel.app [3s]
+https://vitrine-quinto-andar-gokyw3zu5-brunofp01-6014s-projects.vercel.appBuilding...
+Building: Running build in Washington, D.C., USA (East) – iad1
+Building: Build machine configuration: 2 cores, 8 GB
+Building: Retrieving list of deployment files...
+Building: Previous build caches not available.
+Building: Previous build caches not available.
+Building: Downloading 23 deployment files...
+Building: Running "vercel build"
+Building: Vercel CLI 51.6.1
+Building: Installing dependencies...
+Building: bun install v1.3.6 (d530ed99)
+Building: + @tailwindcss/postcss@4.2.2
+Building: + @types/node@20.19.39
+Building: + @types/react@19.2.14
+Building: + @types/react-dom@19.2.3
+Building: + eslint@9.39.4
+Building: + eslint-config-next@16.2.4
+Building: + tailwindcss@4.2.2
+Building: + typescript@5.9.3
+Building: + @supabase/supabase-js@2.103.3
+Building: + axios@1.15.0
+Building: + clsx@2.1.1
+Building: + framer-motion@12.38.0
+Building: + lucide-react@1.8.0
+Building: + next@16.2.4
+Building: + react@19.2.4
+Building: + react-dom@19.2.4
+Building: + tailwind-merge@3.5.0
+Building: 382 packages installed [4.00s]
+Building: Running "bun run build"
+Building: $ next build
+Building: Attention: Next.js now collects completely anonymous telemetry regarding usage.
+Building: This information is used to shape Next.js' roadmap and prioritize features.
+Building: You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+Building: https://nextjs.org/telemetry
+Building: ▲ Next.js 16.2.4 (Turbopack)
+Building: Creating an optimized production build ...
+Building: ✓ Compiled successfully in 7.0s
+Building: Running TypeScript ...
+Building: Failed to type check.
+Building: ./src/app/page.tsx:215:27
+Building: Type error: Type '{ hidden: { opacity: number; y: number; }; visible: { opacity: number; y: number; transition: { type: string; damping: number; stiffness: number; }; }; }' is not assignable to type 'Variants'.
+Building: Property 'visible' is incompatible with index signature.
+Building: Type '{ opacity: number; y: number; transition: { type: string; damping: number; stiffness: number; }; }' is not assignable to type 'Variant'.
+Building: Type '{ opacity: number; y: number; transition: { type: string; damping: number; stiffness: number; }; }' is not assignable to type 'TargetAndTransition'.
+Building: Type '{ opacity: number; y: number; transition: { type: string; damping: number; stiffness: number; }; }' is not assignable to type '{ transition?: Transition<any> | undefined; transitionEnd?: ResolvedValues$1 | undefined; }'.
+Building: Types of property 'transition' are incompatible.
+Building: Type '{ type: string; damping: number; stiffness: number; }' is not assignable to type 'Transition<any> | undefined'.
+Building: Type '{ type: string; damping: number; stiffness: number; }' is not assignable to type 'TransitionWithValueOverrides<any>'.
+Building: Type '{ type: string; damping: number; stiffness: number; }' is not assignable to type 'ValueAnimationTransition<any>'.
+Building: Types of property 'type' are incompatible.
+Building: Type 'string' is not assignable to type 'AnimationGeneratorType | undefined'.
+Building: 213 |             >
+Building: 214 |               {/* Header result */}
+Building: > 215 |               <motion.div variants={itemVariants} className="flex flex-col md:flex-row ju...
+Building: |                           ^
+Building: 216 |                 <div className="space-y-2">
+Building: 217 |                   <div className="flex items-center gap-2 text-blue-500">
+Building: 218 |                     <MapPin className="w-5 h-5" />
+Building: Next.js build worker exited with code: 1 and signal: null
+Building: error: script "build" exited with code 1
+Building: Error: Command "bun run build" exited with 1
+Error: Command "bun run build" exited with 1
