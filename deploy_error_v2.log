@@ -1,0 +1,38 @@
+Retrieving project…
+Deploying brunofp01-6014s-projects/vitrine-quinto-andar
+Inspect: https://vercel.com/brunofp01-6014s-projects/vitrine-quinto-andar/3qgDy525Z6mh1fQF5N8CmF5fEvNx [2s]
+Production: https://vitrine-quinto-andar-5yw9323ll-brunofp01-6014s-projects.vercel.app [2s]
+https://vitrine-quinto-andar-5yw9323ll-brunofp01-6014s-projects.vercel.appBuilding...
+Building...
+Building: Running build in Washington, D.C., USA (East) – iad1
+Building: Build machine configuration: 2 cores, 8 GB
+Building: Retrieving list of deployment files...
+Building: Downloading 26 deployment files...
+Building: Restored build cache from previous deployment (Aq3Fv7PSZjZGSnN5V9cVs8TseD3j)
+Building: Running "vercel build"
+Building: Vercel CLI 51.6.1
+Building: Installing dependencies...
+Building: bun install v1.3.6 (d530ed99)
+Building: Checked 415 installs across 457 packages (no changes) [123.00ms]
+Building: Detected Next.js version: 16.2.4
+Building: Running "bun run build"
+Building: $ next build
+Building: Applying modifyConfig from Vercel
+Building: ▲ Next.js 16.2.4 (Turbopack)
+Building: Creating an optimized production build ...
+Building: ✓ Compiled successfully in 7.7s
+Building: Running TypeScript ...
+Building: Failed to type check.
+Building: ./src/app/api/scrape/route.ts:45:14
+Building: Type error: Cannot find name 'dynamicTitle'.
+Building: 43 |     const cleanedData = {
+Building: 44 |       id: propertyData.id,
+Building: > 45 |       title: dynamicTitle,
+Building: |              ^
+Building: 46 |       type: type,
+Building: 47 |       address: typeof propertyData.address === 'object'
+Building: 48 |         ? `${propertyData.address.address}, ${propertyData.address.neighborhood}`
+Building: Next.js build worker exited with code: 1 and signal: null
+Building: error: script "build" exited with code 1
+Building: Error: Command "bun run build" exited with 1
+Error: Command "bun run build" exited with 1

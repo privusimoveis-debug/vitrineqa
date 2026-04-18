@@ -40,6 +40,10 @@ export async function POST(req: Request) {
     const unitGroup = findGroup('Imóvel');
     const buildingGroup = findGroup('Condominio') || findGroup('Condomínio');
 
+    const isForSale = !!propertyData.salePrice && propertyData.salePrice > 0;
+    const type = propertyData.type || 'Imóvel';
+    const dynamicTitle = `${type} à ${isForSale ? 'venda' : 'aluguel'} com ${propertyData.totalArea}m², ${propertyData.bedrooms} quartos e ${propertyData.parkingSlots} vagas`;
+
     const cleanedData = {
       id: propertyData.id,
       title: dynamicTitle,
