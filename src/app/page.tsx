@@ -7,7 +7,8 @@ import {
   ArrowRight, Loader2, Image as ImageIcon, 
   CheckCircle2, Building2, 
   Share2, Heart, ExternalLink, TrendingUp, Tag,
-  Info, ShieldCheck, Home as HomeIcon
+  Info, ShieldCheck, Home as HomeIcon,
+  ChevronDown, ChevronUp, Instagram, Sparkles
 } from 'lucide-react';
 import axios from 'axios';
 import { clsx, type ClassValue } from 'clsx';
@@ -64,6 +65,20 @@ const itemVariants = {
   }
 };
 
+// --- Small Components ---
+const StepIndicator = ({ number, title, active }: { number: number; title: string; active?: boolean }) => (
+  <div className={cn(
+    "flex items-center gap-4 mb-10 transition-all duration-700",
+    active ? "opacity-100 scale-100" : "opacity-30 scale-95"
+  )}>
+    <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-blue-700 to-blue-400 flex items-center justify-center font-black text-xl shadow-lg shadow-blue-500/20">
+      {number}
+    </div>
+    <h3 className="text-3xl font-black tracking-tighter uppercase italic">{title}</h3>
+    <div className="h-[2px] flex-1 bg-gradient-to-r from-white/20 to-transparent"></div>
+  </div>
+);
+
 // --- Main Page Component ---
 export default function ScraperPage() {
   const [url, setUrl] = useState('');
@@ -71,6 +86,7 @@ export default function ScraperPage() {
   const [data, setData] = useState<PropertyData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [scrolled, setScrolled] = useState(false);
+  const [isGalleryExpanded, setIsGalleryExpanded] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -85,12 +101,13 @@ export default function ScraperPage() {
     setLoading(true);
     setError(null);
     setData(null);
+    setIsGalleryExpanded(false);
 
     try {
       const response = await axios.post('/api/scrape', { url });
       setData(response.data);
       setTimeout(() => {
-        const resultsEl = document.getElementById('results');
+        const resultsEl = document.getElementById('step-2');
         resultsEl?.scrollIntoView({ behavior: 'smooth' });
       }, 500);
     } catch (err: any) {
@@ -135,39 +152,41 @@ export default function ScraperPage() {
         </div>
       </nav>
 
-      {/* Hero Section Simplified */}
+      {/* STAGE 1: SEARCH */}
       <section className="relative pt-48 pb-20 overflow-hidden text-center">
-        <div className="max-w-3xl mx-auto px-6 space-y-12">
-          {/* Search Bar Premium */}
+        <div className="max-w-4xl mx-auto px-6 space-y-12">
+          <StepIndicator number={1} title="Coleta de Dados" active={true} />
+
+          {/* Search Bar Premium - FIXED LIGHTNESS */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             className="relative group"
           >
-            <div className="absolute -inset-2 bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-[2.5rem] blur-2xl opacity-0 group-focus-within:opacity-100 transition duration-1000"></div>
-            <form onSubmit={handleScrape} className="relative bg-[#0d0d0d]/80 backdrop-blur-3xl border border-white/10 rounded-[2rem] flex items-center p-2.5 shadow-2xl">
-              <div className="pl-6 text-white/20">
-                <Search className="w-6 h-6" />
+            <div className="absolute -inset-2 bg-gradient-to-r from-blue-600/10 to-purple-600/10 rounded-[2.5rem] blur-2xl opacity-100 group-focus-within:opacity-100 transition duration-1000"></div>
+            <form onSubmit={handleScrape} className="relative bg-[#1a1a1a]/40 backdrop-blur-3xl border border-white/20 rounded-[2rem] flex items-center p-3 shadow-2xl">
+              <div className="pl-6 text-white/40">
+                <Search className="w-7 h-7" />
               </div>
               <input
                 type="text"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
-                placeholder="Cole o link do imóvel aqui..."
-                className="flex-1 bg-transparent border-none py-5 px-5 text-lg focus:outline-none placeholder:text-white/20 text-white font-medium"
+                placeholder="Cole o link do imóvel do QuintoAndar aqui..."
+                className="flex-1 bg-transparent border-none py-6 px-6 text-xl focus:outline-none placeholder:text-white/30 text-white font-semibold"
               />
               <button
                 type="submit"
                 disabled={loading || !url}
                 className={cn(
-                  "bg-white text-black hover:bg-zinc-200 disabled:opacity-30 px-10 py-5 rounded-[1.6rem] font-black text-sm uppercase tracking-widest flex items-center gap-3 transition-all active:scale-95",
+                  "bg-white text-black hover:bg-zinc-200 disabled:opacity-30 px-12 py-6 rounded-[1.6rem] font-black text-sm uppercase tracking-widest flex items-center gap-3 transition-all active:scale-95 shadow-lg",
                   loading && "animate-pulse"
                 )}
               >
-                {loading ? "Processando..." : (
+                {loading ? "Capturando..." : (
                   <>
-                    Coletar Dados
+                    Iniciar
                     <ArrowRight className="w-5 h-5 font-bold" />
                   </>
                 )}
@@ -189,8 +208,8 @@ export default function ScraperPage() {
         </div>
       </section>
 
-      {/* Results Section */}
-      <section id="results" className="max-w-7xl mx-auto px-6 pb-60">
+      {/* STAGE 2: RESULTS */}
+      <section id="step-2" className="max-w-7xl mx-auto px-6 pb-40 min-h-[50vh]">
         <AnimatePresence mode="wait">
           {data ? (
             <motion.div
@@ -199,6 +218,8 @@ export default function ScraperPage() {
               animate="visible"
               className="space-y-20"
             >
+              <StepIndicator number={2} title="Análise & Mídia" active={true} />
+
               {/* Header result */}
               <motion.div variants={itemVariants} className="flex flex-col md:flex-row justify-between items-start md:items-end gap-10 border-b border-white/5 pb-16">
                 <div className="space-y-6 flex-1">
@@ -206,180 +227,152 @@ export default function ScraperPage() {
                     <MapPin className="w-4 h-4" />
                     <span className="font-bold tracking-widest uppercase text-[10px]">{data.city} • ID: {data.id}</span>
                   </div>
-                  <h2 className="text-4xl md:text-6xl font-black tracking-tight leading-[1.1] uppercase">{data.title}</h2>
+                  <h2 className="text-4xl md:text-6xl font-black tracking-tight leading-[1.1] uppercase italic">{data.title}</h2>
                   <p className="text-white/40 text-xl font-medium tracking-tight whitespace-pre-wrap">{data.address}</p>
                 </div>
                 <div className="flex flex-wrap gap-4">
                   <button className="w-16 h-16 bg-white/5 border border-white/10 rounded-[1.5rem] flex items-center justify-center hover:bg-white/10 hover:scale-105 active:scale-95 transition-all text-white/50 hover:text-white">
                     <Share2 className="w-6 h-6" />
                   </button>
-                  <button className="w-16 h-16 bg-white/5 border border-white/10 rounded-[1.5rem] flex items-center justify-center hover:bg-white/10 hover:scale-105 active:scale-95 transition-all text-white/50 hover:text-white">
-                    <Heart className="w-6 h-6" />
-                  </button>
                   <a 
                     href={url} 
                     target="_blank" 
                     className="flex items-center gap-3 bg-white text-black px-10 h-16 rounded-[1.5rem] font-black uppercase text-xs tracking-widest hover:bg-zinc-200 transition-all flex-shrink-0"
                   >
-                    Original <ExternalLink className="w-4 h-4" />
+                    Abrir QuintoAndar <ExternalLink className="w-4 h-4" />
                   </a>
                 </div>
               </motion.div>
 
-              {/* Stats Grid */}
-              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
-                 <div className="bg-white/5 border border-white/10 p-8 rounded-[2rem] flex flex-col justify-between group hover:border-blue-500/50 transition-all duration-500">
-                    <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-blue-500">
-                      <HomeIcon className="w-5 h-5" />
-                    </div>
-                    <div className="mt-6">
-                      <p className="text-white/30 text-[10px] font-black uppercase tracking-widest">Imóvel</p>
-                      <p className="text-xl font-black mt-1 tracking-tighter uppercase">{data.type}</p>
-                    </div>
-                  </div>
-                  {[
-                    { icon: Maximize2, label: 'Área', value: `${data.area} m²` },
-                    { icon: Bed, label: 'Quartos', value: data.bedrooms },
-                    { icon: Bath, label: 'Banheiros', value: data.bathrooms },
-                    { icon: Car, label: 'Vagas', value: data.parking },
-                  ].map((stat, i) => (
-                    <div key={i} className="bg-white/5 border border-white/10 p-8 rounded-[2rem] flex flex-col justify-between group hover:border-blue-500/50 transition-all duration-500">
+              {/* Stats & Financial Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-10">
+                <div className="md:col-span-8 grid grid-cols-2 md:grid-cols-4 gap-6">
+                   <div className="bg-white/5 border border-white/10 p-8 rounded-[2rem] flex flex-col justify-between group hover:border-blue-500/50 transition-all duration-500">
                       <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-blue-500">
-                        <stat.icon className="w-5 h-5" />
+                        <HomeIcon className="w-5 h-5" />
                       </div>
                       <div className="mt-6">
-                        <p className="text-white/30 text-[10px] font-black uppercase tracking-widest">{stat.label}</p>
-                        <p className="text-3xl font-black mt-1 tracking-tighter">{stat.value}</p>
+                        <p className="text-white/30 text-[10px] font-black uppercase tracking-widest">Imóvel</p>
+                        <p className="text-xl font-black mt-1 tracking-tighter uppercase">{data.type}</p>
                       </div>
                     </div>
-                  ))}
-              </div>
-
-              {/* Main Content: Investment + Description + Amenities */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-                
-                {/* Investment Side Card */}
-                <div className="lg:col-span-4 h-fit sticky top-24">
-                   <div className="bg-gradient-to-br from-blue-700 to-blue-900 border border-blue-500/30 p-10 rounded-[3rem] flex flex-col justify-between shadow-2xl relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 blur-3xl rounded-full -mr-20 -mt-20"></div>
-                    <div className="relative space-y-8">
-                      <div className="flex justify-between items-center">
-                        <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center">
-                          <Tag className="w-6 h-6 text-white" />
+                    {[
+                      { icon: Maximize2, label: 'Área', value: `${data.area} m²` },
+                      { icon: Bed, label: 'Quartos', value: data.bedrooms },
+                      { icon: Bath, label: 'Banheiros', value: data.bathrooms },
+                    ].map((stat, i) => (
+                      <div key={i} className="bg-white/5 border border-white/10 p-8 rounded-[2rem] flex flex-col justify-between group hover:border-blue-500/50 transition-all duration-500">
+                        <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-blue-500">
+                          <stat.icon className="w-5 h-5" />
                         </div>
+                        <div className="mt-6">
+                          <p className="text-white/30 text-[10px] font-black uppercase tracking-widest">{stat.label}</p>
+                          <p className="text-3xl font-black mt-1 tracking-tighter">{stat.value}</p>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+
+                <div className="md:col-span-4 bg-gradient-to-br from-blue-700 to-blue-900 border border-blue-500/30 p-10 rounded-[3rem] shadow-2xl relative overflow-hidden group h-full flex flex-col justify-between">
+                    <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 blur-3xl rounded-full -mr-20 -mt-20"></div>
+                    <div className="relative space-y-4">
+                      <div className="flex justify-between items-center mb-6">
+                        <Tag className="w-8 h-8 text-white/50" />
                         <span className="bg-white text-blue-700 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-xl">
                           {data.prices.isForSale ? "Venda" : "Aluguel"}
                         </span>
                       </div>
-                      
-                      <div className="space-y-4">
-                        <p className="text-white/60 text-[10px] font-black uppercase tracking-widest">
-                          {data.prices.isForSale ? "Valor de Venda" : "Aluguel Mensal"}
-                        </p>
-                        <h3 className="text-5xl font-black tracking-tighter text-white leading-none">
-                          {data.prices.isForSale ? formatCurrency(data.prices.salePrice) : formatCurrency(data.prices.rent)}
-                        </h3>
-                      </div>
-
-                      <div className="pt-8 border-t border-white/20 space-y-4">
-                        <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-white/60">
-                          <span>Total Mensal</span>
-                          <span className="text-white">{formatCurrency(data.prices.total)}</span>
-                        </div>
-                        <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-white/40">
-                          <span>Condomínio + IPTU</span>
-                          <span className="text-white/70">{formatCurrency(data.prices.condo + data.prices.iptu)}</span>
-                        </div>
+                      <p className="text-white/60 text-[10px] font-black uppercase tracking-widest">
+                        Valor Proposto
+                      </p>
+                      <h3 className="text-5xl font-black tracking-tighter text-white leading-none">
+                        {data.prices.isForSale ? formatCurrency(data.prices.salePrice) : formatCurrency(data.prices.rent)}
+                      </h3>
+                      <div className="pt-6 border-t border-white/10 flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-white/40">
+                         <span>Taxas Inclusas</span>
+                         <span>{formatCurrency(data.prices.condo + data.prices.iptu)}</span>
                       </div>
                     </div>
-                  </div>
+                </div>
+              </div>
+
+              {/* Description & Gallery Toggle */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+                <div className="lg:col-span-1 bg-white/5 border border-white/10 p-10 rounded-[3rem] h-fit">
+                   <h3 className="text-xl font-black uppercase tracking-tighter mb-8 italic flex items-center gap-3">
+                     <TrendingUp className="w-5 h-5 text-blue-500" /> Descrição
+                   </h3>
+                   <p className="text-white/60 text-lg leading-relaxed font-medium">
+                      {data.description || 'Nenhuma descrição detalhada disponível.'}
+                   </p>
                 </div>
 
-                {/* Info Blocks Side */}
-                <div className="lg:col-span-8 space-y-12">
-                  
-                  {/* Descrição Section */}
-                  <div className="bg-white/5 border border-white/10 p-10 rounded-[3rem] space-y-8">
-                     <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center text-blue-500">
-                          <TrendingUp className="w-5 h-5" />
-                        </div>
-                        <h3 className="text-2xl font-black uppercase tracking-tighter">Descrição</h3>
-                     </div>
-                     <p className="text-white/60 text-lg leading-relaxed font-medium whitespace-pre-wrap">
-                        {data.description || 'Nenhuma descrição detalhada disponível.'}
-                     </p>
-                  </div>
+                <div className="lg:col-span-2 space-y-10">
+                   {/* COLLAPSIBLE GALLERY BOX */}
+                   <div className="bg-white/5 border border-white/10 p-4 rounded-[3.5rem] relative overflow-hidden group">
+                      <div className="grid grid-cols-2 gap-4">
+                        {(isGalleryExpanded ? data.images : data.images.slice(0, 4)).map((img, i) => (
+                          <motion.div 
+                            key={i} 
+                            layout
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className="relative aspect-video rounded-3xl overflow-hidden border border-white/5"
+                          >
+                            <img src={img.url} className="w-full h-full object-cover" alt="" />
+                          </motion.div>
+                        ))}
+                      </div>
 
-                  {/* Imóvel Amenities Section */}
-                  <div className="bg-white/5 border border-white/10 p-10 rounded-[3rem] space-y-8">
-                     <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center text-blue-500">
-                          <Info className="w-5 h-5" />
+                      {/* Expand Overlay */}
+                      {!isGalleryExpanded && data.images.length > 4 && (
+                        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black via-black/80 to-transparent flex items-end justify-center pb-10">
+                           <button 
+                            onClick={() => setIsGalleryExpanded(true)}
+                            className="bg-white text-black px-10 py-5 rounded-[1.6rem] font-black text-xs uppercase tracking-[0.2em] flex items-center gap-3 hover:scale-105 active:scale-95 transition-all shadow-2xl"
+                           >
+                             Expandir Galeria ({data.images.length} fotos) <ChevronDown className="w-5 h-5" />
+                           </button>
                         </div>
-                        <h3 className="text-2xl font-black uppercase tracking-tighter">Imóvel</h3>
-                     </div>
-                     <div className="flex flex-wrap gap-3">
-                        {data.unitAmenities.length > 0 ? data.unitAmenities.map((amenity, i) => (
-                           <div key={i} className="bg-white/5 border border-white/10 px-5 py-2 rounded-2xl text-sm font-bold text-white/70">
-                              {amenity}
-                           </div>
-                        )) : <p className="text-white/30 italic">Nenhuma característica específica listada.</p>}
-                     </div>
-                  </div>
+                      )}
 
-                  {/* Condomínio Amenities Section */}
-                  <div className="bg-white/5 border border-white/10 p-10 rounded-[3rem] space-y-8">
-                     <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center text-blue-500">
-                          <ShieldCheck className="w-5 h-5" />
-                        </div>
-                        <h3 className="text-2xl font-black uppercase tracking-tighter">Condomínio</h3>
-                     </div>
-                     <div className="flex flex-wrap gap-3">
-                        {data.buildingAmenities.length > 0 ? data.buildingAmenities.map((amenity, i) => (
-                           <div key={i} className="bg-white/5 border border-white/10 px-5 py-2 rounded-2xl text-sm font-bold text-white/70">
-                              {amenity}
-                           </div>
-                        )) : <p className="text-white/30 italic">Características do condomínio não informadas.</p>}
-                     </div>
-                  </div>
-
-                  {/* Gallery */}
-                  <div className="space-y-12 pt-10">
-                    <div className="flex items-center gap-6">
-                        <h3 className="text-4xl font-black tracking-tight uppercase italic mix-blend-difference">Galeria de Fotos</h3>
-                        <div className="h-[2px] flex-1 bg-white/10"></div>
-                        <span className="text-white/20 font-black text-xs tracking-[0.3em]">{data.images.length} FOTOS</span>
-                    </div>
-                    
-                    <div className="columns-1 md:columns-2 gap-8 space-y-8">
-                      {data.images.map((img, i) => (
-                        <motion.div 
-                          key={i} 
-                          initial={{ opacity: 0, scale: 0.95 }}
-                          whileInView={{ opacity: 1, scale: 1 }}
-                          viewport={{ once: true }}
-                          className="relative group overflow-hidden rounded-[2.5rem] border border-white/10 shadow-2xl cursor-zoom-in"
-                        >
-                          <img 
-                            src={img.url} 
-                            alt={img.subtitle || 'Foto do imóvel'}
-                            className="w-full h-auto object-cover transition-transform duration-1000 group-hover:scale-110"
-                            loading="lazy"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 p-8 flex flex-col justify-end">
-                              <span className="text-blue-500 text-[10px] font-black uppercase tracking-widest mb-2">Ambiente • {i + 1}</span>
-                              <p className="text-white font-black text-xl tracking-tight leading-none uppercase italic">
-                                {img.subtitle || 'Detalhe do Imóvel'}
-                              </p>
-                          </div>
-                        </motion.div>
-                      ))}
-                    </div>
-                  </div>
+                      {isGalleryExpanded && (
+                         <div className="flex justify-center pt-10 pb-6">
+                            <button 
+                              onClick={() => {
+                                setIsGalleryExpanded(false);
+                                document.getElementById('step-2')?.scrollIntoView({ behavior: 'smooth' });
+                              }}
+                              className="bg-white/10 hover:bg-white/20 text-white px-10 py-5 rounded-[1.6rem] font-black text-xs uppercase tracking-[0.2em] flex items-center gap-3 transition-all"
+                            >
+                              Recolher <ChevronUp className="w-5 h-5" />
+                            </button>
+                         </div>
+                      )}
+                   </div>
                 </div>
+              </div>
 
+              {/* STAGE 3: MARKETING */}
+              <div id="step-3" className="pt-20">
+                <StepIndicator number={3} title="Criação de Conteúdo" active={true} />
+                <motion.div 
+                  variants={itemVariants}
+                  className="bg-white/5 border border-white/10 rounded-[4rem] p-16 flex flex-col md:flex-row items-center justify-between gap-12 group hover:border-blue-500/30 transition-all duration-700"
+                >
+                  <div className="space-y-6 text-center md:text-left">
+                    <div className="w-20 h-20 bg-gradient-to-tr from-pink-500/20 to-purple-500/20 border border-pink-500/30 rounded-[2rem] flex items-center justify-center group-hover:scale-110 transition-transform duration-700">
+                       <Instagram className="w-10 h-10 text-pink-500" />
+                    </div>
+                    <h4 className="text-4xl font-black tracking-tighter uppercase italic">Postagem Instagram</h4>
+                    <p className="text-white/40 text-xl font-medium max-w-lg">
+                      Transforme automaticamente os dados deste imóvel em Stories e Feed de alta conversão.
+                    </p>
+                  </div>
+                  <button className="bg-white/5 border border-white/10 text-white/40 px-12 py-8 rounded-[2rem] font-black uppercase text-sm tracking-widest flex items-center gap-4 cursor-not-allowed group-hover:bg-white group-hover:text-black transition-all">
+                    Configurar Postagem <Sparkles className="w-5 h-5" />
+                  </button>
+                </motion.div>
               </div>
             </motion.div>
           ) : (
@@ -387,14 +380,14 @@ export default function ScraperPage() {
               <motion.div 
                 initial={{ opacity: 0 }} 
                 animate={{ opacity: 1 }}
-                className="py-60 flex flex-col items-center justify-center text-center space-y-10"
+                className="py-40 flex flex-col items-center justify-center text-center space-y-10"
               >
-                <div className="w-32 h-32 rounded-[2.5rem] bg-white/5 border border-white/10 flex items-center justify-center text-white/10 shadow-inner">
+                <div className="w-32 h-32 rounded-[2.5rem] bg-white/5 border border-white/10 flex items-center justify-center text-white/5 shadow-inner">
                   <ImageIcon className="w-12 h-12" />
                 </div>
                 <div className="space-y-4">
-                  <h3 className="text-3xl font-black tracking-tighter text-white/20 uppercase italic">Aguardando Coleta</h3>
-                  <p className="text-white/10 max-w-sm font-bold uppercase tracking-widest text-[10px]">Utilize o campo superior para processar um link do QuintoAndar</p>
+                  <h3 className="text-3xl font-black tracking-tighter text-white/20 uppercase italic">Aguardando Captura</h3>
+                  <p className="text-white/10 max-w-sm font-bold uppercase tracking-widest text-[10px]">Cole um link do QuintoAndar na Etapa 1</p>
                 </div>
               </motion.div>
             )
@@ -407,14 +400,14 @@ export default function ScraperPage() {
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-10">
           <div className="flex items-center gap-3 opacity-20">
              <div className="w-8 h-8 bg-white/50 rounded-lg"></div>
-             <span className="font-black tracking-tighter text-xl">VITRINE QA</span>
+             <span className="font-black tracking-tighter text-xl uppercase">Vitrine QA</span>
           </div>
           <div className="flex gap-12 text-[10px] font-black uppercase tracking-[0.2em] text-white/20">
-            <a href="#" className="hover:text-blue-500 transition-colors">Privacidade</a>
+            <a href="#" className="hover:text-blue-500 transition-colors">Explorer</a>
             <a href="#" className="hover:text-blue-500 transition-colors">Histórico</a>
-            <a href="#" className="hover:text-blue-500 transition-colors">Github</a>
+            <a href="#" className="hover:text-blue-500 transition-colors">Open Source</a>
           </div>
-          <p className="text-white/10 text-[10px] font-black uppercase tracking-widest">© 2026 VitrineQA • Desenvolvido para Agentes de Elite</p>
+          <p className="text-white/10 text-[10px] font-black uppercase tracking-widest italic">© 2026 VitrineQA • Para Corretores de Elite</p>
         </div>
       </footer>
     </div>
