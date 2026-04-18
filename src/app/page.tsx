@@ -7,7 +7,7 @@ import {
   ArrowRight, Loader2, Image as ImageIcon, 
   CheckCircle2, Building2, 
   Share2, Heart, ExternalLink, TrendingUp, Tag,
-  Info, ShieldCheck, Home
+  Info, ShieldCheck, Home as HomeIcon
 } from 'lucide-react';
 import axios from 'axios';
 import { clsx, type ClassValue } from 'clsx';
@@ -230,7 +230,7 @@ export default function Home() {
               <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
                  <div className="bg-white/5 border border-white/10 p-8 rounded-[2rem] flex flex-col justify-between group hover:border-blue-500/50 transition-all duration-500">
                     <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-blue-500">
-                      <Home className="w-5 h-5" />
+                      <HomeIcon className="w-5 h-5" />
                     </div>
                     <div className="mt-6">
                       <p className="text-white/30 text-[10px] font-black uppercase tracking-widest">Imóvel</p>
