@@ -81,24 +81,24 @@ const CAROUSEL_THEMES = {
 type ThemeKey = keyof typeof CAROUSEL_THEMES;
 
 // --- Slide Component ---
-const InstagramSlide = ({ id, theme, children, watermark }: { id: string, theme: any, children: React.ReactNode, watermark: string }) => (
+const InstagramSlide = ({ theme, children, watermark, className }: { theme: any, children: React.ReactNode, watermark: string, className?: string }) => (
   <div 
-    id={id}
     className={cn(
-      "w-[1080px] h-[1350px] relative overflow-hidden flex flex-col font-sans text-white bg-black shrink-0",
-      theme.from && "bg-gradient-to-br " + theme.from + " " + theme.via + " " + theme.to
+      "w-[1080px] h-[1350px] relative overflow-hidden flex flex-col text-white bg-zinc-950 shrink-0 select-none",
+      theme.from && "bg-gradient-to-br " + theme.from + " " + theme.via + " " + theme.to,
+      className
     )}
     style={{ fontFamily: "'Inter', sans-serif" }}
   >
-    <div className="absolute inset-0 bg-black/40" />
-    <div className="relative z-10 flex-1 flex flex-col p-20">
+    <div className="absolute inset-0 bg-black/50" />
+    <div className="relative z-10 flex-1 flex flex-col p-24">
       {children}
     </div>
     
-    {/* Watermark */}
-    <div className="absolute bottom-12 right-12 z-20 flex items-center gap-3 bg-black/60 backdrop-blur-xl px-8 py-4 rounded-full border border-white/20 shadow-2xl">
-      <Instagram className="w-6 h-6 text-white" />
-      <span className="text-2xl font-black tracking-tighter uppercase italic" style={{ fontFamily: "'Montserrat', sans-serif" }}>{watermark}</span>
+    {/* Watermark with better contrast */}
+    <div className="absolute bottom-12 right-12 z-20 flex items-center gap-3 bg-black/80 backdrop-blur-3xl px-10 py-5 rounded-full border border-white/20 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+      <Instagram className="w-8 h-8 text-white" />
+      <span className="text-3xl font-black tracking-tighter uppercase italic" style={{ fontFamily: "'Montserrat', sans-serif" }}>{watermark}</span>
     </div>
   </div>
 );
@@ -173,12 +173,13 @@ export default function ScraperPage() {
   const [currentTheme, setCurrentTheme] = useState<ThemeKey>('azure');
   const [isRenderingCarousel, setIsRenderingCarousel] = useState(false);
   const [renderProgress, setRenderProgress] = useState(0);
+  const [activeCaptureIndex, setActiveCaptureIndex] = useState<number | null>(null);
 
   useEffect(() => {
     if (data) {
       // Pick a theme based on property ID to ensure variety
       const keys = Object.keys(CAROUSEL_THEMES) as ThemeKey[];
-      const index = parseInt(data.id.slice(-2)) % keys.length;
+      const index = parseInt(data.id.slice(-1)) % keys.length;
       setCurrentTheme(keys[index]);
     }
   }, [data]);
@@ -326,18 +327,23 @@ export default function ScraperPage() {
     const zip = new JSZip();
 
     try {
-      const slideIds = ['slide-1', 'slide-2', 'slide-3', 'slide-4', 'slide-5', 'slide-6', 'slide-7', 'slide-8'];
-      
-      for (let i = 0; i < slideIds.length; i++) {
-        setRenderProgress(Math.round(((i) / slideIds.length) * 100));
+      // Ensure fonts are loaded
+      await document.fonts.ready;
+
+      // Sequential capture: 1 to 8
+      for (let i = 0; i < 8; i++) {
+        setRenderProgress(Math.round((i / 8) * 100));
         
-        // Wait for potential UI updates
-        await new Promise(resolve => setTimeout(resolve, 500));
+        // 1. Set the active slide to render
+        setActiveCaptureIndex(i);
         
-        const element = document.getElementById(slideIds[i]);
+        // 2. Wait for React to render and images to load
+        await new Promise(resolve => setTimeout(resolve, 800));
+        
+        const element = document.getElementById('capture-target');
         if (!element) continue;
 
-        // Force a brief check for images inside
+        // Force image load check
         const imgs = element.querySelectorAll('img');
         await Promise.all(Array.from(imgs).map(img => {
           if (img.complete) return Promise.resolve();
@@ -347,9 +353,10 @@ export default function ScraperPage() {
           });
         }));
 
+        // 3. Capture with high quality
         const blob = await htmlToImage.toBlob(element, { 
-          quality: 0.95,
-          pixelRatio: 2, // High DPI for Instagram (2160x2700)
+          quality: 0.98,
+          pixelRatio: 3, // Ultra High Quality (3240x4050)
           cacheBust: true,
           style: {
             transform: 'scale(1)',
@@ -357,19 +364,21 @@ export default function ScraperPage() {
         });
         
         if (blob) {
-          zip.file(`${i + 1}.jpg`, blob);
+          zip.file(`post-${i + 1}.jpg`, blob);
         }
       }
 
       setRenderProgress(100);
       const content = await zip.generateAsync({ type: "blob" });
-      saveAs(content, `${data.id}-carrossel.zip`);
+      saveAs(content, `${data.id}-instagram-premium.zip`);
+      setIsDownloadModalOpen(false);
     } catch (err) {
       console.error('Carousel generation failed', err);
-      alert('Erro ao gerar carrossel. Tente novamente.');
+      alert('Houve um erro técnico na geração. Tente mudar o navegador ou recarregar a página.');
     } finally {
       setIsRenderingCarousel(false);
       setRenderProgress(0);
+      setActiveCaptureIndex(null);
     }
   };
 
@@ -440,16 +449,12 @@ export default function ScraperPage() {
                   loading && "animate-pulse"
                 )}
               >
-                {loading ? "Capturando..." : (
-                  <>
-                    Iniciar
-                    <ArrowRight className="w-4 h-4 md:w-5 md:h-5 font-bold" />
-                  </>
-                )}
+                {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <ArrowRight className="w-5 h-5" />}
+                <span>{loading ? "Processando..." : "Explorar Agora"}</span>
               </button>
             </form>
-            <AnimatePresence>
-              {error && (
+            {error && (
+              <AnimatePresence>
                 <motion.p
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -458,8 +463,8 @@ export default function ScraperPage() {
                 >
                   {error}
                 </motion.p>
-              )}
-            </AnimatePresence>
+              </AnimatePresence>
+            )}
           </motion.div>
         </div>
       </section>
@@ -512,202 +517,125 @@ export default function ScraperPage() {
                         <a 
                           href={url} 
                           target="_blank" 
-                          className="flex-1 md:flex-none flex items-center justify-center gap-3 bg-white text-black px-8 h-16 rounded-[1.5rem] font-black uppercase text-xs tracking-widest hover:bg-zinc-200 transition-all active:scale-95"
+                          rel="noopener noreferrer"
+                          className="flex-1 md:flex-none flex items-center justify-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 text-white px-8 h-16 rounded-[1.5rem] font-black uppercase text-xs tracking-widest transition-all"
                         >
-                          Link Original <ExternalLink className="w-4 h-4" />
+                          Ver no QA <ExternalLink className="w-4 h-4" />
                         </a>
                       </div>
                     </div>
 
-                    {/* Stats & Financial Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-12 gap-10">
-                      <div className="md:col-span-8 grid grid-cols-2 lg:grid-cols-5 gap-4">
-                         <div className="bg-white/5 border border-white/10 p-6 md:p-8 rounded-2xl md:rounded-[2rem] flex flex-col justify-between group hover:border-blue-500/50 transition-all duration-500">
-                            <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-blue-500">
-                              <HomeIcon className="w-5 h-5" />
-                            </div>
-                            <div className="mt-4 md:mt-6">
-                              <p className="text-white/30 text-[10px] font-black uppercase tracking-widest">Imóvel</p>
-                              <p className="text-xs md:text-sm font-black mt-1 tracking-tighter uppercase line-clamp-1">{data.type}</p>
-                            </div>
+                    {/* Stats Grid */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                      {[
+                        { label: 'Metragem', value: `${data.area}m²`, icon: Maximize2 },
+                        { label: 'Dormitórios', value: data.bedrooms, icon: Bed },
+                        { label: 'Banheiros', value: data.bathrooms, icon: Bath },
+                        { label: 'Vagas', value: data.parking, icon: Car },
+                      ].map((stat, i) => (
+                        <div key={i} className="bg-white/5 border border-white/10 p-8 rounded-[2rem] space-y-4 hover:border-blue-500/30 transition-all group">
+                          <div className="w-12 h-12 bg-blue-500/10 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <stat.icon className="w-6 h-6 text-blue-500" />
                           </div>
-                          {[
-                            { icon: Maximize2, label: 'Área', value: `${data.area}m²` },
-                            { icon: Bed, label: 'Quartos', value: data.bedrooms },
-                            { icon: Bath, label: 'Banheiros', value: data.bathrooms },
-                            { icon: Car, label: 'Vagas', value: data.parking },
-                          ].map((stat, i) => (
-                            <div key={i} className="bg-white/5 border border-white/10 p-6 md:p-8 rounded-2xl md:rounded-[2rem] flex flex-col justify-between group hover:border-blue-500/50 transition-all duration-500">
-                              <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-blue-500">
-                                <stat.icon className="w-5 h-5" />
-                              </div>
-                              <div className="mt-4 md:mt-6">
-                                <p className="text-white/30 text-[10px] font-black uppercase tracking-widest">{stat.label}</p>
-                                <p className="text-xl md:text-2xl font-black mt-1 tracking-tighter">{stat.value}</p>
-                              </div>
-                            </div>
-                          ))}
-                      </div>
+                          <div>
+                            <p className="text-white/20 text-[10px] font-black uppercase tracking-widest">{stat.label}</p>
+                            <p className="text-2xl font-black tracking-tight">{stat.value}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
 
-                      <div className="md:col-span-4 bg-gradient-to-br from-blue-700 to-blue-900 border border-blue-500/30 p-8 md:p-10 rounded-2xl md:rounded-[3rem] shadow-2xl relative overflow-hidden group h-full flex flex-col justify-between">
-                          <div className="absolute top-0 right-0 w-32 md:w-40 h-32 md:h-40 bg-white/10 blur-3xl rounded-full -mr-16 md:-mr-20 -mt-16 md:-mt-20"></div>
-                          <div className="relative space-y-4">
-                            <div className="flex justify-between items-center mb-4 md:mb-6">
-                              <Tag className="w-6 h-6 md:w-8 md:h-8 text-white/50" />
-                              <span className="bg-white text-blue-700 px-3 md:px-4 py-1.5 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-widest shadow-xl">
-                                {data.prices.isForSale ? "Venda" : "Aluguel"}
-                              </span>
-                            </div>
-                            <p className="text-white/60 text-[10px] font-black uppercase tracking-widest">
-                              Valor Proposto
-                            </p>
-                            <h3 className="text-4xl md:text-5xl font-black tracking-tighter text-white leading-none">
-                              {data.prices.isForSale ? formatCurrency(data.prices.salePrice) : formatCurrency(data.prices.rent)}
+                    {/* Description & Gallery */}
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+                       <div className="lg:col-span-12 space-y-12">
+                          {/* Description with Expand */}
+                          <div className="bg-white/5 border border-white/10 rounded-[3rem] p-10">
+                            <h3 className="text-xl font-black uppercase tracking-tighter mb-8 italic flex items-center gap-3">
+                              <Info className="w-5 h-5 text-blue-500" /> Descrição do Imóvel
                             </h3>
-                            <div className="pt-4 md:pt-6 border-t border-white/10 flex justify-between items-center text-[9px] md:text-[10px] font-black uppercase tracking-widest text-white/40">
-                               <span>Taxas Inclusas</span>
-                               <span>{formatCurrency(data.prices.condo + data.prices.iptu)}</span>
+                            <div className="relative">
+                              <p className={cn(
+                                "text-white/50 text-base leading-relaxed whitespace-pre-wrap transition-all duration-700",
+                                !isDescExpanded && "max-h-[150px] overflow-hidden"
+                              )}>
+                                {data.description}
+                              </p>
+                              {!isDescExpanded && (
+                                <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#0d0d0d] to-transparent pointer-events-none" />
+                              )}
                             </div>
+                            <button 
+                             onClick={() => setIsDescExpanded(!isDescExpanded)}
+                             className="mt-8 text-blue-500 text-[10px] font-black underline uppercase tracking-widest hover:text-white transition-colors"
+                            >
+                              {isDescExpanded ? "Ler Menos" : "Ler Descrição Completa"}
+                            </button>
                           </div>
-                      </div>
-                    </div>
 
-                    {/* Description & Gallery Toggle */}
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-                      <div className="lg:col-span-1 bg-white/5 border border-white/10 p-10 rounded-[3rem] h-fit relative">
-                         <h3 className="text-xl font-black uppercase tracking-tighter mb-8 italic flex items-center gap-3">
-                           <TrendingUp className="w-5 h-5 text-blue-500" /> Descrição
-                         </h3>
-                         <div className={cn(
-                           "relative transition-all duration-700 overflow-hidden",
-                           isDescExpanded ? "max-h-[2000px]" : "max-h-[200px]"
-                         )}>
-                           <p className="text-white/60 text-lg leading-relaxed font-medium pb-10">
-                              {data.description || 'Nenhuma descrição detalhada disponível.'}
-                           </p>
-                           {!isDescExpanded && (
-                             <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#0d0d0d] to-transparent pointer-events-none" />
-                           )}
-                         </div>
-                         <button 
-                          onClick={() => setIsDescExpanded(!isDescExpanded)}
-                          className="mt-4 text-blue-500 text-[10px] font-black underline uppercase tracking-widest hover:text-white transition-colors"
-                         >
-                           {isDescExpanded ? "Ver Menos" : "Ver Tudo"}
-                         </button>
-                      </div>
-
-                      <div className="lg:col-span-2 space-y-8 md:space-y-10">
-                         {/* COLLAPSIBLE GALLERY BOX */}
-                         <div className="bg-white/5 border border-white/10 p-2 md:p-4 rounded-3xl md:rounded-[3.5rem] relative overflow-hidden group">
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 md:gap-4">
-                              {(isGalleryExpanded ? data.images : data.images.slice(0, 4)).map((img, i) => (
-                                <motion.div 
-                                  key={i} 
-                                  layout
-                                  initial={{ opacity: 0 }}
-                                  animate={{ opacity: 1 }}
-                                  className="relative aspect-video rounded-2xl md:rounded-3xl overflow-hidden border border-white/5"
-                                >
-                                  <img src={img.url} className="w-full h-full object-cover" alt="" />
-                                </motion.div>
-                              ))}
-                            </div>
-
-                            {/* Expand Overlay */}
-                            {!isGalleryExpanded && data.images.length > 4 && (
-                              <div className="absolute inset-x-0 bottom-0 h-32 md:h-40 bg-gradient-to-t from-black via-black/80 to-transparent flex items-end justify-center pb-6 md:pb-10">
-                                 <button 
-                                  onClick={() => setIsGalleryExpanded(true)}
-                                  className="bg-white text-black px-6 md:px-10 py-3 md:py-5 rounded-xl md:rounded-[1.6rem] font-black text-[10px] md:text-xs uppercase tracking-[0.2em] flex items-center gap-2 md:gap-3 hover:scale-105 active:scale-95 transition-all shadow-2xl"
-                                 >
-                                   Expandir Galeria ({data.images.length}) <ChevronDown className="w-4 h-4 md:w-5 md:h-5" />
-                                 </button>
-                              </div>
-                            )}
-
-                            {isGalleryExpanded && (
-                               <div className="flex justify-center pt-6 md:pt-10 pb-4 md:pb-6">
-                                  <button 
-                                    onClick={() => {
-                                      setIsGalleryExpanded(false);
-                                      document.getElementById('step-2')?.scrollIntoView({ behavior: 'smooth' });
-                                    }}
-                                    className="bg-white/10 hover:bg-white/20 text-white px-8 md:px-10 py-4 md:py-5 rounded-xl md:rounded-[1.6rem] font-black text-[10px] md:text-xs uppercase tracking-[0.2em] flex items-center gap-2 md:gap-3 transition-all"
-                                  >
-                                    Recolher <ChevronUp className="w-4 h-4 md:w-5 md:h-5" />
-                                  </button>
-                               </div>
-                            )}
-                         </div>
-                      </div>
-                    </div>
-
-                    {/* AMENITIES ROW */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-                      {/* UNIT AMENITIES */}
-                      <div className="bg-white/5 border border-white/10 p-10 rounded-[3rem] h-fit relative">
-                         <h3 className="text-xl font-black uppercase tracking-tighter mb-8 italic flex items-center gap-3">
-                           <Info className="w-5 h-5 text-blue-500" /> Do Imóvel
-                         </h3>
-                         <div className={cn(
-                           "relative transition-all duration-700 overflow-hidden",
-                           isUnitExpanded ? "max-h-[2000px]" : "max-h-[200px]"
-                         )}>
-                            <div className="flex flex-wrap gap-3 pb-10">
-                              {data.unitAmenities?.length > 0 ? data.unitAmenities.map((item, i) => (
-                                <div key={i} className="bg-white/5 border border-white/10 px-4 py-2 rounded-xl text-xs font-bold text-white/40 group-hover:text-white transition-all">
-                                  {item}
+                          {/* Unit Amenities with Expand */}
+                          <div className="bg-white/5 border border-white/10 rounded-[3rem] p-10">
+                             <h3 className="text-xl font-black uppercase tracking-tighter mb-8 italic flex items-center gap-3">
+                               <CheckCircle2 className="w-5 h-5 text-blue-500" /> Itens do Imóvel
+                             </h3>
+                             <div className={cn(
+                               "relative transition-all duration-700 overflow-hidden",
+                               isUnitExpanded ? "max-h-[2000px]" : "max-h-[200px]"
+                             )}>
+                                <div className="flex flex-wrap gap-3 pb-10">
+                                  {data.unitAmenities?.length > 0 ? data.unitAmenities.map((item, i) => (
+                                    <div key={i} className="bg-white/5 border border-white/10 px-4 py-2 rounded-xl text-xs font-bold text-white/40 transition-all hover:bg-blue-500/10 hover:border-blue-500/30">
+                                      {item}
+                                    </div>
+                                  )) : (
+                                    <p className="text-white/20 text-xs italic">Não informado</p>
+                                  )}
                                 </div>
-                              )) : (
-                                <p className="text-white/20 text-xs italic">Não informado</p>
-                              )}
-                            </div>
-                           {!isUnitExpanded && data.unitAmenities?.length > 10 && (
-                             <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#0d0d0d] to-transparent pointer-events-none" />
-                           )}
-                         </div>
-                         {data.unitAmenities?.length > 10 && (
-                           <button 
-                            onClick={() => setIsUnitExpanded(!isUnitExpanded)}
-                            className="mt-4 text-blue-500 text-[10px] font-black underline uppercase tracking-widest hover:text-white transition-colors"
-                           >
-                             {isUnitExpanded ? "Ver Menos" : "Ver Tudo"}
-                           </button>
-                         )}
-                      </div>
+                               {!isUnitExpanded && data.unitAmenities?.length > 10 && (
+                                 <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#0d0d0d] to-transparent pointer-events-none" />
+                               )}
+                             </div>
+                             {data.unitAmenities?.length > 10 && (
+                               <button 
+                                onClick={() => setIsUnitExpanded(!isUnitExpanded)}
+                                className="mt-4 text-blue-500 text-[10px] font-black underline uppercase tracking-widest hover:text-white transition-colors"
+                               >
+                                 {isUnitExpanded ? "Ver Menos" : "Ver Tudo"}
+                               </button>
+                             )}
+                          </div>
 
-                      {/* BUILDING AMENITIES */}
-                      <div className="bg-white/5 border border-white/10 p-10 rounded-[3rem] h-fit relative">
-                         <h3 className="text-xl font-black uppercase tracking-tighter mb-8 italic flex items-center gap-3">
-                           <ShieldCheck className="w-5 h-5 text-blue-500" /> Do Condomínio
-                         </h3>
-                         <div className={cn(
-                           "relative transition-all duration-700 overflow-hidden",
-                           isBuildingExpanded ? "max-h-[2000px]" : "max-h-[200px]"
-                         )}>
-                            <div className="flex flex-wrap gap-3 pb-10">
-                              {data.buildingAmenities?.length > 0 ? data.buildingAmenities.map((item, i) => (
-                                <div key={i} className="bg-white/5 border border-white/10 px-4 py-2 rounded-xl text-xs font-bold text-white/40 transition-all">
-                                  {item}
+                          {/* Building Amenities with Expand */}
+                          <div className="bg-white/5 border border-white/10 rounded-[3rem] p-10">
+                             <h3 className="text-xl font-black uppercase tracking-tighter mb-8 italic flex items-center gap-3">
+                               <ShieldCheck className="w-5 h-5 text-blue-500" /> Do Condomínio
+                             </h3>
+                             <div className={cn(
+                               "relative transition-all duration-700 overflow-hidden",
+                               isBuildingExpanded ? "max-h-[2000px]" : "max-h-[200px]"
+                             )}>
+                                <div className="flex flex-wrap gap-3 pb-10">
+                                  {data.buildingAmenities?.length > 0 ? data.buildingAmenities.map((item, i) => (
+                                    <div key={i} className="bg-white/5 border border-white/10 px-4 py-2 rounded-xl text-xs font-bold text-white/40 transition-all hover:bg-blue-500/10 hover:border-blue-500/30">
+                                      {item}
+                                    </div>
+                                  )) : (
+                                    <p className="text-white/20 text-xs italic">Não informado</p>
+                                  )}
                                 </div>
-                              )) : (
-                                <p className="text-white/20 text-xs italic">Não informado</p>
-                              )}
-                            </div>
-                           {!isBuildingExpanded && data.buildingAmenities?.length > 10 && (
-                             <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#0d0d0d] to-transparent pointer-events-none" />
-                           )}
-                         </div>
-                         {data.buildingAmenities?.length > 10 && (
-                           <button 
-                            onClick={() => setIsBuildingExpanded(!isBuildingExpanded)}
-                            className="mt-4 text-blue-500 text-[10px] font-black underline uppercase tracking-widest hover:text-white transition-colors"
-                           >
-                             {isBuildingExpanded ? "Ver Menos" : "Ver Tudo"}
-                           </button>
-                         )}
-                      </div>
+                               {!isBuildingExpanded && data.buildingAmenities?.length > 10 && (
+                                 <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#0d0d0d] to-transparent pointer-events-none" />
+                               )}
+                             </div>
+                             {data.buildingAmenities?.length > 10 && (
+                               <button 
+                                onClick={() => setIsBuildingExpanded(!isBuildingExpanded)}
+                                className="mt-4 text-blue-500 text-[10px] font-black underline uppercase tracking-widest hover:text-white transition-colors"
+                               >
+                                 {isBuildingExpanded ? "Ver Menos" : "Ver Tudo"}
+                               </button>
+                             )}
+                          </div>
+                       </div>
                     </div>
                   </motion.div>
                 )}
@@ -798,137 +726,152 @@ export default function ScraperPage() {
                               
                               <h4 className="text-2xl font-black tracking-tighter uppercase italic">Imagens do Carrossel</h4>
                               
-                              {/* Preview Area (Scaled down) */}
                               <div className="relative aspect-[4/5] bg-black rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
-                                <div className="absolute inset-0 flex items-center justify-center scale-[0.22] origin-center -translate-y-[350px]">
-                                   {/* RENDER HIDDEN SLIDES HERE FOR PREVIEW AND CAPTURE */}
-                                   <div className="flex flex-col gap-40">
-                                      {/* SLIDE 1: CAPA */}
-                                      <InstagramSlide id="slide-1" theme={CAROUSEL_THEMES[currentTheme]} watermark="brunofernandes.corporativo">
-                                         <div className="absolute inset-0 z-0">
-                                            <img 
-                                              src={`/api/proxy-image?url=${encodeURIComponent(data.images[0].url)}`} 
-                                              className="w-full h-full object-cover scale-105" 
-                                              alt="" 
-                                              crossOrigin="anonymous"
-                                            />
-                                            <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/40 to-black/90" />
-                                         </div>
-                                         <div className="relative z-10 h-full flex flex-col justify-between items-center text-center py-10">
-                                            <div className={cn("px-12 py-5 rounded-full border-4 font-black uppercase tracking-[0.5em] text-4xl shadow-2xl", "border-white " + CAROUSEL_THEMES[currentTheme].bg)} style={{ fontFamily: "'Montserrat', sans-serif" }}>
-                                              {data.prices.isForSale ? "Oportunidade" : "Disponível"}
-                                            </div>
-                                            
-                                            <div className="space-y-6">
-                                              <p className="text-6xl font-black uppercase tracking-[0.3em] text-white/70 italic" style={{ fontFamily: "'Montserrat', sans-serif" }}>
-                                                {data.address.split(',').pop()?.trim() || data.city}
-                                              </p>
-                                              <h1 className="text-[140px] font-[900] uppercase italic leading-[0.75] tracking-tighter block [text-shadow:0_20px_50px_rgba(0,0,0,0.8)]" style={{ fontFamily: "'Montserrat', sans-serif" }}>
-                                                {data.title.split(' ').slice(0, 1).join(' ')}<br />
-                                                <span className={CAROUSEL_THEMES[currentTheme].accent}>{data.title.split(' ').slice(1, 3).join(' ')}</span><br />
-                                                {data.title.split(' ').slice(3, 5).join(' ')}
-                                              </h1>
-                                            </div>
-
-                                            <div className="w-full space-y-12">
-                                              <div className="flex justify-center items-center gap-16 text-5xl font-black uppercase italic text-white" style={{ fontFamily: "'Montserrat', sans-serif" }}>
-                                                <div className="flex flex-col items-center gap-2">
-                                                  <span className="text-white/40 text-2xl tracking-widest">Área</span>
-                                                  <span>{data.area}m²</span>
-                                                </div>
-                                                <div className="w-[2px] h-16 bg-white/20" />
-                                                <div className="flex flex-col items-center gap-2">
-                                                  <span className="text-white/40 text-2xl tracking-widest">Quartos</span>
-                                                  <span>{data.bedrooms}</span>
-                                                </div>
-                                                <div className="w-[2px] h-16 bg-white/20" />
-                                                <div className="flex flex-col items-center gap-2">
-                                                  <span className="text-white/40 text-2xl tracking-widest">Vagas</span>
-                                                  <span>{data.parking}</span>
-                                                </div>
+                                {/* REAL-TIME CAPTURE PORTAL (Hidden from view but visible to engine) */}
+                                <div className="fixed -left-[2000px] top-0 pointer-events-none origin-top-left">
+                                  {data && activeCaptureIndex !== null && (
+                                    <div id="capture-target">
+                                      {activeCaptureIndex === 0 ? (
+                                        <InstagramSlide theme={CAROUSEL_THEMES[currentTheme]} watermark="brunofernandes.corporativo">
+                                           <div className="absolute inset-0 z-0 scale-110">
+                                              <img 
+                                                src={`/api/proxy-image?url=${encodeURIComponent(data.images[0].url)}`} 
+                                                className="w-full h-full object-cover blur-[2px]" 
+                                                crossOrigin="anonymous"
+                                              />
+                                              <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/30 to-black/95" />
+                                           </div>
+                                           <div className="relative z-10 h-full flex flex-col justify-between items-center text-center">
+                                              <div className={cn("px-16 py-6 rounded-full border-4 font-black uppercase tracking-[0.6em] text-4xl shadow-2xl", "border-white " + CAROUSEL_THEMES[currentTheme].bg)} style={{ fontFamily: "'Montserrat', sans-serif" }}>
+                                                {data.prices.isForSale ? "Oportunidade" : "Disponível"}
                                               </div>
                                               
-                                              <div className={cn("inline-block px-16 py-8 rounded-[3rem] shadow-[0_30px_60px_rgba(0,0,0,0.5)] border-t border-white/20", CAROUSEL_THEMES[currentTheme].bg)}>
-                                                <p className="text-[100px] font-black italic tracking-tighter leading-none" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+                                              <div className="w-full flex flex-col gap-6">
+                                                <p className="text-6xl font-black uppercase tracking-[0.4em] text-white/50 italic mb-4" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+                                                  {data.address.split(',').pop()?.trim() || data.city}
+                                                </p>
+                                                <h1 className="text-[145px] font-[900] uppercase italic leading-[0.75] tracking-tighter block drop-shadow-[0_20px_40px_rgba(0,0,0,0.8)]" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+                                                  {data.title.split(' ').slice(0, 1).join(' ')}<br />
+                                                  <span className={CAROUSEL_THEMES[currentTheme].accent}>{data.title.split(' ').slice(1, 3).join(' ')}</span><br />
+                                                  {data.title.split(' ').slice(3, 5).join(' ')}
+                                                </h1>
+                                              </div>
+
+                                              <div className="w-full bg-white/5 backdrop-blur-3xl border border-white/10 rounded-[5rem] p-16 space-y-12">
+                                                <div className="flex justify-around items-center gap-4 text-5xl font-black uppercase italic text-white" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+                                                  <div className="flex flex-col items-center gap-4">
+                                                    <Maximize2 className="w-12 h-12 text-white/30" />
+                                                    <span>{data.area}m²</span>
+                                                  </div>
+                                                  <div className="w-[3px] h-20 bg-white/10" />
+                                                  <div className="flex flex-col items-center gap-4">
+                                                    <Bed className="w-12 h-12 text-white/30" />
+                                                    <span>{data.bedrooms} Qts</span>
+                                                  </div>
+                                                  <div className="w-[3px] h-20 bg-white/10" />
+                                                  <div className="flex flex-col items-center gap-4">
+                                                    <Car className="w-12 h-12 text-white/30" />
+                                                    <span>{data.parking} Vagas</span>
+                                                  </div>
+                                                </div>
+                                                
+                                                <div className={cn("h-1 w-32 bg-white/20 mx-auto rounded-full")} />
+                                                
+                                                <p className="text-[120px] font-black italic tracking-tighter leading-none" style={{ fontFamily: "'Montserrat', sans-serif" }}>
                                                   {data.prices.isForSale ? formatCurrency(data.prices.salePrice) : formatCurrency(data.prices.rent)}
                                                 </p>
                                               </div>
-                                            </div>
-                                         </div>
-                                      </InstagramSlide>
-
-                                      {/* SLIDES 2-7: PHOTOS */}
-                                      {[1, 2, 3, 4, 5, 6].map((idx) => (
-                                        <InstagramSlide key={idx} id={`slide-${idx + 1}`} theme={CAROUSEL_THEMES[currentTheme]} watermark="brunofernandes.corporativo">
-                                          <div className="absolute inset-0">
-                                             <img 
-                                              src={`/api/proxy-image?url=${encodeURIComponent(data.images[idx]?.url || data.images[0].url)}`} 
-                                              className="w-full h-full object-cover" 
-                                              alt="" 
-                                              crossOrigin="anonymous"
-                                            />
-                                            <div className="absolute inset-0 bg-black/10 shadow-[inset_0_0_300px_rgba(0,0,0,0.6)]" />
-                                          </div>
+                                           </div>
                                         </InstagramSlide>
-                                      ))}
-
-                                      {/* SLIDE 8: CTA */}
-                                      <InstagramSlide id="slide-8" theme={CAROUSEL_THEMES[currentTheme]} watermark="brunofernandes.corporativo">
-                                         <div className="h-full flex flex-col justify-center items-center text-center space-y-24">
-                                            <div className="w-56 h-56 bg-white/5 border border-white/10 rounded-[5rem] flex items-center justify-center mb-10 shadow-2xl">
-                                              <Building2 className={cn("w-28 h-28", CAROUSEL_THEMES[currentTheme].accent)} />
+                                      ) : activeCaptureIndex === 7 ? (
+                                        <InstagramSlide theme={CAROUSEL_THEMES[currentTheme]} watermark="brunofernandes.corporativo">
+                                          <div className="h-full flex flex-col justify-center items-center text-center space-y-32">
+                                            <div className="w-64 h-64 bg-white/5 border border-white/10 rounded-[6rem] flex items-center justify-center shadow-2xl">
+                                              <Building2 className={cn("w-32 h-32", CAROUSEL_THEMES[currentTheme].accent)} />
                                             </div>
-                                            <div className="space-y-10">
-                                              <h2 className="text-[110px] font-black uppercase italic leading-[0.85] tracking-tighter px-10" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+                                            <div className="space-y-12 px-12">
+                                              <h2 className="text-[120px] font-black uppercase italic leading-[0.8] tracking-tighter" style={{ fontFamily: "'Montserrat', sans-serif" }}>
                                                 Gostou deste<br /> <span className={CAROUSEL_THEMES[currentTheme].accent}>Imóvel?</span>
                                               </h2>
                                               <div className="h-2 w-48 bg-white/20 mx-auto rounded-full" />
-                                              <p className="text-5xl text-white/50 px-24 font-medium uppercase tracking-[0.2em] leading-relaxed">
+                                              <p className="text-6xl text-white/50 font-medium uppercase tracking-[0.2em] leading-relaxed">
                                                 Toque no botão e fale direto comigo!
                                               </p>
                                             </div>
-                                            <div className="space-y-12">
+                                            <div className="space-y-16">
                                                <div className="flex flex-col items-center gap-4">
-                                                <div className="flex items-center gap-8 bg-white text-black px-16 py-10 rounded-[4rem] shadow-2xl">
-                                                  <Instagram className="w-12 h-12" />
-                                                  <span className="text-6xl font-black uppercase tracking-tight" style={{ fontFamily: "'Montserrat', sans-serif" }}>WhatsApp</span>
+                                                <div className="flex items-center gap-10 bg-white text-black px-20 py-12 rounded-[5rem] shadow-2xl">
+                                                  <Instagram className="w-16 h-16" />
+                                                  <span className="text-7xl font-black uppercase tracking-tight" style={{ fontFamily: "'Montserrat', sans-serif" }}>WhatsApp</span>
                                                 </div>
                                                </div>
-                                               <p className="text-[90px] font-black italic tracking-tight text-white border-b-8 border-blue-500 pb-4 inline-block" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+                                               <p className="text-[110px] font-black italic tracking-tight text-white border-b-8 border-blue-500 pb-4 inline-block" style={{ fontFamily: "'Montserrat', sans-serif" }}>
                                                  31 97336 2545
                                                </p>
                                             </div>
+                                          </div>
+                                        </InstagramSlide>
+                                      ) : (
+                                        <InstagramSlide theme={CAROUSEL_THEMES[currentTheme]} watermark="brunofernandes.corporativo">
+                                          <div className="absolute inset-0">
+                                            <img 
+                                              src={`/api/proxy-image?url=${encodeURIComponent(data.images[activeCaptureIndex]?.url || data.images[0].url)}`} 
+                                              className="w-full h-full object-cover" 
+                                              crossOrigin="anonymous"
+                                            />
+                                            <div className="absolute inset-0 bg-black/5 shadow-[inset_0_0_400px_rgba(0,0,0,0.7)]" />
+                                          </div>
+                                        </InstagramSlide>
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
+
+                                <div className="absolute inset-0 flex items-center justify-center scale-[0.22] origin-center -translate-y-[280px]">
+                                   {/* STATIC PREVIEW FOR USER ONLY */}
+                                   <div className="flex flex-col gap-40 opacity-50 grayscale pointer-events-none">
+                                      <InstagramSlide theme={CAROUSEL_THEMES[currentTheme]} watermark="brunofernandes.corporativo">
+                                         <div className="h-full flex flex-col justify-center items-center text-center">
+                                           <h1 className="text-[140px] font-black italic uppercase">Preview</h1>
                                          </div>
                                       </InstagramSlide>
                                    </div>
                                 </div>
                                 
-                                {/* Overlay while rendering */}
                                 <AnimatePresence>
                                   {isRenderingCarousel && (
                                     <motion.div 
                                       initial={{ opacity: 0 }}
                                       animate={{ opacity: 1 }}
                                       exit={{ opacity: 0 }}
-                                      className="absolute inset-0 bg-black/80 backdrop-blur-md flex flex-col items-center justify-center p-10 z-50"
+                                      className="absolute inset-0 bg-black/90 backdrop-blur-2xl flex flex-col items-center justify-center p-10 z-50 text-center"
                                     >
-                                      <Loader2 className="w-12 h-12 text-blue-500 animate-spin mb-6" />
-                                      <div className="w-full bg-white/10 h-2 rounded-full overflow-hidden max-w-[200px]">
+                                      <div className="relative mb-10">
+                                        <Loader2 className="w-20 h-20 text-blue-500 animate-spin" />
+                                        <div className="absolute inset-0 flex items-center justify-center text-[10px] font-black">
+                                          {renderProgress}%
+                                        </div>
+                                      </div>
+                                      <h5 className="text-xl font-black uppercase italic tracking-tighter mb-4">Capturando Slides</h5>
+                                      <div className="w-full bg-white/10 h-3 rounded-full overflow-hidden max-w-[240px]">
                                         <motion.div 
-                                          className="h-full bg-blue-500"
+                                          className="h-full bg-gradient-to-r from-blue-600 to-indigo-600"
                                           animate={{ width: `${renderProgress}%` }}
                                         />
                                       </div>
-                                      <p className="mt-4 text-[10px] font-black uppercase tracking-widest text-white/40">Renderizando Slides...</p>
+                                      <p className="mt-8 text-[12px] font-medium text-white/40 max-w-[200px] leading-relaxed">
+                                        Garantindo nitidez máxima e carregamento de cada foto...
+                                      </p>
                                     </motion.div>
                                   )}
                                 </AnimatePresence>
                               </div>
 
-                              <p className="text-white/40 text-xs font-medium">
+                              <p className="text-white/40 text-[10px] font-bold uppercase tracking-widest text-center mt-4">
                                 Design dinâmico inspirado em campanhas de alta conversão.
                               </p>
                            </div>
+                           
                            <button 
                             onClick={handleDownloadCarousel}
                             disabled={isRenderingCarousel}
