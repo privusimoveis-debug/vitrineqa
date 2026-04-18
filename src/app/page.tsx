@@ -68,14 +68,14 @@ const itemVariants = {
 // --- Small Components ---
 const StepIndicator = ({ number, title, active }: { number: number; title: string; active?: boolean }) => (
   <div className={cn(
-    "flex items-center gap-4 mb-10 transition-all duration-700",
+    "flex items-center gap-3 md:gap-4 mb-6 md:mb-10 transition-all duration-700",
     active ? "opacity-100 scale-100" : "opacity-30 scale-95"
   )}>
-    <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-blue-700 to-blue-400 flex items-center justify-center font-black text-xl shadow-lg shadow-blue-500/20">
+    <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-tr from-blue-700 to-blue-400 flex items-center justify-center font-black text-lg md:text-xl shadow-lg shadow-blue-500/20 flex-shrink-0">
       {number}
     </div>
-    <h3 className="text-3xl font-black tracking-tighter uppercase italic">{title}</h3>
-    <div className="h-[2px] flex-1 bg-gradient-to-r from-white/20 to-transparent"></div>
+    <h3 className="text-xl md:text-3xl font-black tracking-tighter uppercase italic truncate">{title}</h3>
+    <div className="h-[2px] flex-1 bg-gradient-to-r from-white/20 to-transparent hidden sm:block"></div>
   </div>
 );
 
@@ -162,32 +162,32 @@ export default function ScraperPage() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="relative group"
+            className="relative group w-full"
           >
-            <div className="absolute -inset-2 bg-gradient-to-r from-blue-600/10 to-purple-600/10 rounded-[2.5rem] blur-2xl opacity-100 group-focus-within:opacity-100 transition duration-1000"></div>
-            <form onSubmit={handleScrape} className="relative bg-[#1a1a1a]/40 backdrop-blur-3xl border border-white/20 rounded-[2rem] flex items-center p-3 shadow-2xl">
-              <div className="pl-6 text-white/40">
+            <div className="absolute -inset-2 bg-gradient-to-r from-blue-600/10 to-purple-600/10 rounded-[2rem] md:rounded-[2.5rem] blur-2xl opacity-100 group-focus-within:opacity-100 transition duration-1000"></div>
+            <form onSubmit={handleScrape} className="relative bg-[#1a1a1a]/40 backdrop-blur-3xl border border-white/20 rounded-2xl md:rounded-[2rem] flex flex-col md:flex-row items-stretch md:items-center p-2 md:p-3 shadow-2xl gap-2 md:gap-0">
+              <div className="hidden md:flex pl-6 text-white/40">
                 <Search className="w-7 h-7" />
               </div>
               <input
                 type="text"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
-                placeholder="Cole o link do imóvel do QuintoAndar aqui..."
-                className="flex-1 bg-transparent border-none py-6 px-6 text-xl focus:outline-none placeholder:text-white/30 text-white font-semibold"
+                placeholder="Cole o link do imóvel aqui..."
+                className="flex-1 bg-transparent border-none py-4 md:py-6 px-4 md:px-6 text-base md:text-xl focus:outline-none placeholder:text-white/30 text-white font-semibold"
               />
               <button
                 type="submit"
                 disabled={loading || !url}
                 className={cn(
-                  "bg-white text-black hover:bg-zinc-200 disabled:opacity-30 px-12 py-6 rounded-[1.6rem] font-black text-sm uppercase tracking-widest flex items-center gap-3 transition-all active:scale-95 shadow-lg",
+                  "bg-white text-black hover:bg-zinc-200 disabled:opacity-30 px-6 md:px-12 py-4 md:py-6 rounded-xl md:rounded-[1.6rem] font-black text-xs md:text-sm uppercase tracking-widest flex items-center justify-center gap-3 transition-all active:scale-95 shadow-lg",
                   loading && "animate-pulse"
                 )}
               >
                 {loading ? "Capturando..." : (
                   <>
                     Iniciar
-                    <ArrowRight className="w-5 h-5 font-bold" />
+                    <ArrowRight className="w-4 h-4 md:w-5 md:h-5 font-bold" />
                   </>
                 )}
               </button>
@@ -198,7 +198,7 @@ export default function ScraperPage() {
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="mt-6 text-red-500 text-xs font-black tracking-widest uppercase text-center"
+                  className="mt-4 md:mt-6 text-red-500 text-[10px] md:text-xs font-black tracking-widest uppercase text-center"
                 >
                   {error}
                 </motion.p>
@@ -227,8 +227,8 @@ export default function ScraperPage() {
                     <MapPin className="w-4 h-4" />
                     <span className="font-bold tracking-widest uppercase text-[10px]">{data.city} • ID: {data.id}</span>
                   </div>
-                  <h2 className="text-4xl md:text-6xl font-black tracking-tight leading-[1.1] uppercase italic">{data.title}</h2>
-                  <p className="text-white/40 text-xl font-medium tracking-tight whitespace-pre-wrap">{data.address}</p>
+                  <h2 className="text-3xl md:text-6xl font-black tracking-tight leading-[1.1] uppercase italic">{data.title}</h2>
+                  <p className="text-white/40 text-lg md:text-xl font-medium tracking-tight whitespace-pre-wrap">{data.address}</p>
                 </div>
                 <div className="flex flex-wrap gap-4">
                   <button className="w-16 h-16 bg-white/5 border border-white/10 rounded-[1.5rem] flex items-center justify-center hover:bg-white/10 hover:scale-105 active:scale-95 transition-all text-white/50 hover:text-white">
@@ -246,14 +246,14 @@ export default function ScraperPage() {
 
               {/* Stats & Financial Grid */}
               <div className="grid grid-cols-1 md:grid-cols-12 gap-10">
-                <div className="md:col-span-8 grid grid-cols-2 md:grid-cols-4 gap-6">
-                   <div className="bg-white/5 border border-white/10 p-8 rounded-[2rem] flex flex-col justify-between group hover:border-blue-500/50 transition-all duration-500">
+                <div className="md:col-span-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+                   <div className="bg-white/5 border border-white/10 p-6 md:p-8 rounded-2xl md:rounded-[2rem] flex flex-col justify-between group hover:border-blue-500/50 transition-all duration-500">
                       <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-blue-500">
                         <HomeIcon className="w-5 h-5" />
                       </div>
-                      <div className="mt-6">
+                      <div className="mt-4 md:mt-6">
                         <p className="text-white/30 text-[10px] font-black uppercase tracking-widest">Imóvel</p>
-                        <p className="text-xl font-black mt-1 tracking-tighter uppercase">{data.type}</p>
+                        <p className="text-lg md:text-xl font-black mt-1 tracking-tighter uppercase">{data.type}</p>
                       </div>
                     </div>
                     {[
@@ -261,34 +261,34 @@ export default function ScraperPage() {
                       { icon: Bed, label: 'Quartos', value: data.bedrooms },
                       { icon: Bath, label: 'Banheiros', value: data.bathrooms },
                     ].map((stat, i) => (
-                      <div key={i} className="bg-white/5 border border-white/10 p-8 rounded-[2rem] flex flex-col justify-between group hover:border-blue-500/50 transition-all duration-500">
+                      <div key={i} className="bg-white/5 border border-white/10 p-6 md:p-8 rounded-2xl md:rounded-[2rem] flex flex-col justify-between group hover:border-blue-500/50 transition-all duration-500">
                         <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-blue-500">
                           <stat.icon className="w-5 h-5" />
                         </div>
-                        <div className="mt-6">
+                        <div className="mt-4 md:mt-6">
                           <p className="text-white/30 text-[10px] font-black uppercase tracking-widest">{stat.label}</p>
-                          <p className="text-3xl font-black mt-1 tracking-tighter">{stat.value}</p>
+                          <p className="text-2xl md:text-3xl font-black mt-1 tracking-tighter">{stat.value}</p>
                         </div>
                       </div>
                     ))}
                 </div>
 
-                <div className="md:col-span-4 bg-gradient-to-br from-blue-700 to-blue-900 border border-blue-500/30 p-10 rounded-[3rem] shadow-2xl relative overflow-hidden group h-full flex flex-col justify-between">
-                    <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 blur-3xl rounded-full -mr-20 -mt-20"></div>
+                <div className="md:col-span-4 bg-gradient-to-br from-blue-700 to-blue-900 border border-blue-500/30 p-8 md:p-10 rounded-2xl md:rounded-[3rem] shadow-2xl relative overflow-hidden group h-full flex flex-col justify-between">
+                    <div className="absolute top-0 right-0 w-32 md:w-40 h-32 md:h-40 bg-white/10 blur-3xl rounded-full -mr-16 md:-mr-20 -mt-16 md:-mt-20"></div>
                     <div className="relative space-y-4">
-                      <div className="flex justify-between items-center mb-6">
-                        <Tag className="w-8 h-8 text-white/50" />
-                        <span className="bg-white text-blue-700 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-xl">
+                      <div className="flex justify-between items-center mb-4 md:mb-6">
+                        <Tag className="w-6 h-6 md:w-8 md:h-8 text-white/50" />
+                        <span className="bg-white text-blue-700 px-3 md:px-4 py-1.5 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-widest shadow-xl">
                           {data.prices.isForSale ? "Venda" : "Aluguel"}
                         </span>
                       </div>
                       <p className="text-white/60 text-[10px] font-black uppercase tracking-widest">
                         Valor Proposto
                       </p>
-                      <h3 className="text-5xl font-black tracking-tighter text-white leading-none">
+                      <h3 className="text-4xl md:text-5xl font-black tracking-tighter text-white leading-none">
                         {data.prices.isForSale ? formatCurrency(data.prices.salePrice) : formatCurrency(data.prices.rent)}
                       </h3>
-                      <div className="pt-6 border-t border-white/10 flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-white/40">
+                      <div className="pt-4 md:pt-6 border-t border-white/10 flex justify-between items-center text-[9px] md:text-[10px] font-black uppercase tracking-widest text-white/40">
                          <span>Taxas Inclusas</span>
                          <span>{formatCurrency(data.prices.condo + data.prices.iptu)}</span>
                       </div>
@@ -307,17 +307,17 @@ export default function ScraperPage() {
                    </p>
                 </div>
 
-                <div className="lg:col-span-2 space-y-10">
+                <div className="lg:col-span-2 space-y-8 md:space-y-10">
                    {/* COLLAPSIBLE GALLERY BOX */}
-                   <div className="bg-white/5 border border-white/10 p-4 rounded-[3.5rem] relative overflow-hidden group">
-                      <div className="grid grid-cols-2 gap-4">
+                   <div className="bg-white/5 border border-white/10 p-2 md:p-4 rounded-3xl md:rounded-[3.5rem] relative overflow-hidden group">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 md:gap-4">
                         {(isGalleryExpanded ? data.images : data.images.slice(0, 4)).map((img, i) => (
                           <motion.div 
                             key={i} 
                             layout
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
-                            className="relative aspect-video rounded-3xl overflow-hidden border border-white/5"
+                            className="relative aspect-video rounded-2xl md:rounded-3xl overflow-hidden border border-white/5"
                           >
                             <img src={img.url} className="w-full h-full object-cover" alt="" />
                           </motion.div>
@@ -326,26 +326,26 @@ export default function ScraperPage() {
 
                       {/* Expand Overlay */}
                       {!isGalleryExpanded && data.images.length > 4 && (
-                        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black via-black/80 to-transparent flex items-end justify-center pb-10">
+                        <div className="absolute inset-x-0 bottom-0 h-32 md:h-40 bg-gradient-to-t from-black via-black/80 to-transparent flex items-end justify-center pb-6 md:pb-10">
                            <button 
                             onClick={() => setIsGalleryExpanded(true)}
-                            className="bg-white text-black px-10 py-5 rounded-[1.6rem] font-black text-xs uppercase tracking-[0.2em] flex items-center gap-3 hover:scale-105 active:scale-95 transition-all shadow-2xl"
+                            className="bg-white text-black px-6 md:px-10 py-3 md:py-5 rounded-xl md:rounded-[1.6rem] font-black text-[10px] md:text-xs uppercase tracking-[0.2em] flex items-center gap-2 md:gap-3 hover:scale-105 active:scale-95 transition-all shadow-2xl"
                            >
-                             Expandir Galeria ({data.images.length} fotos) <ChevronDown className="w-5 h-5" />
+                             Expandir Galeria ({data.images.length}) <ChevronDown className="w-4 h-4 md:w-5 md:h-5" />
                            </button>
                         </div>
                       )}
 
                       {isGalleryExpanded && (
-                         <div className="flex justify-center pt-10 pb-6">
+                         <div className="flex justify-center pt-6 md:pt-10 pb-4 md:pb-6">
                             <button 
                               onClick={() => {
                                 setIsGalleryExpanded(false);
                                 document.getElementById('step-2')?.scrollIntoView({ behavior: 'smooth' });
                               }}
-                              className="bg-white/10 hover:bg-white/20 text-white px-10 py-5 rounded-[1.6rem] font-black text-xs uppercase tracking-[0.2em] flex items-center gap-3 transition-all"
+                              className="bg-white/10 hover:bg-white/20 text-white px-8 md:px-10 py-4 md:py-5 rounded-xl md:rounded-[1.6rem] font-black text-[10px] md:text-xs uppercase tracking-[0.2em] flex items-center gap-2 md:gap-3 transition-all"
                             >
-                              Recolher <ChevronUp className="w-5 h-5" />
+                              Recolher <ChevronUp className="w-4 h-4 md:w-5 md:h-5" />
                             </button>
                          </div>
                       )}
@@ -358,19 +358,19 @@ export default function ScraperPage() {
                 <StepIndicator number={3} title="Criação de Conteúdo" active={true} />
                 <motion.div 
                   variants={itemVariants}
-                  className="bg-white/5 border border-white/10 rounded-[4rem] p-16 flex flex-col md:flex-row items-center justify-between gap-12 group hover:border-blue-500/30 transition-all duration-700"
+                  className="bg-white/5 border border-white/10 rounded-3xl md:rounded-[4rem] p-8 md:p-16 flex flex-col md:flex-row items-center justify-between gap-8 md:gap-12 group hover:border-blue-500/30 transition-all duration-700"
                 >
-                  <div className="space-y-6 text-center md:text-left">
-                    <div className="w-20 h-20 bg-gradient-to-tr from-pink-500/20 to-purple-500/20 border border-pink-500/30 rounded-[2rem] flex items-center justify-center group-hover:scale-110 transition-transform duration-700">
-                       <Instagram className="w-10 h-10 text-pink-500" />
+                  <div className="space-y-4 md:space-y-6 text-center md:text-left">
+                    <div className="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-tr from-pink-500/20 to-purple-500/20 border border-pink-500/30 rounded-2xl md:rounded-[2rem] flex items-center justify-center group-hover:scale-110 transition-transform duration-700 mx-auto md:mx-0">
+                       <Instagram className="w-8 h-8 md:w-10 md:h-10 text-pink-500" />
                     </div>
-                    <h4 className="text-4xl font-black tracking-tighter uppercase italic">Postagem Instagram</h4>
-                    <p className="text-white/40 text-xl font-medium max-w-lg">
+                    <h4 className="text-2xl md:text-4xl font-black tracking-tighter uppercase italic">Postagem Instagram</h4>
+                    <p className="text-white/40 text-base md:text-xl font-medium max-w-lg">
                       Transforme automaticamente os dados deste imóvel em Stories e Feed de alta conversão.
                     </p>
                   </div>
-                  <button className="bg-white/5 border border-white/10 text-white/40 px-12 py-8 rounded-[2rem] font-black uppercase text-sm tracking-widest flex items-center gap-4 cursor-not-allowed group-hover:bg-white group-hover:text-black transition-all">
-                    Configurar Postagem <Sparkles className="w-5 h-5" />
+                  <button className="w-full md:w-auto bg-white/5 border border-white/10 text-white/40 px-8 md:px-12 py-6 md:py-8 rounded-2xl md:rounded-[2rem] font-black uppercase text-xs md:text-sm tracking-widest flex items-center justify-center gap-4 cursor-not-allowed group-hover:bg-white group-hover:text-black transition-all">
+                    Configurar Postagem <Sparkles className="w-4 h-4 md:w-5 md:h-5" />
                   </button>
                 </motion.div>
               </div>
