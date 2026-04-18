@@ -763,172 +763,167 @@ export default function ScraperPage() {
                               <h4 className="text-2xl font-black tracking-tighter uppercase italic">Imagens do Carrossel</h4>
                               
                               <div className="relative aspect-[4/5] bg-black rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
-                                {/* REAL-TIME CAPTURE PORTAL (Hidden from view but visible to engine) */}
-                                <div className="fixed -left-[2000px] top-0 pointer-events-none origin-top-left">
+                                {/* REAL-TIME CAPTURE PORTAL */}
+                                <div className="fixed -left-[9999px] top-0 pointer-events-none origin-top-left">
                                   {data && activeCaptureIndex !== null && (
-                                    <div id="capture-target" className="bg-black">
-                                       <InstagramSlide theme={ELITE_GRADIENTS[gradientIndex]} watermark="brunofernandes.corporativo">
-                                          {activeCaptureIndex === 0 ? (
-                                                             <div style={{ width: '100%', height: '100%', position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', overflow: 'hidden' }}>
-                                              {/* BG Photo */}
-                                              <img
-                                                src={preloadedImages[0]}
-                                                style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
-                                              />
-                                              {/* Warm Overlay - gradient per theme */}
-                                              {(() => {
-                                                const overlays = [
-                                                  'rgba(220,38,38,0.72)',   // Midnight → Red
-                                                  'rgba(5,150,105,0.72)',   // Emerald
-                                                  'rgba(190,18,60,0.72)',   // Rose
-                                                  'rgba(217,119,6,0.72)',   // Amber
-                                                  'rgba(109,40,217,0.72)',  // Violet
-                                                  'rgba(51,65,85,0.72)',    // Slate
-                                                ];
-                                                return <div style={{ position: 'absolute', inset: 0, background: overlays[gradientIndex], zIndex: 1 }} />;
-                                              })()}
+                                    <div id="capture-target">
 
-                                              {/* ALL CONTENT - centered column */}
-                                              <div style={{ position: 'relative', zIndex: 2, width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '60px', padding: '80px 70px', boxSizing: 'border-box' }}>
+                                      {/* ========== SLIDE 0: CAPA (standalone, no wrapper) ========== */}
+                                      {activeCaptureIndex === 0 ? (() => {
+                                        const palettes = [
+                                          { ov1:'rgba(220,38,38,0.82)', ov2:'rgba(220,38,38,0.50)', pill:['#f59e0b','#d97706'], pillBdr:'#92400e', pillTxt:'#1c1917', infoBg:'#fbbf24', infoTxt:'#1e1b4b', accent:'#7c3aed', priceBg:'linear-gradient(135deg,#7f1d1d,#450a0a)', priceBdr:'#fbbf24', priceTxt:'#fde68a' },
+                                          { ov1:'rgba(5,150,105,0.82)', ov2:'rgba(5,150,105,0.48)', pill:['#34d399','#059669'], pillBdr:'#064e3b', pillTxt:'#052e16', infoBg:'#a7f3d0', infoTxt:'#064e3b', accent:'#0891b2', priceBg:'linear-gradient(135deg,#064e3b,#022c22)', priceBdr:'#34d399', priceTxt:'#a7f3d0' },
+                                          { ov1:'rgba(190,18,60,0.82)', ov2:'rgba(190,18,60,0.48)', pill:['#fb923c','#f97316'], pillBdr:'#9a3412', pillTxt:'#1c1917', infoBg:'#fde68a', infoTxt:'#1e1b4b', accent:'#c026d3', priceBg:'linear-gradient(135deg,#4a044e,#1a0533)', priceBdr:'#fde68a', priceTxt:'#fde68a' },
+                                          { ov1:'rgba(217,119,6,0.82)', ov2:'rgba(217,119,6,0.48)', pill:['#fbbf24','#f59e0b'], pillBdr:'#78350f', pillTxt:'#1c1917', infoBg:'#fef3c7', infoTxt:'#78350f', accent:'#dc2626', priceBg:'linear-gradient(135deg,#78350f,#451a03)', priceBdr:'#fbbf24', priceTxt:'#fde68a' },
+                                          { ov1:'rgba(109,40,217,0.82)', ov2:'rgba(109,40,217,0.48)', pill:['#a78bfa','#8b5cf6'], pillBdr:'#4c1d95', pillTxt:'#1e1b4b', infoBg:'#ede9fe', infoTxt:'#4c1d95', accent:'#ec4899', priceBg:'linear-gradient(135deg,#3b0764,#1e1b4b)', priceBdr:'#a78bfa', priceTxt:'#e9d5ff' },
+                                          { ov1:'rgba(30,58,138,0.82)', ov2:'rgba(30,58,138,0.48)', pill:['#60a5fa','#3b82f6'], pillBdr:'#1e3a8a', pillTxt:'#1e3a8a', infoBg:'#dbeafe', infoTxt:'#1e3a8a', accent:'#f59e0b', priceBg:'linear-gradient(135deg,#172554,#0c1529)', priceBdr:'#60a5fa', priceTxt:'#bfdbfe' },
+                                        ];
+                                        const c = palettes[gradientIndex % palettes.length];
+                                        const hood = data.address.includes(',') ? data.address.split(',').slice(-2, -1)[0].trim() : data.city;
+                                        const price = data.prices.isForSale ? formatCurrency(data.prices.salePrice) : formatCurrency(data.prices.rent);
+                                        return (
+                                          <div style={{ width: '1080px', height: '1350px', position: 'relative', overflow: 'hidden' }}>
+                                            <img src={preloadedImages[0]} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+                                            <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: `linear-gradient(180deg, ${c.ov1} 0%, ${c.ov2} 35%, ${c.ov2} 60%, ${c.ov1} 100%)`, zIndex: 1 }} />
+                                            <div style={{ position: 'relative', zIndex: 2, width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '48px', padding: '70px 55px', boxSizing: 'border-box' }}>
 
-                                                {/* 1. PILL BADGE - Bairro */}
-                                                {(() => {
-                                                  const pillGradients = [
-                                                    'linear-gradient(90deg, #f59e0b, #ef4444)',   // Midnight
-                                                    'linear-gradient(90deg, #fbbf24, #f59e0b)',   // Emerald
-                                                    'linear-gradient(90deg, #f59e0b, #a21caf)',   // Rose
-                                                    'linear-gradient(90deg, #ef4444, #f97316)',   // Amber
-                                                    'linear-gradient(90deg, #8b5cf6, #ec4899)',   // Violet
-                                                    'linear-gradient(90deg, #f59e0b, #f97316)',   // Slate
-                                                  ];
-                                                  const neighborhood = data.address.split(',').length > 1
-                                                    ? data.address.split(',')[data.address.split(',').length - 2].trim()
-                                                    : data.city;
-                                                  return (
-                                                    <div style={{ background: pillGradients[gradientIndex], borderRadius: '100px', padding: '28px 80px', border: '6px solid rgba(255,255,255,0.3)', boxShadow: '0 20px 60px rgba(0,0,0,0.4)' }}>
-                                                      <span style={{ fontFamily: "'Montserrat', sans-serif", fontSize: '68px', fontWeight: 900, color: '#1a1a1a', letterSpacing: '0.05em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
-                                                        {neighborhood.toUpperCase()}
-                                                      </span>
-                                                    </div>
-                                                  );
-                                                })()}
+                                              {/* PILL BADGE */}
+                                              <div style={{ background: `linear-gradient(180deg, ${c.pill[0]}, ${c.pill[1]})`, borderRadius: '100px', padding: '22px 65px', border: `6px solid ${c.pillBdr}`, boxShadow: '0 10px 35px rgba(0,0,0,0.45), inset 0 2px 6px rgba(255,255,255,0.35)' }}>
+                                                <span style={{ fontFamily: "'Montserrat', 'Arial Black', sans-serif", fontSize: '52px', fontWeight: 900, color: c.pillTxt, letterSpacing: '0.1em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
+                                                  {hood.toUpperCase()}
+                                                </span>
+                                              </div>
 
-                                                {/* 2. MAIN TITLE */}
-                                                <div style={{ textAlign: 'center', lineHeight: 1.0 }}>
-                                                  <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: '195px', fontWeight: 900, color: '#ffffff', textTransform: 'uppercase', letterSpacing: '-0.02em', textShadow: '0 8px 40px rgba(0,0,0,0.8)', lineHeight: 0.9 }}>
-                                                    {data.prices.isForSale ? 'Apartamento' : 'Apartamento'}
-                                                  </div>
-                                                  <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: '195px', fontWeight: 900, color: '#fde68a', textTransform: 'uppercase', letterSpacing: '-0.02em', textShadow: '0 8px 40px rgba(0,0,0,0.8)', lineHeight: 0.9 }}>
-                                                    {data.prices.isForSale ? 'à Venda' : 'Disponível'}
-                                                  </div>
+                                              {/* TITLE */}
+                                              <div style={{ textAlign: 'center' }}>
+                                                <div style={{ fontFamily: "'Montserrat', 'Arial Black', sans-serif", fontSize: '155px', fontWeight: 900, color: '#ffffff', textShadow: '0 6px 35px rgba(0,0,0,0.7), 0 2px 4px rgba(0,0,0,0.5)', lineHeight: '0.92', textTransform: 'capitalize' }}>
+                                                  {data.prices.isForSale ? 'Apartamento' : 'Apartamento'}
                                                 </div>
-
-                                                {/* 3. INFO BOX */}
-                                                {(() => {
-                                                  const infoBg = [
-                                                    'linear-gradient(135deg, #b91c1c, #7f1d1d)',
-                                                    'linear-gradient(135deg, #065f46, #064e3b)',
-                                                    'linear-gradient(135deg, #9d174d, #4c0519)',
-                                                    'linear-gradient(135deg, #92400e, #78350f)',
-                                                    'linear-gradient(135deg, #5b21b6, #3b0764)',
-                                                    'linear-gradient(135deg, #1e293b, #0f172a)',
-                                                  ];
-                                                  return (
-                                                    <div style={{ background: infoBg[gradientIndex], borderRadius: '40px', padding: '50px 70px', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-around', border: '5px solid rgba(255,255,255,0.2)', boxShadow: '0 30px 80px rgba(0,0,0,0.5)', gap: '20px' }}>
-                                                      <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-                                                        <span style={{ fontSize: '80px' }}>📏</span>
-                                                        <span style={{ fontFamily: "'Montserrat', sans-serif", fontSize: '80px', fontWeight: 900, color: '#fde68a', whiteSpace: 'nowrap' }}>{data.area}m²</span>
-                                                      </div>
-                                                      <div style={{ width: '6px', height: '100px', background: 'rgba(255,255,255,0.2)', borderRadius: '3px', flexShrink: 0 }} />
-                                                      <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-                                                        <span style={{ fontSize: '80px' }}>🛏</span>
-                                                        <span style={{ fontFamily: "'Montserrat', sans-serif", fontSize: '80px', fontWeight: 900, color: '#fde68a', whiteSpace: 'nowrap' }}>{data.bedrooms} Qts</span>
-                                                      </div>
-                                                      <div style={{ width: '6px', height: '100px', background: 'rgba(255,255,255,0.2)', borderRadius: '3px', flexShrink: 0 }} />
-                                                      <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-                                                        <span style={{ fontSize: '80px' }}>🚗</span>
-                                                        <span style={{ fontFamily: "'Montserrat', sans-serif", fontSize: '80px', fontWeight: 900, color: '#fde68a', whiteSpace: 'nowrap' }}>{data.parking} Vaga{data.parking !== 1 ? 's' : ''}</span>
-                                                      </div>
-                                                    </div>
-                                                  );
-                                                })()}
-
-                                                {/* 4. PRICE BOX */}
-                                                {(() => {
-                                                  const priceBg = [
-                                                    'linear-gradient(135deg, #4c1d95, #1e1b4b)',
-                                                    'linear-gradient(135deg, #14532d, #052e16)',
-                                                    'linear-gradient(135deg, #4a044e, #1a0533)',
-                                                    'linear-gradient(135deg, #7c2d12, #431407)',
-                                                    'linear-gradient(135deg, #2d1b69, #12054a)',
-                                                    'linear-gradient(135deg, #0f172a, #020617)',
-                                                  ];
-                                                  return (
-                                                    <div style={{ background: priceBg[gradientIndex], borderRadius: '40px', padding: '45px 80px', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '5px solid rgba(255,255,255,0.15)', boxShadow: '0 30px 80px rgba(0,0,0,0.6)' }}>
-                                                      <span style={{ fontFamily: "'Montserrat', sans-serif", fontSize: '140px', fontWeight: 900, color: '#fde68a', letterSpacing: '-0.04em', textShadow: '0 4px 20px rgba(0,0,0,0.5)', whiteSpace: 'nowrap' }}>
-                                                        {data.prices.isForSale ? formatCurrency(data.prices.salePrice) : formatCurrency(data.prices.rent)}
-                                                      </span>
-                                                    </div>
-                                                  );
-                                                })()}
-
+                                                <div style={{ fontFamily: "'Montserrat', 'Arial Black', sans-serif", fontSize: '155px', fontWeight: 900, color: '#ffffff', textShadow: '0 6px 35px rgba(0,0,0,0.7), 0 2px 4px rgba(0,0,0,0.5)', lineHeight: '0.92', textTransform: 'capitalize' }}>
+                                                  {data.prices.isForSale ? 'à Venda' : 'para Alugar'}
+                                                </div>
                                               </div>
-                                             </div>
-                                          ) : activeCaptureIndex === 7 ? (
-                                            <div className="h-full flex flex-col justify-center items-center text-center space-y-32 relative z-10 px-10">
-                                              <div className="w-64 h-64 bg-white/5 backdrop-blur-3xl border border-white/10 rounded-full flex items-center justify-center shadow-2xl">
-                                                <Building2 className={cn("w-32 h-32", ELITE_GRADIENTS[gradientIndex].accent)} />
+
+                                              {/* INFO BOX */}
+                                              <div style={{ background: c.infoBg, borderRadius: '28px', padding: '32px 40px', border: `6px solid ${c.accent}`, width: '90%', display: 'flex', alignItems: 'center', justifyContent: 'space-around', boxShadow: '0 18px 50px rgba(0,0,0,0.35)' }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                                                  <span style={{ fontSize: '46px' }}>📏</span>
+                                                  <span style={{ fontFamily: "'Montserrat', 'Arial Black', sans-serif", fontSize: '52px', fontWeight: 900, color: c.infoTxt }}>{data.area}m²</span>
+                                                </div>
+                                                <div style={{ width: '5px', height: '65px', background: 'rgba(0,0,0,0.12)', borderRadius: '3px' }} />
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                                                  <span style={{ fontSize: '46px' }}>🛏</span>
+                                                  <span style={{ fontFamily: "'Montserrat', 'Arial Black', sans-serif", fontSize: '52px', fontWeight: 900, color: c.infoTxt }}>{data.bedrooms} Quartos</span>
+                                                </div>
+                                                <div style={{ width: '5px', height: '65px', background: 'rgba(0,0,0,0.12)', borderRadius: '3px' }} />
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                                                  <span style={{ fontSize: '46px' }}>🚗</span>
+                                                  <span style={{ fontFamily: "'Montserrat', 'Arial Black', sans-serif", fontSize: '52px', fontWeight: 900, color: c.infoTxt }}>{data.parking} {Number(data.parking) === 1 ? 'Vaga' : 'Vagas'}</span>
+                                                </div>
                                               </div>
-                                              <div className="space-y-12">
-                                                <h2 className="text-[110px] font-black uppercase italic leading-[0.85] tracking-tighter drop-shadow-[0_20px_50px_rgba(0,0,0,0.8)]" style={{ fontFamily: "'Montserrat', sans-serif" }}>
-                                                  Gostou deste<br /> <span className={ELITE_GRADIENTS[gradientIndex].accent}>Imóvel?</span>
-                                                </h2>
-                                                <p className="text-6xl text-white/60 font-medium uppercase tracking-[0.2em] leading-relaxed max-w-4xl mx-auto">
-                                                  Toque no botão abaixo e fale direto comigo no WhatsApp!
-                                                </p>
+
+                                              {/* PRICE BOX */}
+                                              <div style={{ background: c.priceBg, borderRadius: '28px', padding: '30px 55px', border: `6px solid ${c.priceBdr}`, width: '90%', textAlign: 'center', boxShadow: '0 18px 50px rgba(0,0,0,0.45)' }}>
+                                                <span style={{ fontFamily: "'Montserrat', 'Arial Black', sans-serif", fontSize: '115px', fontWeight: 900, color: c.priceTxt, letterSpacing: '-0.02em', textShadow: '0 4px 18px rgba(0,0,0,0.4)' }}>
+                                                  {price}
+                                                </span>
                                               </div>
-                                              <div className="space-y-16 w-full">
-                                                 <div className="bg-white text-black px-24 py-14 rounded-full shadow-[0_30px_60px_rgba(0,0,0,0.5)] flex items-center justify-center gap-10">
-                                                   <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center">
-                                                     <Instagram className="w-10 h-10 text-white" />
-                                                   </div>
-                                                   <span className="text-8xl font-black uppercase tracking-tighter" style={{ fontFamily: "'Montserrat', sans-serif" }}>WhatsApp</span>
-                                                 </div>
-                                                 <p className="text-[110px] font-black italic tracking-tighter text-white/90 bg-white/5 border border-white/10 px-12 py-4 rounded-3xl inline-block" style={{ fontFamily: "'Montserrat', sans-serif" }}>
-                                                   31 97336 2545
-                                                 </p>
+
+                                            </div>
+                                            {/* Watermark */}
+                                            <div style={{ position: 'absolute', bottom: '25px', right: '30px', zIndex: 3, display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(0,0,0,0.45)', padding: '10px 22px', borderRadius: '50px', border: '1px solid rgba(255,255,255,0.1)' }}>
+                                              <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#3b82f6' }} />
+                                              <span style={{ fontFamily: "'Inter', sans-serif", fontSize: '22px', fontWeight: 500, color: 'rgba(255,255,255,0.7)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+                                                brunofernandes.corporativo
+                                              </span>
+                                            </div>
+                                          </div>
+                                        );
+                                      })()
+
+                                      /* ========= SLIDE 7: CTA (standalone) ========= */
+                                      : activeCaptureIndex === 7 ? (() => {
+                                        const c = [
+                                          { bg:'linear-gradient(135deg,#1e1b4b,#0f0a2e)', accent:'#fbbf24', txt:'#fff', btnBg:'#22c55e', btnTxt:'#fff' },
+                                          { bg:'linear-gradient(135deg,#022c22,#041a14)', accent:'#34d399', txt:'#fff', btnBg:'#059669', btnTxt:'#fff' },
+                                          { bg:'linear-gradient(135deg,#2d0a31,#1a0520)', accent:'#f472b6', txt:'#fff', btnBg:'#ec4899', btnTxt:'#fff' },
+                                          { bg:'linear-gradient(135deg,#451a03,#2a0f00)', accent:'#fbbf24', txt:'#fff', btnBg:'#f59e0b', btnTxt:'#1c1917' },
+                                          { bg:'linear-gradient(135deg,#2e1065,#1a0a3a)', accent:'#a78bfa', txt:'#fff', btnBg:'#8b5cf6', btnTxt:'#fff' },
+                                          { bg:'linear-gradient(135deg,#0f172a,#070b14)', accent:'#60a5fa', txt:'#fff', btnBg:'#3b82f6', btnTxt:'#fff' },
+                                        ][gradientIndex % 6];
+                                        return (
+                                          <div style={{ width: '1080px', height: '1350px', position: 'relative', overflow: 'hidden', background: c.bg }}>
+                                            <div style={{ position: 'relative', zIndex: 2, width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '65px', padding: '80px 60px', boxSizing: 'border-box', textAlign: 'center' }}>
+                                              {/* Icon circle */}
+                                              <div style={{ width: '200px', height: '200px', borderRadius: '50%', border: `5px solid ${c.accent}`, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.05)' }}>
+                                                <Building2 style={{ width: '100px', height: '100px', color: c.accent }} />
+                                              </div>
+                                              {/* Title */}
+                                              <div>
+                                                <div style={{ fontFamily: "'Montserrat', 'Arial Black', sans-serif", fontSize: '120px', fontWeight: 900, color: c.txt, textShadow: '0 6px 30px rgba(0,0,0,0.6)', lineHeight: '0.95' }}>
+                                                  Gostou deste
+                                                </div>
+                                                <div style={{ fontFamily: "'Montserrat', 'Arial Black', sans-serif", fontSize: '120px', fontWeight: 900, color: c.accent, textShadow: '0 6px 30px rgba(0,0,0,0.6)', lineHeight: '0.95' }}>
+                                                  Imóvel?
+                                                </div>
+                                              </div>
+                                              {/* Subtitle */}
+                                              <p style={{ fontFamily: "'Inter', sans-serif", fontSize: '48px', fontWeight: 500, color: 'rgba(255,255,255,0.6)', lineHeight: 1.4, maxWidth: '800px', letterSpacing: '0.05em' }}>
+                                                Fale direto comigo no WhatsApp e saiba mais!
+                                              </p>
+                                              {/* WhatsApp Button */}
+                                              <div style={{ background: c.btnBg, borderRadius: '100px', padding: '40px 80px', display: 'flex', alignItems: 'center', gap: '30px', boxShadow: '0 25px 60px rgba(0,0,0,0.5)' }}>
+                                                <span style={{ fontSize: '70px' }}>💬</span>
+                                                <span style={{ fontFamily: "'Montserrat', 'Arial Black', sans-serif", fontSize: '72px', fontWeight: 900, color: c.btnTxt, textTransform: 'uppercase', letterSpacing: '-0.02em' }}>
+                                                  WhatsApp
+                                                </span>
+                                              </div>
+                                              {/* Phone number */}
+                                              <div style={{ background: 'rgba(255,255,255,0.06)', borderRadius: '25px', padding: '30px 60px', border: `4px solid ${c.accent}` }}>
+                                                <span style={{ fontFamily: "'Montserrat', 'Arial Black', sans-serif", fontSize: '100px', fontWeight: 900, color: c.accent, letterSpacing: '0.02em' }}>
+                                                  31 97336 2545
+                                                </span>
                                               </div>
                                             </div>
-                                          ) : (
-                                            <div className="h-full relative px-10 py-10 flex flex-col justify-end">
-                                               {/* Full Bleed Image */}
-                                               <div className="absolute inset-0 z-0">
-                                                  <img 
-                                                    src={preloadedImages[activeCaptureIndex]} 
-                                                    className="w-full h-full object-cover brightness-[0.85] contrast-[1.05]" 
-                                                  />
-                                                  <div className="absolute inset-0 shadow-[inset_0_0_500px_rgba(0,0,0,0.6)]" />
-                                                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-80" />
-                                               </div>
-                                               
-                                               {/* Elegant Minimal Info Overlay */}
-                                               <div className="relative z-10 flex justify-between items-end border-t border-white/10 pt-10">
-                                                  <div className="flex flex-col gap-2">
-                                                    <span className="text-2xl font-black uppercase tracking-[0.5em] text-white/40 italic">Exclusividade</span>
-                                                    <span className="text-5xl font-black uppercase italic tracking-tighter text-white">
-                                                      {data.city} • <span className={ELITE_GRADIENTS[gradientIndex].accent}>{data.address.split(',').pop()?.trim()}</span>
-                                                    </span>
-                                                  </div>
-                                                  <div className="px-10 py-4 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl text-4xl font-black italic">
-                                                    {activeCaptureIndex + 1} / 8
-                                                  </div>
-                                               </div>
+                                            {/* Watermark */}
+                                            <div style={{ position: 'absolute', bottom: '25px', right: '30px', zIndex: 3, display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(0,0,0,0.45)', padding: '10px 22px', borderRadius: '50px', border: '1px solid rgba(255,255,255,0.1)' }}>
+                                              <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#3b82f6' }} />
+                                              <span style={{ fontFamily: "'Inter', sans-serif", fontSize: '22px', fontWeight: 500, color: 'rgba(255,255,255,0.7)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+                                                brunofernandes.corporativo
+                                              </span>
                                             </div>
-                                          )}
-                                       </InstagramSlide>
+                                          </div>
+                                        );
+                                      })()
+
+                                      /* ========= SLIDES 1-6: GALLERY (uses InstagramSlide) ========= */
+                                      : (
+                                        <InstagramSlide theme={ELITE_GRADIENTS[gradientIndex]} watermark="brunofernandes.corporativo">
+                                          <div className="h-full relative flex flex-col justify-end" style={{ padding: 0, margin: '-80px' }}>
+                                            <div className="absolute inset-0 z-0">
+                                              <img src={preloadedImages[activeCaptureIndex]} className="w-full h-full object-cover" style={{ imageRendering: 'auto' } as any} />
+                                              <div className="absolute inset-0" style={{ boxShadow: 'inset 0 0 400px rgba(0,0,0,0.5)' }} />
+                                              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+                                            </div>
+                                            <div className="relative z-10 p-16 flex justify-between items-end border-t border-white/10 pt-8">
+                                              <div className="flex flex-col gap-2">
+                                                <span className="text-2xl font-black uppercase tracking-[0.5em] text-white/40 italic">Exclusividade</span>
+                                                <span className="text-5xl font-black uppercase italic tracking-tighter text-white">
+                                                  {data.city} &bull; <span className={ELITE_GRADIENTS[gradientIndex].accent}>{data.address.split(',').pop()?.trim()}</span>
+                                                </span>
+                                              </div>
+                                              <div className="px-8 py-4 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl text-4xl font-black italic">
+                                                {(activeCaptureIndex ?? 0) + 1} / 8
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </InstagramSlide>
+                                      )}
+
                                     </div>
                                   )}
                                 </div>
+
 
                                 <div className="absolute inset-0 flex items-center justify-center scale-[0.22] origin-center -translate-y-[280px]">
                                    {/* STATIC PREVIEW FOR USER ONLY */}
