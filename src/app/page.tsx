@@ -249,8 +249,8 @@ export default function ScraperPage() {
       </nav>
 
       {/* STAGE 1: SEARCH */}
-      <section className="relative pt-48 pb-20 overflow-hidden text-center">
-        <div className="max-w-4xl mx-auto px-6 space-y-12">
+      <section className="relative pt-48 pb-20 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-6 space-y-12">
           <StepIndicator number={1} title="Coleta de Dados" active={true} />
 
           {/* Search Bar Premium - FIXED LIGHTNESS */}
