@@ -9,7 +9,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'URL is required' }, { status: 400 });
     }
 
-    // Validate if it's a QuintoAndar Vitrine link
     if (!url.includes('vitrine.quintoandar.com.br')) {
       return NextResponse.json({ error: 'Invalid QuintoAndar Vitrine URL' }, { status: 400 });
     }
@@ -21,8 +20,6 @@ export async function POST(req: Request) {
     });
 
     const html = response.data;
-    
-    // Extract __NEXT_DATA__ JSON
     const nextDataMatch = html.match(/<script id="__NEXT_DATA__" type="application\/json">([\s\S]*?)<\/script>/);
     
     if (!nextDataMatch) {
@@ -40,8 +37,11 @@ export async function POST(req: Request) {
     const cleanedData = {
       id: propertyData.id,
       title: propertyData.type || 'Imóvel',
-      address: `${propertyData.address}, ${propertyData.neighborhood}`,
-      city: propertyData.city,
+      // Fix address: join object properties
+      address: typeof propertyData.address === 'object' 
+        ? `${propertyData.address.address}, ${propertyData.address.neighborhood}`
+        : propertyData.address,
+      city: typeof propertyData.address === 'object' ? propertyData.address.city : propertyData.city,
       area: propertyData.totalArea,
       bedrooms: propertyData.bedrooms,
       bathrooms: propertyData.bathrooms,
@@ -51,11 +51,14 @@ export async function POST(req: Request) {
         url: img.url.startsWith('//') ? `https:${img.url}` : img.url,
         subtitle: img.subtitle
       })) || [],
+      // Fix prices: Handle Sale vs Rent
       prices: {
-        rent: propertyData.rent,
-        iptu: propertyData.iptu,
-        condo: propertyData.condo,
-        total: propertyData.total
+        salePrice: propertyData.salePrice || 0,
+        rent: propertyData.rentValue || propertyData.rent || 0,
+        iptu: propertyData.iptu?.amount || propertyData.iptu || 0,
+        condo: propertyData.condominium || propertyData.condo || 0,
+        total: propertyData.totalCost || propertyData.total || 0,
+        isForSale: !!propertyData.salePrice && propertyData.salePrice > 0
       },
       amenities: propertyData.amenities || []
     };

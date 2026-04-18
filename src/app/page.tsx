@@ -6,7 +6,7 @@ import {
   Search, MapPin, Maximize2, Bed, Bath, Car, 
   ArrowRight, Loader2, Image as ImageIcon, 
   CheckCircle2, Sparkles, Building2, 
-  Share2, Heart, ExternalLink
+  Share2, Heart, ExternalLink, TrendingUp, Tag
 } from 'lucide-react';
 import axios from 'axios';
 import { clsx, type ClassValue } from 'clsx';
@@ -30,10 +30,12 @@ interface PropertyData {
   description: string;
   images: { url: string; subtitle: string | null }[];
   prices: {
+    salePrice: number;
     rent: number;
     iptu: number;
     condo: number;
     total: number;
+    isForSale: boolean;
   };
   amenities: string[];
 }
@@ -84,7 +86,6 @@ export default function Home() {
     try {
       const response = await axios.post('/api/scrape', { url });
       setData(response.data);
-      // Wait a bit to ensure animations transitions smoothly
       setTimeout(() => {
         const resultsEl = document.getElementById('results');
         resultsEl?.scrollIntoView({ behavior: 'smooth' });
@@ -104,83 +105,85 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen selection:bg-blue-500/30">
+    <div className="min-h-screen selection:bg-blue-500/30 font-sans text-white bg-[#050505]">
       <div className="bg-mesh" />
       
       {/* Navigation */}
       <nav className={cn(
         "fixed top-0 left-0 w-full z-50 transition-all duration-500 px-6 py-4",
-        scrolled ? "bg-black/40 backdrop-blur-xl border-b border-white/5 py-3" : "bg-transparent"
+        scrolled ? "bg-black/80 backdrop-blur-xl border-b border-white/5 py-3" : "bg-transparent"
       )}>
         <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <div className="flex items-center gap-2 group cursor-pointer">
-            <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-600/20 group-hover:scale-110 transition-transform">
+          <div className="flex items-center gap-3 group cursor-pointer">
+            <div className="w-10 h-10 bg-gradient-to-tr from-blue-700 to-blue-500 rounded-xl flex items-center justify-center shadow-lg shadow-blue-600/20 group-hover:scale-110 transition-transform duration-500">
               <Building2 className="text-white w-6 h-6" />
             </div>
-            <span className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-white/60">
-              VitrineQA <span className="text-blue-500">.</span>
+            <span className="text-2xl font-black tracking-tighter">
+              VITRINE<span className="text-blue-500">QA</span>
             </span>
           </div>
-          <div className="hidden md:flex items-center gap-8 text-sm font-medium text-white/50">
-            <a href="#" className="hover:text-white transition-colors">Início</a>
-            <a href="#" className="hover:text-white transition-colors">Histórico</a>
-            <button className="glass-pill px-5 py-2 text-white hover:bg-white/10 transition-all">
-              Minha Conta
+          <div className="hidden md:flex items-center gap-10 text-xs font-bold uppercase tracking-widest text-white/40">
+            <a href="#" className="hover:text-white transition-colors">Explorer</a>
+            <a href="#" className="hover:text-white transition-colors">History</a>
+            <button className="bg-white/5 hover:bg-white/10 border border-white/10 px-6 py-2.5 rounded-full text-white transition-all">
+              Join Workspace
             </button>
           </div>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section className="relative pt-40 pb-20 overflow-hidden">
-        <div className="max-w-4xl mx-auto px-6 text-center space-y-10">
+      <section className="relative pt-48 pb-32 overflow-hidden">
+        <div className="max-w-5xl mx-auto px-6 text-center space-y-12">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
           >
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-sm font-semibold mb-6">
+            <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white/5 border border-white/10 text-blue-400 text-xs font-bold uppercase tracking-widest mb-8 backdrop-blur-sm">
               <Sparkles className="w-4 h-4" />
-              Web Scraping IA 2026
+              Intelligence Engine v2.6
             </div>
-            <h1 className="text-6xl md:text-8xl font-black tracking-tight mb-6 leading-[0.9]">
-              EXTRAÇÃO <span className="gradient-text">INTELIGENTE</span>
+            <h1 className="text-7xl md:text-9xl font-black tracking-tight mb-8 leading-[0.8] mix-blend-difference">
+              VITRINIZAR <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-white/20 italic">IMÓVEIS</span>
             </h1>
-            <p className="text-zinc-400 text-xl md:text-2xl font-medium max-w-2xl mx-auto leading-relaxed">
-              Transforme links do QuintoAndar em vitrines de alta conversão instantaneamente.
+            <p className="text-white/40 text-xl md:text-2xl font-medium max-w-2xl mx-auto leading-relaxed">
+              Alta fidelidade em extração de dados para corretores de elite. Cole o link, gere o valor.
             </p>
           </motion.div>
 
           {/* Search Bar Premium */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
             className="relative max-w-3xl mx-auto group"
           >
-            <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-[2rem] blur opacity-25 group-focus-within:opacity-50 transition duration-1000"></div>
-            <form onSubmit={handleScrape} className="relative bg-[#0d0d0d] border border-white/10 rounded-[1.8rem] flex items-center p-2 shadow-2xl">
-              <div className="pl-6 text-zinc-500 flex items-center justify-center">
+            <div className="absolute -inset-2 bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-[2.5rem] blur-2xl opacity-0 group-focus-within:opacity-100 transition duration-1000"></div>
+            <form onSubmit={handleScrape} className="relative bg-[#0d0d0d]/80 backdrop-blur-3xl border border-white/10 rounded-[2rem] flex items-center p-2.5 shadow-2xl">
+              <div className="pl-6 text-white/20">
                 <Search className="w-6 h-6" />
               </div>
               <input
                 type="text"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
-                placeholder="Cole a URL do imóvel aqui..."
-                className="flex-1 bg-transparent border-none py-4 px-4 text-lg focus:outline-none placeholder:text-zinc-600 text-white font-medium"
+                placeholder="Cole a URL do Vitrine QuintoAndar..."
+                className="flex-1 bg-transparent border-none py-5 px-5 text-lg focus:outline-none placeholder:text-white/20 text-white font-medium"
               />
               <button
                 type="submit"
                 disabled={loading || !url}
-                className="bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white px-8 py-4 rounded-[1.4rem] font-bold text-lg flex items-center gap-2 transition-all active:scale-95 shadow-lg shadow-blue-500/20"
+                className={cn(
+                  "bg-white text-black hover:bg-zinc-200 disabled:opacity-30 px-10 py-5 rounded-[1.6rem] font-black text-sm uppercase tracking-widest flex items-center gap-3 transition-all active:scale-95",
+                  loading && "animate-pulse"
+                )}
               >
-                {loading ? (
-                  <Loader2 className="w-6 h-6 animate-spin" />
-                ) : (
+                {loading ? "Processando..." : (
                   <>
-                    Coletar Dados
-                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                    Gerar
+                    <ArrowRight className="w-5 h-5" />
                   </>
                 )}
               </button>
@@ -191,7 +194,7 @@ export default function Home() {
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="mt-6 text-red-500 text-sm font-semibold tracking-wide uppercase"
+                  className="mt-6 text-red-500 text-xs font-black tracking-widest uppercase text-center"
                 >
                   {error}
                 </motion.p>
@@ -202,141 +205,158 @@ export default function Home() {
       </section>
 
       {/* Results Section */}
-      <section id="results" className="max-w-7xl mx-auto px-6 pb-40">
+      <section id="results" className="max-w-7xl mx-auto px-6 pb-60">
         <AnimatePresence mode="wait">
           {data ? (
             <motion.div
               variants={containerVariants}
               initial="hidden"
               animate="visible"
-              className="space-y-12"
+              className="space-y-20"
             >
               {/* Header result */}
-              <motion.div variants={itemVariants} className="flex flex-col md:flex-row justify-between items-end gap-6">
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-blue-500">
-                    <MapPin className="w-5 h-5" />
-                    <span className="font-bold tracking-widest uppercase text-sm">{data.city}</span>
+              <motion.div variants={itemVariants} className="flex flex-col md:flex-row justify-between items-start md:items-end gap-10 border-b border-white/5 pb-16">
+                <div className="space-y-6 flex-1">
+                  <div className="flex items-center gap-3 text-blue-500 bg-blue-500/10 border border-blue-500/20 px-4 py-1.5 rounded-full w-fit">
+                    <MapPin className="w-4 h-4" />
+                    <span className="font-bold tracking-widest uppercase text-[10px]">{data.city} • {data.id}</span>
                   </div>
-                  <h2 className="text-4xl md:text-5xl font-black">{data.title}</h2>
-                  <p className="text-zinc-500 text-xl">{data.address}</p>
+                  <h2 className="text-5xl md:text-7xl font-black tracking-tight leading-none uppercase">{data.title}</h2>
+                  <p className="text-white/40 text-xl font-medium tracking-tight whitespace-pre-wrap">{data.address}</p>
                 </div>
-                <div className="flex gap-4">
-                  <button className="w-12 h-12 glass rounded-2xl flex items-center justify-center hover:scale-110 active:scale-90 transition-all text-white/70 hover:text-white">
-                    <Share2 className="w-5 h-5" />
+                <div className="flex flex-wrap gap-4">
+                  <button className="w-16 h-16 bg-white/5 border border-white/10 rounded-[1.5rem] flex items-center justify-center hover:bg-white/10 hover:scale-105 active:scale-95 transition-all text-white/50 hover:text-white">
+                    <Share2 className="w-6 h-6" />
                   </button>
-                  <button className="w-12 h-12 glass rounded-2xl flex items-center justify-center hover:scale-110 active:scale-90 transition-all text-white/70 hover:text-white">
-                    <Heart className="w-5 h-5" />
+                  <button className="w-16 h-16 bg-white/5 border border-white/10 rounded-[1.5rem] flex items-center justify-center hover:bg-white/10 hover:scale-105 active:scale-95 transition-all text-white/50 hover:text-white">
+                    <Heart className="w-6 h-6" />
                   </button>
                   <a 
                     href={url} 
                     target="_blank" 
-                    className="flex items-center gap-2 bg-white text-black px-6 rounded-2xl font-bold hover:bg-zinc-200 transition-colors"
+                    className="flex items-center gap-3 bg-white text-black px-10 h-16 rounded-[1.5rem] font-black uppercase text-xs tracking-widest hover:bg-zinc-200 transition-all flex-shrink-0"
                   >
                     Original <ExternalLink className="w-4 h-4" />
                   </a>
                 </div>
               </motion.div>
 
-              {/* Bento Grid Features */}
-              <motion.div variants={itemVariants} className="bento-grid">
-                {/* Large Bento Item: Main Stats */}
-                <div className="grid grid-cols-2 gap-4 col-span-2 row-span-1">
-                  {[
-                    { icon: Maximize2, label: 'Área Total', value: `${data.area}m²` },
-                    { icon: Bed, label: 'Dormitórios', value: data.bedrooms },
-                    { icon: Bath, label: 'Banheiros', value: data.bathrooms },
-                    { icon: Car, label: 'Vagas', value: data.parking },
-                  ].map((stat, i) => (
-                    <div key={i} className="glass p-6 rounded-[2rem] flex flex-col justify-between hover-glow group">
-                      <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-blue-500/20 group-hover:scale-110 transition-all">
-                        <stat.icon className="w-5 h-5 text-blue-500" />
+              {/* Grid System */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+                {/* Left: Info Grid */}
+                <div className="lg:col-span-12 grid grid-cols-1 md:grid-cols-3 gap-10">
+                  
+                  {/* Bento - Specification */}
+                  <div className="md:col-span-2 grid grid-cols-2 lg:grid-cols-4 gap-6">
+                    {[
+                      { icon: Maximize2, label: 'Area', value: `${data.area} m²` },
+                      { icon: Bed, label: 'Rooms', value: data.bedrooms },
+                      { icon: Bath, label: 'Baths', value: data.bathrooms },
+                      { icon: Car, label: 'Garage', value: data.parking },
+                    ].map((stat, i) => (
+                      <div key={i} className="bg-white/5 border border-white/10 p-8 rounded-[2.5rem] flex flex-col justify-between group hover:border-blue-500/50 transition-all duration-500 shadow-inner">
+                        <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center group-hover:bg-blue-500 transition-all duration-500">
+                          <stat.icon className="w-6 h-6 text-blue-500 group-hover:text-white transition-colors" />
+                        </div>
+                        <div className="mt-8">
+                          <p className="text-white/30 text-[10px] font-black uppercase tracking-widest">{stat.label}</p>
+                          <p className="text-3xl font-black mt-2 tracking-tighter">{stat.value}</p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-zinc-500 text-xs font-bold uppercase tracking-widest">{stat.label}</p>
-                        <p className="text-3xl font-black mt-1">{stat.value}</p>
+                    ))}
+                  </div>
+
+                  {/* Bento - Investment Card */}
+                  <div className="md:col-span-1 bg-gradient-to-br from-blue-700 to-blue-900 border border-blue-500/30 p-10 rounded-[3rem] flex flex-col justify-between shadow-2xl relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 blur-3xl rounded-full -mr-20 -mt-20 group-hover:bg-white/20 transition-all duration-1000"></div>
+                    <div className="relative space-y-8">
+                      <div className="flex justify-between items-center">
+                        <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center">
+                          <Tag className="w-6 h-6 text-white" />
+                        </div>
+                        <span className="bg-white text-blue-700 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-xl">
+                          {data.prices.isForSale ? "Oportunidade" : "Disponível"}
+                        </span>
+                      </div>
+                      
+                      <div className="space-y-4">
+                        <p className="text-white/60 text-[10px] font-black uppercase tracking-widest">
+                          {data.prices.isForSale ? "Valor de Venda" : "Aluguel Mensal"}
+                        </p>
+                        <h3 className="text-6xl font-black tracking-tighter text-white leading-none">
+                          {data.prices.isForSale ? formatCurrency(data.prices.salePrice) : formatCurrency(data.prices.rent)}
+                        </h3>
+                      </div>
+
+                      <div className="pt-8 border-t border-white/20 space-y-4">
+                        <div className="flex justify-between items-center text-xs font-bold uppercase tracking-widest text-white/60">
+                          <span>Total Mensal</span>
+                          <span className="text-white">{formatCurrency(data.prices.total)}</span>
+                        </div>
+                        <div className="flex justify-between items-center text-xs font-bold uppercase tracking-widest text-white/40">
+                          <span>Condo + Taxes</span>
+                          <span className="text-white/70">{formatCurrency(data.prices.condo + data.prices.iptu)}</span>
+                        </div>
                       </div>
                     </div>
-                  ))}
+                  </div>
                 </div>
 
-                {/* Price Item */}
-                <div className="col-span-2 row-span-1 glass p-8 rounded-[2.5rem] flex flex-col justify-between hover-glow bg-gradient-to-br from-blue-600/10 to-transparent">
-                  <div className="flex justify-between items-start">
-                    <h3 className="text-2xl font-bold">Investimento</h3>
-                    <div className="bg-emerald-500/20 text-emerald-400 px-3 py-1 rounded-full text-xs font-bold">Disponível</div>
-                  </div>
-                  <div className="space-y-4">
-                    <div className="flex justify-between text-zinc-400 border-b border-white/5 pb-2">
-                      <span>Aluguel</span>
-                      <span className="text-white">{formatCurrency(data.prices.rent || 0)}</span>
+                {/* Bottom Part: Description & Gallery */}
+                <div className="lg:col-span-4 space-y-10">
+                  <div className="bg-white/5 border border-white/10 p-10 rounded-[3rem] space-y-10 shadow-inner">
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center text-blue-500">
+                        <TrendingUp className="w-5 h-5" />
+                      </div>
+                      <h3 className="text-xl font-black uppercase tracking-tighter italic">Destaques</h3>
                     </div>
-                    <div className="flex justify-between text-zinc-400 border-b border-white/5 pb-2">
-                      <span>Condomínio + IPTU</span>
-                      <span className="text-white">{formatCurrency((data.prices.condo || 0) + (data.prices.iptu || 0))}</span>
-                    </div>
-                    <div className="flex justify-between items-end pt-2">
-                      <span className="text-zinc-500 font-bold uppercase tracking-widest text-xs">Total Mensal</span>
-                      <span className="text-5xl font-black text-blue-500 leading-none tracking-tight">
-                        {formatCurrency(data.prices.total || 0)}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-
-              {/* Description & Gallery */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-                {/* Description column */}
-                <motion.div variants={itemVariants} className="md:col-span-1 space-y-8">
-                  <div className="glass p-8 rounded-[2.5rem] space-y-6">
-                    <h3 className="text-2xl font-bold border-b border-white/5 pb-4">Destaques</h3>
-                    <div className="space-y-4">
-                      {data.amenities.slice(0, 10).map((amenity, i) => (
-                        <div key={i} className="flex items-center gap-3 text-zinc-300">
-                          <CheckCircle2 className="w-5 h-5 text-blue-500 shrink-0" />
-                          <span className="text-sm font-medium">{amenity}</span>
+                    <p className="text-white/50 text-lg leading-relaxed font-medium italic">
+                      "{data.description || 'Nenhuma descrição fornecida pelo proprietário.'}"
+                    </p>
+                    <div className="grid grid-cols-1 gap-4 pt-4">
+                      {data.amenities.slice(0, 12).map((amenity, i) => (
+                        <div key={i} className="flex items-center gap-4 text-white/60 group">
+                          <CheckCircle2 className="w-5 h-5 text-blue-500 group-hover:scale-110 transition-transform" />
+                          <span className="text-sm font-bold tracking-tight">{amenity}</span>
                         </div>
                       ))}
                     </div>
-                    <div className="pt-4">
-                      <p className="text-zinc-400 text-sm leading-relaxed line-clamp-6 italic">
-                        "{data.description}"
-                      </p>
-                    </div>
                   </div>
-                </motion.div>
+                </div>
 
-                {/* Gallery column */}
-                <motion.div variants={itemVariants} className="md:col-span-2 space-y-8">
-                  <div className="flex items-center gap-4">
-                    <h3 className="text-3xl font-black tracking-tight">GALERIA DE IMAGENS</h3>
-                    <div className="h-px flex-1 bg-white/10"></div>
-                    <span className="text-zinc-500 font-bold">{data.images.length} FOTOS</span>
-                  </div>
-                  
-                  <div className="masonry">
-                    {data.images.map((img, i) => (
-                      <motion.div 
-                        key={i} 
-                        className="masonry-item group relative overflow-hidden rounded-3xl"
-                        whileHover={{ y: -5 }}
-                      >
-                        <img 
-                          src={img.url} 
-                          alt={img.subtitle || 'Property photo'}
-                          className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105"
-                          loading="lazy"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-6 flex items-end">
-                          <p className="text-white font-bold text-sm tracking-wide">
-                            {img.subtitle || 'Espaço do imóvel'}
-                          </p>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
-                </motion.div>
+                <div className="lg:col-span-8 space-y-12">
+                   <div className="flex items-center gap-6">
+                      <h3 className="text-4xl font-black tracking-tight uppercase italic mix-blend-difference">Galeria Elite</h3>
+                      <div className="h-[2px] flex-1 bg-white/10"></div>
+                      <span className="text-white/20 font-black text-xs tracking-[0.3em]">{data.images.length} FORMATOS</span>
+                   </div>
+                   
+                   <div className="columns-1 md:columns-2 gap-8 space-y-8">
+                     {data.images.map((img, i) => (
+                       <motion.div 
+                         key={i} 
+                         initial={{ opacity: 0, scale: 0.95 }}
+                         whileInView={{ opacity: 1, scale: 1 }}
+                         viewport={{ once: true }}
+                         className="relative group overflow-hidden rounded-[2.5rem] border border-white/10 shadow-2xl cursor-zoom-in"
+                       >
+                         <img 
+                           src={img.url} 
+                           alt={img.subtitle || 'Property photo'}
+                           className="w-full h-auto object-cover transition-transform duration-1000 group-hover:scale-110"
+                           loading="lazy"
+                         />
+                         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 p-8 flex flex-col justify-end">
+                            <span className="text-blue-500 text-[10px] font-black uppercase tracking-widest mb-2">Space • {i + 1}</span>
+                            <p className="text-white font-black text-xl tracking-tight leading-none uppercase italic">
+                              {img.subtitle || 'Detalhe do Imóvel'}
+                            </p>
+                         </div>
+                       </motion.div>
+                     ))}
+                   </div>
+                </div>
               </div>
             </motion.div>
           ) : (
@@ -344,14 +364,14 @@ export default function Home() {
               <motion.div 
                 initial={{ opacity: 0 }} 
                 animate={{ opacity: 1 }}
-                className="py-40 flex flex-col items-center justify-center text-center space-y-6"
+                className="py-60 flex flex-col items-center justify-center text-center space-y-10"
               >
-                <div className="w-24 h-24 rounded-full bg-white/5 flex items-center justify-center text-white/20">
-                  <ImageIcon className="w-10 h-10" />
+                <div className="w-32 h-32 rounded-[2.5rem] bg-white/5 border border-white/10 flex items-center justify-center text-white/10 shadow-inner">
+                  <ImageIcon className="w-12 h-12" />
                 </div>
-                <div className="space-y-2">
-                  <h3 className="text-2xl font-bold text-white/40">Sua vitrine aparecerá aqui</h3>
-                  <p className="text-zinc-600 max-w-sm">Cole o endereço do imóvel acima para iniciar a extração de dados e fotos.</p>
+                <div className="space-y-4">
+                  <h3 className="text-3xl font-black tracking-tighter text-white/20 uppercase italic">Aguardando Extração</h3>
+                  <p className="text-white/10 max-w-sm font-bold uppercase tracking-widest text-[10px]">Utilize o campo superior para processar um link do QuintoAndar</p>
                 </div>
               </motion.div>
             )
@@ -360,14 +380,18 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-white/5 py-12 px-6">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6 text-zinc-500 text-sm font-medium">
-          <p>© 2026 VitrineQA Scraper. Todos os direitos reservados.</p>
-          <div className="flex gap-8">
-            <a href="#" className="hover:text-white">Privacidade</a>
-            <a href="#" className="hover:text-white">Termos</a>
-            <a href="#" className="hover:text-white">Github</a>
+      <footer className="border-t border-white/5 py-24 px-6 bg-black/50 backdrop-blur-3xl">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-10">
+          <div className="flex items-center gap-3 opacity-20">
+             <div className="w-8 h-8 bg-white/50 rounded-lg"></div>
+             <span className="font-black tracking-tighter text-xl">PRO SCRAPER</span>
           </div>
+          <div className="flex gap-12 text-[10px] font-black uppercase tracking-[0.2em] text-white/20">
+            <a href="#" className="hover:text-blue-500 transition-colors">Safety</a>
+            <a href="#" className="hover:text-blue-500 transition-colors">API Keys</a>
+            <a href="#" className="hover:text-blue-500 transition-colors">Open Source</a>
+          </div>
+          <p className="text-white/10 text-[10px] font-black uppercase tracking-widest">© 2026 VitrineQA • Developed by Elite Agents</p>
         </div>
       </footer>
     </div>
