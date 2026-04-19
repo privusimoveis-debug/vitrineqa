@@ -843,14 +843,14 @@ export default function ScraperPage() {
                                               {/* PILL BADGE */}
                                               <div style={{ background: `linear-gradient(180deg, ${c.pill[0]}, ${c.pill[1]})`, borderRadius: '100px', padding: '16px 50px', border: `5px solid ${c.pillBdr}`, boxShadow: '0 10px 35px rgba(0,0,0,0.45), inset 0 2px 6px rgba(255,255,255,0.35)' }}>
                                                 <span style={{ fontFamily: "'Montserrat', 'Arial Black', sans-serif", fontSize: '42px', fontWeight: 900, color: c.pillTxt, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-                                                  {hood.toUpperCase()}
+                                                  {data.type.toUpperCase()}
                                                 </span>
                                               </div>
 
                                               {/* TITLE */}
                                               <div style={{ textAlign: 'center' }}>
                                                 <div style={{ fontFamily: "'Montserrat', 'Arial Black', sans-serif", fontSize: '100px', fontWeight: 900, color: '#ffffff', textShadow: '0 6px 35px rgba(0,0,0,0.7), 0 2px 4px rgba(0,0,0,0.5)', lineHeight: '0.92', textTransform: 'capitalize' }}>
-                                                  {data.prices.isForSale ? 'Apartamento' : 'Apartamento'}
+                                                  {hood}
                                                 </div>
                                                 <div style={{ fontFamily: "'Montserrat', 'Arial Black', sans-serif", fontSize: '100px', fontWeight: 900, color: '#ffffff', textShadow: '0 6px 35px rgba(0,0,0,0.7), 0 2px 4px rgba(0,0,0,0.5)', lineHeight: '0.92', textTransform: 'capitalize' }}>
                                                   {data.prices.isForSale ? 'à Venda' : 'para Alugar'}
