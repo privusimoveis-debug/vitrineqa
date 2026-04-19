@@ -949,10 +949,13 @@ export default function ScraperPage() {
                                         const hood = data.address.includes(',') ? data.address.split(',').pop()?.trim() || data.city : data.city;
                                         return (
                                           <div style={{ width: '1080px', height: '1350px', position: 'relative', overflow: 'hidden', background: fc.bg, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-between', padding: '55px 55px 35px', boxSizing: 'border-box' }}>
-                                            {/* TOP: Brand tag */}
+                                            {/* TOP: Price tag */}
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '14px', alignSelf: 'flex-start' }}>
-                                              <div style={{ width: '5px', height: '36px', background: fc.border, borderRadius: '4px' }} />
-                                              <span style={{ fontFamily: "'Montserrat','Arial Black',sans-serif", fontSize: '28px', fontWeight: 900, color: 'rgba(255,255,255,0.45)', letterSpacing: '0.25em', textTransform: 'uppercase' }}>Imóvel Exclusivo</span>
+                                              <div style={{ width: '5px', height: '44px', background: fc.border, borderRadius: '4px' }} />
+                                              <div style={{ display: 'flex', flexDirection: 'column', gap: '0px' }}>
+                                                <span style={{ fontFamily: "'Inter',sans-serif", fontSize: '20px', fontWeight: 500, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.18em', textTransform: 'uppercase' }}>{data.prices.isForSale ? 'Valor de Venda' : 'Valor do Aluguel'}</span>
+                                                <span style={{ fontFamily: "'Montserrat','Arial Black',sans-serif", fontSize: '48px', fontWeight: 900, color: fc.accent, letterSpacing: '-0.01em', lineHeight: 1 }}>{data.prices.isForSale ? formatCurrency(data.prices.salePrice) : formatCurrency(data.prices.rent)}</span>
+                                              </div>
                                             </div>
                                             {/* MIDDLE: Photo Frame */}
                                             <div style={{ width: '100%', flex: 1, margin: '32px 0', borderRadius: '28px', overflow: 'hidden', border: `6px solid ${fc.border}`, boxShadow: `0 0 55px ${fc.border}55, 0 25px 70px rgba(0,0,0,0.7)`, position: 'relative' }}>
