@@ -188,8 +188,11 @@ export default function ScraperPage() {
   useEffect(() => {
     if (data) {
       handleGenerateCaption();
-      // Pick a random gradient for variety
-      setGradientIndex(Math.floor(Math.random() * ELITE_GRADIENTS.length));
+      // Auto-rotate gradient: sequential based on localStorage
+      const lastIdx = parseInt(localStorage.getItem('vitrineLastGradient') || '-1', 10);
+      const nextIdx = (lastIdx + 1) % ELITE_GRADIENTS.length;
+      setGradientIndex(nextIdx);
+      localStorage.setItem('vitrineLastGradient', String(nextIdx));
     }
   }, [data]);
 
@@ -285,6 +288,21 @@ export default function ScraperPage() {
     navigator.clipboard.writeText(caption);
     setIsCopied(true);
     setTimeout(() => setIsCopied(false), 2000);
+  };
+
+  const handleOneClickGenerate = async () => {
+    if (!data || !caption) return;
+    // 1. Copy caption to clipboard
+    navigator.clipboard.writeText(caption);
+    setIsCopied(true);
+    setTimeout(() => setIsCopied(false), 3000);
+    // 2. Auto-advance gradient for next generation
+    const nextIdx = (gradientIndex + 1) % ELITE_GRADIENTS.length;
+    setGradientIndex(nextIdx);
+    localStorage.setItem('vitrineLastGradient', String(nextIdx));
+    // 3. Small delay to let state update, then trigger download
+    await new Promise(r => setTimeout(r, 200));
+    handleDownloadCarousel();
   };
 
   const handleGenerateCaption = async () => {
@@ -387,18 +405,20 @@ export default function ScraperPage() {
         if (!element) continue;
 
         // 3. Capture with High Fidelity
-        const blob = await htmlToImage.toBlob(element, { 
-          quality: 1,
-          pixelRatio: 4, // Ultra-High Quality (4320x5400)
+        const dataUrl = await htmlToImage.toPng(element, { 
+          pixelRatio: 4,
           cacheBust: true,
+          skipAutoScale: true,
           style: {
             transform: 'scale(1)',
-            imageRendering: 'high-quality',
           }
         });
         
-        if (blob) {
-          zip.file(`post-${i + 1}.jpg`, blob);
+        if (dataUrl) {
+          // Convert data URL to blob for ZIP
+          const res = await fetch(dataUrl);
+          const blob = await res.blob();
+          zip.file(`post-${i + 1}.png`, blob);
         }
       }
 
@@ -762,6 +782,16 @@ export default function ScraperPage() {
                               
                               <h4 className="text-2xl font-black tracking-tighter uppercase italic">Imagens do Carrossel</h4>
                               
+                              {/* ONE-CLICK BUTTON */}
+                              <button 
+                                onClick={handleOneClickGenerate}
+                                disabled={isRenderingCarousel || !caption}
+                                className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 disabled:opacity-30 disabled:cursor-not-allowed text-white px-6 py-5 rounded-2xl font-black uppercase text-xs tracking-widest transition-all shadow-xl shadow-green-600/20 flex items-center justify-center gap-3"
+                              >
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                                {isRenderingCarousel ? "Processando..." : "Gerar Tudo (Copiar + Baixar)"}
+                              </button>
+                              
                               <div className="relative aspect-[4/5] bg-black rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
                                 {/* REAL-TIME CAPTURE PORTAL */}
                                 <div className="fixed -left-[9999px] top-0 pointer-events-none origin-top-left">
@@ -832,7 +862,7 @@ export default function ScraperPage() {
                                             </div>
                                             {/* Watermark */}
                                             <div style={{ position: 'absolute', bottom: '25px', right: '30px', zIndex: 3, display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(0,0,0,0.45)', padding: '10px 22px', borderRadius: '50px', border: '1px solid rgba(255,255,255,0.1)' }}>
-                                              <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#3b82f6' }} />
+                                              <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: '20px', height: '20px', flexShrink: 0 }}><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
                                               <span style={{ fontFamily: "'Inter', sans-serif", fontSize: '22px', fontWeight: 500, color: 'rgba(255,255,255,0.7)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
                                                 brunofernandes.corporativo
                                               </span>
@@ -887,7 +917,7 @@ export default function ScraperPage() {
                                             </div>
                                             {/* Watermark */}
                                             <div style={{ position: 'absolute', bottom: '25px', right: '30px', zIndex: 3, display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(0,0,0,0.45)', padding: '10px 22px', borderRadius: '50px', border: '1px solid rgba(255,255,255,0.1)' }}>
-                                              <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#3b82f6' }} />
+                                              <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: '20px', height: '20px', flexShrink: 0 }}><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
                                               <span style={{ fontFamily: "'Inter', sans-serif", fontSize: '22px', fontWeight: 500, color: 'rgba(255,255,255,0.7)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
                                                 brunofernandes.corporativo
                                               </span>
