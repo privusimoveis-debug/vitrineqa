@@ -338,14 +338,14 @@ export default function ScraperPage() {
 
     try {
       // 1. Pre-load all assets to memory (Base64) to avoid race conditions
-      setStatusMessage('Preparando fotos (0/8)...');
+      setStatusMessage('Preparando fotos (0/10)...');
       const loaded: Record<number, string> = {};
       
-      for (let i = 0; i < 8; i++) {
-        setStatusMessage(`Baixando foto ${i + 1} de 8...`);
+      for (let i = 0; i < 10; i++) {
+        setStatusMessage(`Baixando foto ${i + 1} de 10...`);
         let rawUrl = "";
         if (i === 0) rawUrl = data.images[0].url; // Capa
-        else if (i === 7) rawUrl = data.images[0].url; 
+        else if (i === 9) rawUrl = data.images[0].url; 
         else rawUrl = data.images[i]?.url || data.images[0].url;
 
         const imgUrl = cleanImageUrl(rawUrl);
@@ -372,8 +372,8 @@ export default function ScraperPage() {
       await document.fonts.ready;
 
       // Sequential capture: 1 to 8
-      for (let i = 0; i < 8; i++) {
-        setRenderProgress(50 + Math.round((i / 8) * 50)); // Second half is capture
+      for (let i = 0; i < 10; i++) {
+        setRenderProgress(50 + Math.round((i / 10) * 50)); // Second half is capture
         setStatusMessage(`Capturando slide ${i + 1}...`);
         
         // 1. Set the active slide to render
@@ -771,15 +771,15 @@ export default function ScraperPage() {
                                       {/* ========== SLIDE 0: CAPA (standalone, no wrapper) ========== */}
                                       {activeCaptureIndex === 0 ? (() => {
                                         const palettes = [
-                                          { ov1:'rgba(220,38,38,0.82)', ov2:'rgba(220,38,38,0.50)', pill:['#f59e0b','#d97706'], pillBdr:'#92400e', pillTxt:'#1c1917', infoBg:'#fbbf24', infoTxt:'#1e1b4b', accent:'#7c3aed', priceBg:'linear-gradient(135deg,#7f1d1d,#450a0a)', priceBdr:'#fbbf24', priceTxt:'#fde68a' },
-                                          { ov1:'rgba(5,150,105,0.82)', ov2:'rgba(5,150,105,0.48)', pill:['#34d399','#059669'], pillBdr:'#064e3b', pillTxt:'#052e16', infoBg:'#a7f3d0', infoTxt:'#064e3b', accent:'#0891b2', priceBg:'linear-gradient(135deg,#064e3b,#022c22)', priceBdr:'#34d399', priceTxt:'#a7f3d0' },
-                                          { ov1:'rgba(190,18,60,0.82)', ov2:'rgba(190,18,60,0.48)', pill:['#fb923c','#f97316'], pillBdr:'#9a3412', pillTxt:'#1c1917', infoBg:'#fde68a', infoTxt:'#1e1b4b', accent:'#c026d3', priceBg:'linear-gradient(135deg,#4a044e,#1a0533)', priceBdr:'#fde68a', priceTxt:'#fde68a' },
-                                          { ov1:'rgba(217,119,6,0.82)', ov2:'rgba(217,119,6,0.48)', pill:['#fbbf24','#f59e0b'], pillBdr:'#78350f', pillTxt:'#1c1917', infoBg:'#fef3c7', infoTxt:'#78350f', accent:'#dc2626', priceBg:'linear-gradient(135deg,#78350f,#451a03)', priceBdr:'#fbbf24', priceTxt:'#fde68a' },
-                                          { ov1:'rgba(109,40,217,0.82)', ov2:'rgba(109,40,217,0.48)', pill:['#a78bfa','#8b5cf6'], pillBdr:'#4c1d95', pillTxt:'#1e1b4b', infoBg:'#ede9fe', infoTxt:'#4c1d95', accent:'#ec4899', priceBg:'linear-gradient(135deg,#3b0764,#1e1b4b)', priceBdr:'#a78bfa', priceTxt:'#e9d5ff' },
-                                          { ov1:'rgba(30,58,138,0.82)', ov2:'rgba(30,58,138,0.48)', pill:['#60a5fa','#3b82f6'], pillBdr:'#1e3a8a', pillTxt:'#1e3a8a', infoBg:'#dbeafe', infoTxt:'#1e3a8a', accent:'#f59e0b', priceBg:'linear-gradient(135deg,#172554,#0c1529)', priceBdr:'#60a5fa', priceTxt:'#bfdbfe' },
+                                          { ov1:'rgba(220,38,38,0.40)', ov2:'rgba(220,38,38,0.22)', pill:['#f59e0b','#d97706'], pillBdr:'#92400e', pillTxt:'#1c1917', infoBg:'#fbbf24', infoTxt:'#1e1b4b', accent:'#7c3aed', priceBg:'linear-gradient(135deg,#7f1d1d,#450a0a)', priceBdr:'#fbbf24', priceTxt:'#fde68a' },
+                                          { ov1:'rgba(5,150,105,0.40)', ov2:'rgba(5,150,105,0.22)', pill:['#34d399','#059669'], pillBdr:'#064e3b', pillTxt:'#052e16', infoBg:'#a7f3d0', infoTxt:'#064e3b', accent:'#0891b2', priceBg:'linear-gradient(135deg,#064e3b,#022c22)', priceBdr:'#34d399', priceTxt:'#a7f3d0' },
+                                          { ov1:'rgba(190,18,60,0.40)', ov2:'rgba(190,18,60,0.22)', pill:['#fb923c','#f97316'], pillBdr:'#9a3412', pillTxt:'#1c1917', infoBg:'#fde68a', infoTxt:'#1e1b4b', accent:'#c026d3', priceBg:'linear-gradient(135deg,#4a044e,#1a0533)', priceBdr:'#fde68a', priceTxt:'#fde68a' },
+                                          { ov1:'rgba(217,119,6,0.40)', ov2:'rgba(217,119,6,0.22)', pill:['#fbbf24','#f59e0b'], pillBdr:'#78350f', pillTxt:'#1c1917', infoBg:'#fef3c7', infoTxt:'#78350f', accent:'#dc2626', priceBg:'linear-gradient(135deg,#78350f,#451a03)', priceBdr:'#fbbf24', priceTxt:'#fde68a' },
+                                          { ov1:'rgba(109,40,217,0.40)', ov2:'rgba(109,40,217,0.22)', pill:['#a78bfa','#8b5cf6'], pillBdr:'#4c1d95', pillTxt:'#1e1b4b', infoBg:'#ede9fe', infoTxt:'#4c1d95', accent:'#ec4899', priceBg:'linear-gradient(135deg,#3b0764,#1e1b4b)', priceBdr:'#a78bfa', priceTxt:'#e9d5ff' },
+                                          { ov1:'rgba(30,58,138,0.40)', ov2:'rgba(30,58,138,0.22)', pill:['#60a5fa','#3b82f6'], pillBdr:'#1e3a8a', pillTxt:'#1e3a8a', infoBg:'#dbeafe', infoTxt:'#1e3a8a', accent:'#f59e0b', priceBg:'linear-gradient(135deg,#172554,#0c1529)', priceBdr:'#60a5fa', priceTxt:'#bfdbfe' },
                                         ];
                                         const c = palettes[gradientIndex % palettes.length];
-                                        const hood = data.address.includes(',') ? data.address.split(',').slice(-2, -1)[0].trim() : data.city;
+                                        const hood = data.address.includes(',') ? data.address.split(',').pop()?.trim() || data.city : data.city;
                                         const price = data.prices.isForSale ? formatCurrency(data.prices.salePrice) : formatCurrency(data.prices.rent);
                                         return (
                                           <div style={{ width: '1080px', height: '1350px', position: 'relative', overflow: 'hidden' }}>
@@ -788,43 +788,43 @@ export default function ScraperPage() {
                                             <div style={{ position: 'relative', zIndex: 2, width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '48px', padding: '70px 55px', boxSizing: 'border-box' }}>
 
                                               {/* PILL BADGE */}
-                                              <div style={{ background: `linear-gradient(180deg, ${c.pill[0]}, ${c.pill[1]})`, borderRadius: '100px', padding: '22px 65px', border: `6px solid ${c.pillBdr}`, boxShadow: '0 10px 35px rgba(0,0,0,0.45), inset 0 2px 6px rgba(255,255,255,0.35)' }}>
-                                                <span style={{ fontFamily: "'Montserrat', 'Arial Black', sans-serif", fontSize: '52px', fontWeight: 900, color: c.pillTxt, letterSpacing: '0.1em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
+                                              <div style={{ background: `linear-gradient(180deg, ${c.pill[0]}, ${c.pill[1]})`, borderRadius: '100px', padding: '16px 50px', border: `5px solid ${c.pillBdr}`, boxShadow: '0 10px 35px rgba(0,0,0,0.45), inset 0 2px 6px rgba(255,255,255,0.35)' }}>
+                                                <span style={{ fontFamily: "'Montserrat', 'Arial Black', sans-serif", fontSize: '42px', fontWeight: 900, color: c.pillTxt, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
                                                   {hood.toUpperCase()}
                                                 </span>
                                               </div>
 
                                               {/* TITLE */}
                                               <div style={{ textAlign: 'center' }}>
-                                                <div style={{ fontFamily: "'Montserrat', 'Arial Black', sans-serif", fontSize: '155px', fontWeight: 900, color: '#ffffff', textShadow: '0 6px 35px rgba(0,0,0,0.7), 0 2px 4px rgba(0,0,0,0.5)', lineHeight: '0.92', textTransform: 'capitalize' }}>
+                                                <div style={{ fontFamily: "'Montserrat', 'Arial Black', sans-serif", fontSize: '100px', fontWeight: 900, color: '#ffffff', textShadow: '0 6px 35px rgba(0,0,0,0.7), 0 2px 4px rgba(0,0,0,0.5)', lineHeight: '0.92', textTransform: 'capitalize' }}>
                                                   {data.prices.isForSale ? 'Apartamento' : 'Apartamento'}
                                                 </div>
-                                                <div style={{ fontFamily: "'Montserrat', 'Arial Black', sans-serif", fontSize: '155px', fontWeight: 900, color: '#ffffff', textShadow: '0 6px 35px rgba(0,0,0,0.7), 0 2px 4px rgba(0,0,0,0.5)', lineHeight: '0.92', textTransform: 'capitalize' }}>
+                                                <div style={{ fontFamily: "'Montserrat', 'Arial Black', sans-serif", fontSize: '100px', fontWeight: 900, color: '#ffffff', textShadow: '0 6px 35px rgba(0,0,0,0.7), 0 2px 4px rgba(0,0,0,0.5)', lineHeight: '0.92', textTransform: 'capitalize' }}>
                                                   {data.prices.isForSale ? 'à Venda' : 'para Alugar'}
                                                 </div>
                                               </div>
 
                                               {/* INFO BOX */}
-                                              <div style={{ background: c.infoBg, borderRadius: '28px', padding: '32px 40px', border: `6px solid ${c.accent}`, width: '90%', display: 'flex', alignItems: 'center', justifyContent: 'space-around', boxShadow: '0 18px 50px rgba(0,0,0,0.35)' }}>
+                                              <div style={{ background: c.infoBg, borderRadius: '22px', padding: '22px 30px', border: `4px solid ${c.accent}`, width: '90%', display: 'flex', alignItems: 'center', justifyContent: 'space-around', boxShadow: '0 18px 50px rgba(0,0,0,0.35)' }}>
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                                                  <span style={{ fontSize: '46px' }}>📏</span>
-                                                  <span style={{ fontFamily: "'Montserrat', 'Arial Black', sans-serif", fontSize: '52px', fontWeight: 900, color: c.infoTxt }}>{data.area}m²</span>
+                                                  <span style={{ fontSize: '32px' }}>📏</span>
+                                                  <span style={{ fontFamily: "'Montserrat', 'Arial Black', sans-serif", fontSize: '36px', fontWeight: 900, color: c.infoTxt }}>{data.area}m²</span>
                                                 </div>
-                                                <div style={{ width: '5px', height: '65px', background: 'rgba(0,0,0,0.12)', borderRadius: '3px' }} />
+                                                <div style={{ width: '3px', height: '40px', background: 'rgba(0,0,0,0.12)', borderRadius: '3px' }} />
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                                                  <span style={{ fontSize: '46px' }}>🛏</span>
-                                                  <span style={{ fontFamily: "'Montserrat', 'Arial Black', sans-serif", fontSize: '52px', fontWeight: 900, color: c.infoTxt }}>{data.bedrooms} Quartos</span>
+                                                  <span style={{ fontSize: '32px' }}>🛏</span>
+                                                  <span style={{ fontFamily: "'Montserrat', 'Arial Black', sans-serif", fontSize: '36px', fontWeight: 900, color: c.infoTxt }}>{data.bedrooms} Quartos</span>
                                                 </div>
-                                                <div style={{ width: '5px', height: '65px', background: 'rgba(0,0,0,0.12)', borderRadius: '3px' }} />
+                                                <div style={{ width: '3px', height: '40px', background: 'rgba(0,0,0,0.12)', borderRadius: '3px' }} />
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                                                  <span style={{ fontSize: '46px' }}>🚗</span>
-                                                  <span style={{ fontFamily: "'Montserrat', 'Arial Black', sans-serif", fontSize: '52px', fontWeight: 900, color: c.infoTxt }}>{data.parking} {Number(data.parking) === 1 ? 'Vaga' : 'Vagas'}</span>
+                                                  <span style={{ fontSize: '32px' }}>🚗</span>
+                                                  <span style={{ fontFamily: "'Montserrat', 'Arial Black', sans-serif", fontSize: '36px', fontWeight: 900, color: c.infoTxt }}>{data.parking} {Number(data.parking) === 1 ? 'Vaga' : 'Vagas'}</span>
                                                 </div>
                                               </div>
 
                                               {/* PRICE BOX */}
-                                              <div style={{ background: c.priceBg, borderRadius: '28px', padding: '30px 55px', border: `6px solid ${c.priceBdr}`, width: '90%', textAlign: 'center', boxShadow: '0 18px 50px rgba(0,0,0,0.45)' }}>
-                                                <span style={{ fontFamily: "'Montserrat', 'Arial Black', sans-serif", fontSize: '115px', fontWeight: 900, color: c.priceTxt, letterSpacing: '-0.02em', textShadow: '0 4px 18px rgba(0,0,0,0.4)' }}>
+                                              <div style={{ background: c.priceBg, borderRadius: '22px', padding: '24px 40px', border: `4px solid ${c.priceBdr}`, width: '90%', textAlign: 'center', boxShadow: '0 18px 50px rgba(0,0,0,0.45)' }}>
+                                                <span style={{ fontFamily: "'Montserrat', 'Arial Black', sans-serif", fontSize: '72px', fontWeight: 900, color: c.priceTxt, letterSpacing: '-0.02em', textShadow: '0 4px 18px rgba(0,0,0,0.4)' }}>
                                                   {price}
                                                 </span>
                                               </div>
@@ -842,7 +842,7 @@ export default function ScraperPage() {
                                       })()
 
                                       /* ========= SLIDE 7: CTA (standalone) ========= */
-                                      : activeCaptureIndex === 7 ? (() => {
+                                      : activeCaptureIndex === 9 ? (() => {
                                         const c = [
                                           { bg:'linear-gradient(135deg,#1e1b4b,#0f0a2e)', accent:'#fbbf24', txt:'#fff', btnBg:'#22c55e', btnTxt:'#fff' },
                                           { bg:'linear-gradient(135deg,#022c22,#041a14)', accent:'#34d399', txt:'#fff', btnBg:'#059669', btnTxt:'#fff' },
@@ -912,9 +912,7 @@ export default function ScraperPage() {
                                                   {data.city} &bull; <span className={ELITE_GRADIENTS[gradientIndex].accent}>{data.address.split(',').pop()?.trim()}</span>
                                                 </span>
                                               </div>
-                                              <div className="px-8 py-4 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl text-4xl font-black italic">
-                                                {(activeCaptureIndex ?? 0) + 1} / 8
-                                              </div>
+                                              
                                             </div>
                                           </div>
                                         </InstagramSlide>
