@@ -978,8 +978,7 @@ export default function ScraperPage() {
                                             </div>
                                           </div>
                                         );
-                                      })()
-                                      )}
+                                      })()}
 
                                     </div>
                                   )}
