@@ -18,17 +18,24 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
 
+    console.log('Tentando login para:', email);
+
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Erro no Supabase Auth:', error);
+        throw error;
+      }
 
+      console.log('Login bem-sucedido:', data);
       router.push('/');
       router.refresh();
     } catch (err: any) {
+      console.error('Catch Login Error:', err);
       setError(err.message || 'Erro ao realizar login. Verifique suas credenciais.');
     } finally {
       setLoading(false);
@@ -101,9 +108,9 @@ export default function LoginPage() {
 
               {error && (
                 <motion.p 
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  className="text-red-500 text-[10px] font-black tracking-widest uppercase text-center"
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-red-400 text-sm font-bold tracking-wide text-center bg-red-500/10 border border-red-500/20 py-3 rounded-xl"
                 >
                   {error}
                 </motion.p>
