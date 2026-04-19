@@ -32,8 +32,8 @@ export default function LoginPage() {
       }
 
       console.log('Login bem-sucedido:', data);
-      router.push('/');
-      router.refresh();
+      // Use window.location.href to ensure a full reload and cookie sync with middleware
+      window.location.href = '/';
     } catch (err: any) {
       console.error('Catch Login Error:', err);
       setError(err.message || 'Erro ao realizar login. Verifique suas credenciais.');
