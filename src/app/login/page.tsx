@@ -63,8 +63,8 @@ export default function LoginPage() {
           <div className="relative space-y-10">
             {/* Header */}
             <div className="flex flex-col items-center text-center space-y-4">
-              <div className="w-20 h-20 border-2 border-blue-500 rounded-3xl flex items-center justify-center mb-2 shadow-lg shadow-blue-500/20 overflow-hidden">
-                <img src="/icons/icon.svg" className="w-12 h-12 object-contain" alt="Logo" />
+              <div className="flex items-center justify-center mb-4">
+                <img src="/icons/icon.svg" className="w-24 h-24 object-contain contrast-125" alt="Logo" />
               </div>
               <div className="space-y-1">
                 <h1 className="text-3xl font-black tracking-tighter uppercase italic">
