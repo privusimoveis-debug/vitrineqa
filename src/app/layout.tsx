@@ -28,8 +28,8 @@ export const metadata: Metadata = {
     title: "PostImob",
   },
   icons: {
-    icon: "/favicon.png",
-    apple: "/icons/icon-192.png",
+    icon: "/icons/icon.svg",
+    apple: "/icons/icon.svg",
   },
 };
 

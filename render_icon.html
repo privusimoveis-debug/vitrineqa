@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  body { background: transparent; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
+</style>
+</head>
+<body>
+<canvas id="iconCanvas" width="192" height="192"></canvas>
+<script>
+  const canvas = document.getElementById('iconCanvas');
+  const size = 192;
+  const ctx = canvas.getContext('2d');
+  
+  ctx.clearRect(0, 0, size, size);
+  
+  const blue = '#3b82f6';
+  const stroke = 12;
+  
+  ctx.strokeStyle = blue;
+  ctx.lineWidth = stroke;
+  ctx.lineJoin = 'round';
+  ctx.lineCap = 'round';
+  
+  function drawRoundedRect(x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+    ctx.stroke();
+  }
+  
+  // Instagram Camera Outer
+  const camSize = 140;
+  const camX = (size - camSize) / 2;
+  const camY = (size - camSize) / 2;
+  const camR = 35;
+  drawRoundedRect(camX, camY, camSize, camSize, camR);
+  
+  // Center Circle
+  ctx.beginPath();
+  ctx.arc(size/2, size/2, 35, 0, Math.PI * 2);
+  ctx.stroke();
+  
+  // Lens Dot
+  ctx.beginPath();
+  ctx.arc(size/2 + 45, size/2 - 45, 10, 0, Math.PI * 2);
+  ctx.fillStyle = blue;
+  ctx.fill();
+
+  window.rendered = true;
+</script>
+</body>
+</html>
