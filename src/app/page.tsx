@@ -852,7 +852,7 @@ export default function ScraperPage() {
                                                 <div style={{ fontFamily: "'Montserrat', 'Arial Black', sans-serif", fontSize: '100px', fontWeight: 900, color: '#ffffff', textShadow: '0 6px 35px rgba(0,0,0,0.7), 0 2px 4px rgba(0,0,0,0.5)', lineHeight: '0.92', textTransform: 'capitalize' }}>
                                                   {hood}
                                                 </div>
-                                                <div style={{ fontFamily: "'Montserrat', 'Arial Black', sans-serif", fontSize: '100px', fontWeight: 900, color: '#ffffff', textShadow: '0 6px 35px rgba(0,0,0,0.7), 0 2px 4px rgba(0,0,0,0.5)', lineHeight: '0.92', textTransform: 'capitalize' }}>
+                                                <div style={{ fontFamily: "'Montserrat', 'Arial Black', sans-serif", fontSize: '50px', fontWeight: 900, color: '#ffffff', textShadow: '0 6px 35px rgba(0,0,0,0.7), 0 2px 4px rgba(0,0,0,0.5)', lineHeight: '0.92', textTransform: 'capitalize' }}>
                                                   {data.prices.isForSale ? 'à Venda' : 'para Alugar'}
                                                 </div>
                                               </div>
