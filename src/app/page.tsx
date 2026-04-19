@@ -925,26 +925,60 @@ export default function ScraperPage() {
                                         );
                                       })()
 
-                                      /* ========= SLIDES 1-6: GALLERY (uses InstagramSlide) ========= */
-                                      : (
-                                        <InstagramSlide theme={ELITE_GRADIENTS[gradientIndex]} watermark="brunofernandes.corporativo">
-                                          <div className="h-full relative flex flex-col justify-end" style={{ padding: 0, margin: '-80px' }}>
-                                            <div className="absolute inset-0 z-0">
-                                              <img src={preloadedImages[activeCaptureIndex]} className="w-full h-full object-cover" style={{ imageRendering: 'auto' } as any} />
-                                              <div className="absolute inset-0" style={{ boxShadow: 'inset 0 0 400px rgba(0,0,0,0.5)' }} />
-                                              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+                                      /* ========= SLIDES 1-8: FRAMED GALLERY ========= */
+                                      : (() => {
+                                        const framePalettes = [
+                                          { bg: 'linear-gradient(160deg,#1c0a05,#3b0a0a)', border: '#d97706', accent: '#fbbf24', infoTxt: '#fde68a', infoBg: 'rgba(220,38,38,0.25)', infoBdr: 'rgba(251,191,36,0.3)' },
+                                          { bg: 'linear-gradient(160deg,#021a10,#022c22)', border: '#059669', accent: '#34d399', infoTxt: '#a7f3d0', infoBg: 'rgba(5,150,105,0.25)', infoBdr: 'rgba(52,211,153,0.3)' },
+                                          { bg: 'linear-gradient(160deg,#1a0520,#2d0a31)', border: '#c026d3', accent: '#f472b6', infoTxt: '#fce7f3', infoBg: 'rgba(190,18,60,0.25)', infoBdr: 'rgba(244,114,182,0.3)' },
+                                          { bg: 'linear-gradient(160deg,#1c0e00,#2d1800)', border: '#f59e0b', accent: '#fbbf24', infoTxt: '#fef3c7', infoBg: 'rgba(217,119,6,0.25)', infoBdr: 'rgba(251,191,36,0.3)' },
+                                          { bg: 'linear-gradient(160deg,#1a0a3a,#2e1065)', border: '#8b5cf6', accent: '#a78bfa', infoTxt: '#e9d5ff', infoBg: 'rgba(109,40,217,0.25)', infoBdr: 'rgba(167,139,250,0.3)' },
+                                          { bg: 'linear-gradient(160deg,#0c1529,#172554)', border: '#3b82f6', accent: '#60a5fa', infoTxt: '#bfdbfe', infoBg: 'rgba(30,58,138,0.25)', infoBdr: 'rgba(96,165,250,0.3)' },
+                                        ];
+                                        const fc = framePalettes[gradientIndex % framePalettes.length];
+                                        const hood = data.address.includes(',') ? data.address.split(',').pop()?.trim() || data.city : data.city;
+                                        return (
+                                          <div style={{ width: '1080px', height: '1350px', position: 'relative', overflow: 'hidden', background: fc.bg, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-between', padding: '55px 55px 35px', boxSizing: 'border-box' }}>
+                                            {/* TOP: Brand tag */}
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '14px', alignSelf: 'flex-start' }}>
+                                              <div style={{ width: '5px', height: '36px', background: fc.border, borderRadius: '4px' }} />
+                                              <span style={{ fontFamily: "'Montserrat','Arial Black',sans-serif", fontSize: '28px', fontWeight: 900, color: 'rgba(255,255,255,0.45)', letterSpacing: '0.25em', textTransform: 'uppercase' }}>Imóvel Exclusivo</span>
                                             </div>
-                                            <div className="relative z-10 p-16 flex justify-between items-end border-t border-white/10 pt-8">
-                                              <div className="flex flex-col gap-2">
-                                                <span className="text-2xl font-black uppercase tracking-[0.5em] text-white/40 italic">Exclusividade</span>
-                                                <span className="text-5xl font-black uppercase italic tracking-tighter text-white">
-                                                  {data.city} &bull; <span className={ELITE_GRADIENTS[gradientIndex].accent}>{data.address.split(',').pop()?.trim()}</span>
-                                                </span>
+                                            {/* MIDDLE: Photo Frame */}
+                                            <div style={{ width: '100%', flex: 1, margin: '32px 0', borderRadius: '28px', overflow: 'hidden', border: `6px solid ${fc.border}`, boxShadow: `0 0 55px ${fc.border}55, 0 25px 70px rgba(0,0,0,0.7)`, position: 'relative' }}>
+                                              <img src={preloadedImages[activeCaptureIndex]} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                                              <div style={{ position: 'absolute', inset: 0, boxShadow: 'inset 0 0 70px rgba(0,0,0,0.3)', borderRadius: '22px' }} />
+                                            </div>
+                                            {/* BOTTOM: Info Footer */}
+                                            <div style={{ width: '100%', background: fc.infoBg, borderRadius: '20px', border: `2px solid ${fc.infoBdr}`, padding: '26px 38px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxSizing: 'border-box' }}>
+                                              <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                                                <span style={{ fontFamily: "'Inter',sans-serif", fontSize: '20px', fontWeight: 500, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.15em', textTransform: 'uppercase' }}>Bairro</span>
+                                                <span style={{ fontFamily: "'Montserrat','Arial Black',sans-serif", fontSize: '40px', fontWeight: 900, color: fc.accent, letterSpacing: '-0.01em' }}>{hood}</span>
                                               </div>
-                                              
+                                              <div style={{ width: '2px', height: '55px', background: `${fc.border}55`, borderRadius: '2px', flexShrink: 0 }} />
+                                              <div style={{ display: 'flex', gap: '36px', alignItems: 'center' }}>
+                                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
+                                                  <span style={{ fontSize: '32px' }}>📐</span>
+                                                  <span style={{ fontFamily: "'Montserrat','Arial Black',sans-serif", fontSize: '30px', fontWeight: 900, color: fc.infoTxt }}>{data.area}m²</span>
+                                                </div>
+                                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
+                                                  <span style={{ fontSize: '32px' }}>🛏</span>
+                                                  <span style={{ fontFamily: "'Montserrat','Arial Black',sans-serif", fontSize: '30px', fontWeight: 900, color: fc.infoTxt }}>{data.bedrooms}</span>
+                                                </div>
+                                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
+                                                  <span style={{ fontSize: '32px' }}>🚗</span>
+                                                  <span style={{ fontFamily: "'Montserrat','Arial Black',sans-serif", fontSize: '30px', fontWeight: 900, color: fc.infoTxt }}>{data.parking}</span>
+                                                </div>
+                                              </div>
+                                            </div>
+                                            {/* Watermark */}
+                                            <div style={{ position: 'absolute', bottom: '16px', right: '28px', zIndex: 3, display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(0,0,0,0.40)', padding: '8px 18px', borderRadius: '50px', border: '1px solid rgba(255,255,255,0.08)' }}>
+                                              <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: '15px', height: '15px', flexShrink: 0 }}><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+                                              <span style={{ fontFamily: "'Inter',sans-serif", fontSize: '18px', fontWeight: 500, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>brunofernandes.corporativo</span>
                                             </div>
                                           </div>
-                                        </InstagramSlide>
+                                        );
+                                      })()
                                       )}
 
                                     </div>
