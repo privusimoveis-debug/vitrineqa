@@ -9,9 +9,10 @@ import {
   Share2, Heart, ExternalLink, TrendingUp, Tag,
   Info, ShieldCheck, Home as HomeIcon,
   ChevronDown, ChevronUp, Instagram, Sparkles,
-  Download, X, Check, Grid
+  Download, X, Check, Grid, LogOut
 } from 'lucide-react';
 import axios from 'axios';
+import { supabase } from '@/lib/supabase';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import JSZip from 'jszip';
@@ -189,10 +190,10 @@ export default function ScraperPage() {
     if (data) {
       handleGenerateCaption();
       // Auto-rotate gradient: sequential based on localStorage
-      const lastIdx = parseInt(localStorage.getItem('vitrineLastGradient') || '-1', 10);
+      const lastIdx = parseInt(localStorage.getItem('postImobiliarioLastGradient') || '-1', 10);
       const nextIdx = (lastIdx + 1) % ELITE_GRADIENTS.length;
       setGradientIndex(nextIdx);
-      localStorage.setItem('vitrineLastGradient', String(nextIdx));
+      localStorage.setItem('postImobiliarioLastGradient', String(nextIdx));
     }
   }, [data]);
 
@@ -201,6 +202,11 @@ export default function ScraperPage() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    window.location.href = '/login';
+  };
 
   const handleScrape = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -299,7 +305,7 @@ export default function ScraperPage() {
     // 2. Auto-advance gradient for next generation
     const nextIdx = (gradientIndex + 1) % ELITE_GRADIENTS.length;
     setGradientIndex(nextIdx);
-    localStorage.setItem('vitrineLastGradient', String(nextIdx));
+    localStorage.setItem('postImobiliarioLastGradient', String(nextIdx));
     // 3. Small delay to let state update, then trigger download
     await new Promise(r => setTimeout(r, 200));
     handleDownloadCarousel();
@@ -456,18 +462,20 @@ export default function ScraperPage() {
       )}>
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-3 group cursor-pointer">
-            <div className="w-10 h-10 bg-gradient-to-tr from-blue-700 to-blue-500 rounded-xl flex items-center justify-center shadow-lg shadow-blue-600/20 group-hover:scale-110 transition-transform duration-500">
-              <Building2 className="text-white w-6 h-6" />
+            <div className="w-10 h-10 border-2 border-blue-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+              <Instagram className="text-blue-500 w-6 h-6" />
             </div>
             <span className="text-2xl font-black tracking-tighter uppercase">
-              Vitrine<span className="text-blue-500">QA</span>
+              Post<span className="text-blue-500">Imobiliário</span>
             </span>
           </div>
-          <div className="hidden md:flex items-center gap-10 text-xs font-bold uppercase tracking-widest text-white/40">
-            <a href="#" className="hover:text-white transition-colors">Explorar</a>
-            <a href="#" className="hover:text-white transition-colors">Histórico</a>
-            <button className="bg-white/5 hover:bg-white/10 border border-white/10 px-6 py-2.5 rounded-full text-white transition-all">
-              Entrar
+          <div className="flex items-center gap-10 text-xs font-bold uppercase tracking-widest text-white/40">
+            <button 
+              onClick={handleLogout}
+              className="bg-white/5 hover:bg-white/10 border border-white/10 px-4 md:px-6 py-2.5 rounded-full text-white transition-all flex items-center gap-2"
+            >
+              <LogOut className="w-4 h-4 text-blue-500" />
+              <span className="hidden sm:inline">Sair</span>
             </button>
           </div>
         </div>
@@ -576,7 +584,7 @@ export default function ScraperPage() {
                           rel="noopener noreferrer"
                           className="flex-1 md:flex-none flex items-center justify-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 text-white px-8 h-16 rounded-[1.5rem] font-black uppercase text-xs tracking-widest transition-all"
                         >
-                          Ver no QA <ExternalLink className="w-4 h-4" />
+                          Ver no QuintoAndar <ExternalLink className="w-4 h-4" />
                         </a>
                       </div>
                     </div>
@@ -1095,15 +1103,15 @@ export default function ScraperPage() {
       <footer className="border-t border-white/5 py-24 px-6 bg-black/50 backdrop-blur-3xl">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-10">
           <div className="flex items-center gap-3 opacity-20">
-             <div className="w-8 h-8 bg-white/50 rounded-lg"></div>
-             <span className="font-black tracking-tighter text-xl uppercase">Vitrine QA</span>
+             <div className="w-8 h-8 border border-white/20 rounded-lg flex items-center justify-center">
+               <Instagram className="w-4 h-4" />
+             </div>
+             <span className="font-black tracking-tighter text-xl uppercase">Post Imobiliário</span>
           </div>
           <div className="flex gap-12 text-[10px] font-black uppercase tracking-[0.2em] text-white/20">
-            <a href="#" className="hover:text-blue-500 transition-colors">Explorer</a>
-            <a href="#" className="hover:text-blue-500 transition-colors">Histórico</a>
             <a href="#" className="hover:text-blue-500 transition-colors">Open Source</a>
           </div>
-          <p className="text-white/10 text-[10px] font-black uppercase tracking-widest italic">© 2026 VitrineQA • Para Corretores de Elite</p>
+          <p className="text-white/10 text-[10px] font-black uppercase tracking-widest italic">© 2026 Post Imobiliário • Para Corretores de Elite</p>
         </div>
       </footer>
     </div>
