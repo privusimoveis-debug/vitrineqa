@@ -463,7 +463,11 @@ export default function ScraperPage() {
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-3 group cursor-pointer">
             <div className="flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
-              <img src="/icons/icon.svg" className="w-10 h-10 object-contain" alt="Logo" />
+              <svg width="40" height="40" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="25" y="25" width="462" height="462" rx="100" stroke="#3b82f6" stroke-width="30"/>
+                <circle cx="256" cy="256" r="100" stroke="#3b82f6" stroke-width="30"/>
+                <circle cx="380" cy="132" r="25" fill="#3b82f6"/>
+              </svg>
             </div>
             <span className="text-2xl font-black tracking-tighter uppercase">
               Post<span className="text-blue-500">Imobiliário</span>
@@ -1104,7 +1108,11 @@ export default function ScraperPage() {
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-10">
           <div className="flex items-center gap-3 opacity-20">
              <div className="flex items-center justify-center">
-               <img src="/icons/icon.svg" className="w-8 h-8 object-contain" alt="Logo" />
+               <svg width="32" height="32" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+                 <rect x="25" y="25" width="462" height="462" rx="100" stroke="#3b82f6" stroke-width="30"/>
+                 <circle cx="256" cy="256" r="100" stroke="#3b82f6" stroke-width="30"/>
+                 <circle cx="380" cy="132" r="25" fill="#3b82f6"/>
+               </svg>
              </div>
              <span className="font-black tracking-tighter text-xl uppercase">Post Imobiliário</span>
           </div>

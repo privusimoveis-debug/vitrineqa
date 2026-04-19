@@ -64,7 +64,11 @@ export default function LoginPage() {
             {/* Header */}
             <div className="flex flex-col items-center text-center space-y-4">
               <div className="flex items-center justify-center mb-4">
-                <img src="/icons/icon.svg" className="w-24 h-24 object-contain contrast-125" alt="Logo" />
+                <svg width="96" height="96" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" className="drop-shadow-[0_0_15px_rgba(59,130,246,0.3)]">
+                  <rect x="25" y="25" width="462" height="462" rx="100" stroke="#3b82f6" stroke-width="30"/>
+                  <circle cx="256" cy="256" r="100" stroke="#3b82f6" stroke-width="30"/>
+                  <circle cx="380" cy="132" r="25" fill="#3b82f6"/>
+                </svg>
               </div>
               <div className="space-y-1">
                 <h1 className="text-3xl font-black tracking-tighter uppercase italic">
