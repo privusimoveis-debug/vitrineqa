@@ -71,13 +71,13 @@ const itemVariants = {
 };
 
 // --- Carousel Themes (Elite 2026 Dynamic) ---
+// Brand palette — 5 sophisticated tones
 const ELITE_GRADIENTS = [
-  { name: 'Midnight', from: 'from-blue-900', via: 'via-indigo-950', to: 'to-black', accent: 'text-blue-400', glass: 'bg-white/5 border-white/10' },
-  { name: 'Emerald', from: 'from-emerald-900', via: 'via-teal-950', to: 'to-black', accent: 'text-emerald-400', glass: 'bg-white/5 border-white/10' },
-  { name: 'Rose', from: 'from-rose-900', via: 'via-pink-950', to: 'to-black', accent: 'text-rose-400', glass: 'bg-white/5 border-white/10' },
-  { name: 'Amber', from: 'from-amber-900', via: 'via-orange-950', to: 'to-black', accent: 'text-amber-400', glass: 'bg-white/5 border-white/10' },
-  { name: 'Violet', from: 'from-violet-900', via: 'via-purple-950', to: 'to-black', accent: 'text-violet-400', glass: 'bg-white/5 border-white/10' },
-  { name: 'Slate', from: 'from-slate-800', via: 'via-slate-950', to: 'to-black', accent: 'text-slate-300', glass: 'bg-white/5 border-white/10' },
+  { name: 'Charcoal',  hex: '#222426', from: 'from-[#222426]', via: 'via-[#111213]', to: 'to-black', accent: 'text-[#C1B49D]', glass: 'bg-white/5 border-white/10' },
+  { name: 'Steel',     hex: '#3A4B54', from: 'from-[#3A4B54]', via: 'via-[#1d262b]', to: 'to-black', accent: 'text-[#C1B49D]', glass: 'bg-white/5 border-white/10' },
+  { name: 'Sage',      hex: '#6B705C', from: 'from-[#6B705C]', via: 'via-[#35382e]', to: 'to-black', accent: 'text-[#C1B49D]', glass: 'bg-white/5 border-white/10' },
+  { name: 'Copper',    hex: '#B87333', from: 'from-[#B87333]', via: 'via-[#5c3919]', to: 'to-black', accent: 'text-[#C1B49D]', glass: 'bg-white/5 border-white/10' },
+  { name: 'Linen',     hex: '#C1B49D', from: 'from-[#C1B49D]', via: 'via-[#60594e]', to: 'to-black', accent: 'text-[#B87333]', glass: 'bg-white/5 border-white/10' },
 ];
 
 const cleanImageUrl = (url: string) => {
@@ -344,6 +344,8 @@ export default function ScraperPage() {
       data.description.length > 100 ? data.description.substring(0, 150) + "..." : data.description,
       "",
       "Agende sua visita e venha conhecer este imóvel incrível. 🚀",
+      "",
+      `🔑 Ref: ${data.id}`,
       "",
       `#imobiliaria #corretor #imoveis #${bairroTag} #${cityTag} #${typeTag} ${profileTags.join(' ')}`
     ];
@@ -746,15 +748,16 @@ export default function ScraperPage() {
                                     <p className="text-xs text-white/40 font-medium">10 slides • Alta resolução PNG</p>
                                   </div>
                                 </div>
-                                <div className="flex gap-2">
+                                <div className="flex gap-2 items-center">
                                   {ELITE_GRADIENTS.map((g, idx) => (
                                     <button 
                                       key={g.name}
                                       onClick={() => setGradientIndex(idx)}
+                                      title={g.name}
+                                      style={{ backgroundColor: g.hex }}
                                       className={cn(
-                                        "w-5 h-5 rounded-full border border-white/20 transition-all shadow-lg",
-                                        gradientIndex === idx ? "scale-125 border-white ring-2 ring-white/40" : "opacity-30 hover:opacity-100",
-                                        g.from.replace('from-', 'bg-')
+                                        "w-6 h-6 rounded-full border border-white/20 transition-all shadow-lg",
+                                        gradientIndex === idx ? "scale-125 border-white ring-2 ring-white/50" : "opacity-50 hover:opacity-100",
                                       )}
                                     />
                                   ))}
@@ -810,12 +813,16 @@ export default function ScraperPage() {
                                       {/* ========== SLIDE 0: CAPA (standalone, no wrapper) ========== */}
                                       {activeCaptureIndex === 0 ? (() => {
                                         const palettes = [
-                                          { ov1:'rgba(220,38,38,0.40)', ov2:'rgba(220,38,38,0.22)', pill:['#f59e0b','#d97706'], pillBdr:'#92400e', pillTxt:'#1c1917', infoBg:'#fbbf24', infoTxt:'#1e1b4b', accent:'#7c3aed', priceBg:'linear-gradient(135deg,#7f1d1d,#450a0a)', priceBdr:'#fbbf24', priceTxt:'#fde68a' },
-                                          { ov1:'rgba(5,150,105,0.40)', ov2:'rgba(5,150,105,0.22)', pill:['#34d399','#059669'], pillBdr:'#064e3b', pillTxt:'#052e16', infoBg:'#a7f3d0', infoTxt:'#064e3b', accent:'#0891b2', priceBg:'linear-gradient(135deg,#064e3b,#022c22)', priceBdr:'#34d399', priceTxt:'#a7f3d0' },
-                                          { ov1:'rgba(190,18,60,0.40)', ov2:'rgba(190,18,60,0.22)', pill:['#fb923c','#f97316'], pillBdr:'#9a3412', pillTxt:'#1c1917', infoBg:'#fde68a', infoTxt:'#1e1b4b', accent:'#c026d3', priceBg:'linear-gradient(135deg,#4a044e,#1a0533)', priceBdr:'#fde68a', priceTxt:'#fde68a' },
-                                          { ov1:'rgba(217,119,6,0.40)', ov2:'rgba(217,119,6,0.22)', pill:['#fbbf24','#f59e0b'], pillBdr:'#78350f', pillTxt:'#1c1917', infoBg:'#fef3c7', infoTxt:'#78350f', accent:'#dc2626', priceBg:'linear-gradient(135deg,#78350f,#451a03)', priceBdr:'#fbbf24', priceTxt:'#fde68a' },
-                                          { ov1:'rgba(109,40,217,0.40)', ov2:'rgba(109,40,217,0.22)', pill:['#a78bfa','#8b5cf6'], pillBdr:'#4c1d95', pillTxt:'#1e1b4b', infoBg:'#ede9fe', infoTxt:'#4c1d95', accent:'#ec4899', priceBg:'linear-gradient(135deg,#3b0764,#1e1b4b)', priceBdr:'#a78bfa', priceTxt:'#e9d5ff' },
-                                          { ov1:'rgba(30,58,138,0.40)', ov2:'rgba(30,58,138,0.22)', pill:['#60a5fa','#3b82f6'], pillBdr:'#1e3a8a', pillTxt:'#1e3a8a', infoBg:'#dbeafe', infoTxt:'#1e3a8a', accent:'#f59e0b', priceBg:'linear-gradient(135deg,#172554,#0c1529)', priceBdr:'#60a5fa', priceTxt:'#bfdbfe' },
+                                          // Charcoal
+                                          { ov1:'rgba(34,36,38,0.55)', ov2:'rgba(34,36,38,0.30)', pill:['#C1B49D','#a89e8a'], pillBdr:'#604f3a', pillTxt:'#1a1a1a', infoBg:'#C1B49D', infoTxt:'#1a1518', accent:'#B87333', priceBg:'linear-gradient(135deg,#1a1818,#0d0c0c)', priceBdr:'#B87333', priceTxt:'#C1B49D' },
+                                          // Steel
+                                          { ov1:'rgba(58,75,84,0.55)', ov2:'rgba(58,75,84,0.30)', pill:['#C1B49D','#a89e8a'], pillBdr:'#2a3840', pillTxt:'#0f1518', infoBg:'#C1B49D', infoTxt:'#1a1518', accent:'#B87333', priceBg:'linear-gradient(135deg,#1d262b,#0d1215)', priceBdr:'#B87333', priceTxt:'#C1B49D' },
+                                          // Sage
+                                          { ov1:'rgba(107,112,92,0.55)', ov2:'rgba(107,112,92,0.30)', pill:['#C1B49D','#a89e8a'], pillBdr:'#3a3d30', pillTxt:'#111410', infoBg:'#C1B49D', infoTxt:'#111410', accent:'#B87333', priceBg:'linear-gradient(135deg,#292c22,#141610)', priceBdr:'#B87333', priceTxt:'#C1B49D' },
+                                          // Copper
+                                          { ov1:'rgba(184,115,51,0.55)', ov2:'rgba(184,115,51,0.30)', pill:['#C1B49D','#a89e8a'], pillBdr:'#7a4a1a', pillTxt:'#1a1008', infoBg:'#C1B49D', infoTxt:'#1a1008', accent:'#ffffff', priceBg:'linear-gradient(135deg,#3d2010,#1e1008)', priceBdr:'#C1B49D', priceTxt:'#fff' },
+                                          // Linen
+                                          { ov1:'rgba(193,180,157,0.50)', ov2:'rgba(193,180,157,0.28)', pill:['#B87333','#9e6020'], pillBdr:'#6e4818', pillTxt:'#fff', infoBg:'#B87333', infoTxt:'#fff', accent:'#222426', priceBg:'linear-gradient(135deg,#3d2e1a,#1a1208)', priceBdr:'#C1B49D', priceTxt:'#fff' },
                                         ];
                                         const c = palettes[gradientIndex % palettes.length];
                                         const hood = data.address.includes(',') ? data.address.split(',').pop()?.trim() || data.city : data.city;
@@ -883,13 +890,12 @@ export default function ScraperPage() {
                                       /* ========= SLIDE 7: CTA (standalone) ========= */
                                       : activeCaptureIndex === 9 ? (() => {
                                         const c = [
-                                          { bg:'linear-gradient(135deg,#1e1b4b,#0f0a2e)', accent:'#fbbf24', txt:'#fff', btnBg:'#22c55e', btnTxt:'#fff' },
-                                          { bg:'linear-gradient(135deg,#022c22,#041a14)', accent:'#34d399', txt:'#fff', btnBg:'#059669', btnTxt:'#fff' },
-                                          { bg:'linear-gradient(135deg,#2d0a31,#1a0520)', accent:'#f472b6', txt:'#fff', btnBg:'#ec4899', btnTxt:'#fff' },
-                                          { bg:'linear-gradient(135deg,#451a03,#2a0f00)', accent:'#fbbf24', txt:'#fff', btnBg:'#f59e0b', btnTxt:'#1c1917' },
-                                          { bg:'linear-gradient(135deg,#2e1065,#1a0a3a)', accent:'#a78bfa', txt:'#fff', btnBg:'#8b5cf6', btnTxt:'#fff' },
-                                          { bg:'linear-gradient(135deg,#0f172a,#070b14)', accent:'#60a5fa', txt:'#fff', btnBg:'#3b82f6', btnTxt:'#fff' },
-                                        ][gradientIndex % 6];
+                                          { bg:'linear-gradient(135deg,#111213,#0a0a0b)', accent:'#C1B49D', txt:'#fff', btnBg:'#B87333', btnTxt:'#fff' },
+                                          { bg:'linear-gradient(135deg,#1d262b,#0d1215)', accent:'#C1B49D', txt:'#fff', btnBg:'#B87333', btnTxt:'#fff' },
+                                          { bg:'linear-gradient(135deg,#292c22,#141610)', accent:'#C1B49D', txt:'#fff', btnBg:'#B87333', btnTxt:'#fff' },
+                                          { bg:'linear-gradient(135deg,#3d2010,#1e1008)', accent:'#C1B49D', txt:'#fff', btnBg:'#B87333', btnTxt:'#fff' },
+                                          { bg:'linear-gradient(135deg,#3d2e1a,#1a1208)', accent:'#B87333', txt:'#fff', btnBg:'#C1B49D', btnTxt:'#1a1518' },
+                                        ][gradientIndex % 5];
                                         return (
                                           <div style={{ width: '1080px', height: '1350px', position: 'relative', overflow: 'hidden', background: c.bg }}>
                                             <div style={{ position: 'relative', zIndex: 2, width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '70px', padding: '80px 60px', boxSizing: 'border-box', textAlign: 'center' }}>
@@ -928,12 +934,16 @@ export default function ScraperPage() {
                                       /* ========= SLIDES 1-8: FRAMED GALLERY ========= */
                                       : (() => {
                                         const framePalettes = [
-                                          { bg: 'linear-gradient(160deg,#1c0a05,#3b0a0a)', border: '#d97706', accent: '#fbbf24', infoTxt: '#fde68a', infoBg: 'rgba(220,38,38,0.25)', infoBdr: 'rgba(251,191,36,0.3)' },
-                                          { bg: 'linear-gradient(160deg,#021a10,#022c22)', border: '#059669', accent: '#34d399', infoTxt: '#a7f3d0', infoBg: 'rgba(5,150,105,0.25)', infoBdr: 'rgba(52,211,153,0.3)' },
-                                          { bg: 'linear-gradient(160deg,#1a0520,#2d0a31)', border: '#c026d3', accent: '#f472b6', infoTxt: '#fce7f3', infoBg: 'rgba(190,18,60,0.25)', infoBdr: 'rgba(244,114,182,0.3)' },
-                                          { bg: 'linear-gradient(160deg,#1c0e00,#2d1800)', border: '#f59e0b', accent: '#fbbf24', infoTxt: '#fef3c7', infoBg: 'rgba(217,119,6,0.25)', infoBdr: 'rgba(251,191,36,0.3)' },
-                                          { bg: 'linear-gradient(160deg,#1a0a3a,#2e1065)', border: '#8b5cf6', accent: '#a78bfa', infoTxt: '#e9d5ff', infoBg: 'rgba(109,40,217,0.25)', infoBdr: 'rgba(167,139,250,0.3)' },
-                                          { bg: 'linear-gradient(160deg,#0c1529,#172554)', border: '#3b82f6', accent: '#60a5fa', infoTxt: '#bfdbfe', infoBg: 'rgba(30,58,138,0.25)', infoBdr: 'rgba(96,165,250,0.3)' },
+                                          // Charcoal
+                                          { bg: 'linear-gradient(160deg,#111213,#0a0a0b)', border: '#B87333', accent: '#C1B49D', infoTxt: '#e8ddd0', infoBg: 'rgba(34,36,38,0.6)', infoBdr: 'rgba(184,115,51,0.4)' },
+                                          // Steel
+                                          { bg: 'linear-gradient(160deg,#1d262b,#0d1215)', border: '#B87333', accent: '#C1B49D', infoTxt: '#e8ddd0', infoBg: 'rgba(58,75,84,0.6)', infoBdr: 'rgba(184,115,51,0.4)' },
+                                          // Sage
+                                          { bg: 'linear-gradient(160deg,#292c22,#141610)', border: '#B87333', accent: '#C1B49D', infoTxt: '#e8ddd0', infoBg: 'rgba(107,112,92,0.5)', infoBdr: 'rgba(184,115,51,0.4)' },
+                                          // Copper
+                                          { bg: 'linear-gradient(160deg,#3d2010,#1e1008)', border: '#C1B49D', accent: '#fff', infoTxt: '#fff', infoBg: 'rgba(184,115,51,0.35)', infoBdr: 'rgba(193,180,157,0.4)' },
+                                          // Linen
+                                          { bg: 'linear-gradient(160deg,#3d2e1a,#1a1208)', border: '#B87333', accent: '#C1B49D', infoTxt: '#e8ddd0', infoBg: 'rgba(193,180,157,0.15)', infoBdr: 'rgba(184,115,51,0.4)' },
                                         ];
                                         const fc = framePalettes[gradientIndex % framePalettes.length];
                                         const hood = data.address.includes(',') ? data.address.split(',').pop()?.trim() || data.city : data.city;
