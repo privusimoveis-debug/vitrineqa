@@ -189,11 +189,6 @@ export default function ScraperPage() {
   useEffect(() => {
     if (data) {
       handleGenerateCaption();
-      // Auto-rotate gradient: sequential based on localStorage
-      const lastIdx = parseInt(localStorage.getItem('postImobiliarioLastGradient') || '-1', 10);
-      const nextIdx = (lastIdx + 1) % ELITE_GRADIENTS.length;
-      setGradientIndex(nextIdx);
-      localStorage.setItem('postImobiliarioLastGradient', String(nextIdx));
     }
   }, [data]);
 
@@ -302,11 +297,7 @@ export default function ScraperPage() {
     navigator.clipboard.writeText(caption);
     setIsCopied(true);
     setTimeout(() => setIsCopied(false), 3000);
-    // 2. Auto-advance gradient for next generation
-    const nextIdx = (gradientIndex + 1) % ELITE_GRADIENTS.length;
-    setGradientIndex(nextIdx);
-    localStorage.setItem('postImobiliarioLastGradient', String(nextIdx));
-    // 3. Small delay to let state update, then trigger download
+    // 2. Small delay to let state update, then trigger download
     await new Promise(r => setTimeout(r, 200));
     handleDownloadCarousel();
   };
@@ -329,6 +320,22 @@ export default function ScraperPage() {
     // Profile-based tags
     const profileTags = ["#luxo", "#moderno", "#oportunidade", "#investimento", "#design", "#conforto"];
 
+    // Create a smart summary
+    const cleanDesc = data.description.replace(/\r?\n|\r/g, ' ').trim();
+    // Get first 2 sentences or first 200 chars ending in space
+    let summary = cleanDesc.split(/[.!?]\s/).slice(0, 2).join('. ');
+    if (summary.length < 50 && cleanDesc.length > 50) {
+      summary = cleanDesc.substring(0, 180).split(' ').slice(0, -1).join(' ') + '...';
+    } else if (!summary.endsWith('.')) {
+      summary += '.';
+    }
+
+    // Add highlights if available
+    const highlights = [...data.unitAmenities, ...data.buildingAmenities].slice(0, 4);
+    const highlightLine = highlights.length > 0 
+      ? `\nDestaques: ${highlights.join(', ')}.`
+      : '';
+
     const lines = [
       `${bairro} - ${data.title}`,
       "",
@@ -341,7 +348,7 @@ export default function ScraperPage() {
       "",
       `💰 Investimento: ${price}`,
       "",
-      data.description.length > 100 ? data.description.substring(0, 150) + "..." : data.description,
+      summary + highlightLine,
       "",
       "Agende sua visita e venha conhecer este imóvel incrível. 🚀",
       "",
