@@ -719,51 +719,20 @@ export default function ScraperPage() {
                     >
                       <motion.div 
                         variants={itemVariants}
-                        className="grid grid-cols-1 lg:grid-cols-12 gap-10"
+                        className="flex flex-col gap-8"
                       >
-                        {/* Caption Editor */}
-                        <div className="lg:col-span-7 bg-white/5 border border-white/10 rounded-[3rem] p-10 flex flex-col gap-8">
-                          <div className="flex justify-between items-center">
-                            <h4 className="text-2xl font-black tracking-tighter uppercase italic flex items-center gap-3">
-                              <Sparkles className="w-6 h-6 text-blue-500" /> Legenda do Post
-                            </h4>
-                            <button 
-                              onClick={handleGenerateCaption}
-                              disabled={isGeneratingCaption}
-                              className="bg-blue-600 hover:bg-blue-500 disabled:opacity-30 text-white px-6 py-3 rounded-2xl font-black uppercase text-[10px] tracking-widest transition-all flex items-center gap-2"
-                            >
-                              {isGeneratingCaption ? <Loader2 className="w-4 h-4 animate-spin" /> : "Gerar com IA"}
-                            </button>
-                          </div>
-
-                          <div className="relative group flex-1 min-h-[300px]">
-                            <textarea
-                              value={caption}
-                              onChange={(e) => setCaption(e.target.value)}
-                              placeholder="Clique em 'Gerar com IA' para criar sua legenda perfeita..."
-                              className="w-full h-full bg-black/40 border border-white/5 rounded-[2rem] p-8 text-white/70 text-base font-medium resize-none focus:outline-none focus:border-blue-500/50 transition-all custom-scrollbar"
-                            />
-                            {caption && (
-                              <button 
-                                onClick={handleCopyCaption}
-                                className={cn(
-                                  "absolute bottom-6 right-6 px-6 py-4 rounded-xl font-black uppercase text-[10px] tracking-widest transition-all flex items-center gap-2 shadow-2xl",
-                                  isCopied ? "bg-green-500 text-white" : "bg-white text-black hover:bg-zinc-200"
-                                )}
-                              >
-                                {isCopied ? <Check className="w-4 h-4" /> : <Share2 className="w-4 h-4" />}
-                                {isCopied ? "Copiado!" : "Copiar Legenda"}
-                              </button>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Carousel Generator & Preview */}
-                        <div className="lg:col-span-5 bg-white/5 border border-white/10 rounded-[3rem] p-10 flex flex-col justify-between group hover:border-blue-500/30 transition-all duration-700">
+                        {/* ====== CAROUSEL CARD (Full Width, First) ====== */}
+                        <div className="bg-white/5 border border-white/10 rounded-[3rem] p-8 md:p-10 group hover:border-green-500/30 transition-all duration-700">
                            <div className="space-y-6">
-                              <div className="flex justify-between items-start">
-                                <div className="w-16 h-16 bg-gradient-to-tr from-pink-500/20 to-purple-500/20 border border-pink-500/30 rounded-[1.5rem] flex items-center justify-center group-hover:scale-110 transition-transform duration-700">
-                                   <Instagram className="w-8 h-8 text-pink-500" />
+                              <div className="flex justify-between items-center">
+                                <div className="flex items-center gap-4">
+                                  <div className="w-14 h-14 bg-gradient-to-tr from-pink-500/20 to-purple-500/20 border border-pink-500/30 rounded-2xl flex items-center justify-center">
+                                     <Instagram className="w-7 h-7 text-pink-500" />
+                                  </div>
+                                  <div>
+                                    <h4 className="text-lg font-black tracking-tighter uppercase italic">Imagens do Carrossel</h4>
+                                    <p className="text-xs text-white/40 font-medium">10 slides • Alta resolução PNG</p>
+                                  </div>
                                 </div>
                                 <div className="flex gap-2">
                                   {ELITE_GRADIENTS.map((g, idx) => (
@@ -771,16 +740,14 @@ export default function ScraperPage() {
                                       key={g.name}
                                       onClick={() => setGradientIndex(idx)}
                                       className={cn(
-                                        "w-6 h-6 rounded-full border border-white/20 transition-all shadow-lg",
-                                        gradientIndex === idx ? "scale-125 border-white ring-2 ring-blue-500/50" : "opacity-40 hover:opacity-100",
+                                        "w-5 h-5 rounded-full border border-white/20 transition-all shadow-lg",
+                                        gradientIndex === idx ? "scale-125 border-white ring-2 ring-white/40" : "opacity-30 hover:opacity-100",
                                         g.from.replace('from-', 'bg-')
                                       )}
                                     />
                                   ))}
                                 </div>
                               </div>
-                              
-                              <h4 className="text-2xl font-black tracking-tighter uppercase italic">Imagens do Carrossel</h4>
                               
                               {/* ONE-CLICK BUTTON */}
                               <button 
@@ -789,13 +756,43 @@ export default function ScraperPage() {
                                 className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 disabled:opacity-30 disabled:cursor-not-allowed text-white px-6 py-5 rounded-2xl font-black uppercase text-xs tracking-widest transition-all shadow-xl shadow-green-600/20 flex items-center justify-center gap-3"
                               >
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                                {isRenderingCarousel ? "Processando..." : "Gerar Tudo (Copiar + Baixar)"}
+                                {isRenderingCarousel ? "Processando..." : "⚡ Gerar Tudo (Copiar Legenda + Baixar Fotos)"}
                               </button>
-                              
-                              <div className="relative aspect-[4/5] bg-black rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
-                                {/* REAL-TIME CAPTURE PORTAL */}
-                                <div className="fixed -left-[9999px] top-0 pointer-events-none origin-top-left">
+
+                              {/* PROGRESS BAR (visible during and after processing) */}
+                              <div className="w-full">
+                                {isRenderingCarousel ? (
+                                  <div className="space-y-4 py-4">
+                                    <div className="flex items-center justify-between text-xs font-black uppercase tracking-widest">
+                                      <span className="text-blue-400 animate-pulse">{statusMessage}</span>
+                                      <span className="text-white/60">{renderProgress}%</span>
+                                    </div>
+                                    <div className="w-full bg-white/10 h-3 rounded-full overflow-hidden">
+                                      <motion.div 
+                                        className="h-full bg-gradient-to-r from-green-500 to-emerald-500 rounded-full"
+                                        animate={{ width: `${renderProgress}%` }}
+                                        transition={{ duration: 0.3 }}
+                                      />
+                                    </div>
+                                    <p className="text-[10px] text-white/30 font-medium text-center">
+                                      Não feche a página durante o processamento.
+                                    </p>
+                                  </div>
+                                ) : (
+                                  <div className="flex items-center gap-3 py-3 px-4 bg-white/[0.02] rounded-xl border border-white/5">
+                                    <div className="w-2 h-2 rounded-full bg-green-500/60" />
+                                    <p className="text-[11px] text-white/30 font-medium">
+                                      Pronto para gerar. Clique no botão acima para iniciar o processamento automático.
+                                    </p>
+                                  </div>
+                                )}
+                              </div>
+                           </div>
+
+                           {/* HIDDEN CAPTURE PORTAL (stays offscreen) */}
+                           <div className="fixed -left-[9999px] top-0 pointer-events-none origin-top-left">
                                   {data && activeCaptureIndex !== null && (
+
                                     <div id="capture-target">
 
                                       {/* ========== SLIDE 0: CAPA (standalone, no wrapper) ========== */}
@@ -951,65 +948,38 @@ export default function ScraperPage() {
                                     </div>
                                   )}
                                 </div>
-
-
-                                <div className="absolute inset-0 flex items-center justify-center scale-[0.22] origin-center -translate-y-[280px]">
-                                   {/* STATIC PREVIEW FOR USER ONLY */}
-                                   <div className="flex flex-col gap-40 opacity-50 grayscale pointer-events-none">
-                                      <InstagramSlide theme={ELITE_GRADIENTS[gradientIndex]} watermark="brunofernandes.corporativo">
-                                         <div className="h-full flex flex-col justify-center items-center text-center">
-                                           <h1 className="text-[140px] font-black italic uppercase">Preview</h1>
-                                         </div>
-                                      </InstagramSlide>
-                                   </div>
-                                </div>
-                                
-                                <AnimatePresence>
-                                  {isRenderingCarousel && (
-                                    <motion.div 
-                                      initial={{ opacity: 0 }}
-                                      animate={{ opacity: 1 }}
-                                      exit={{ opacity: 0 }}
-                                      className="absolute inset-0 bg-black/90 backdrop-blur-2xl flex flex-col items-center justify-center p-10 z-50 text-center"
-                                    >
-                                      <div className="relative mb-10">
-                                        <Loader2 className="w-20 h-20 text-blue-500 animate-spin" />
-                                        <div className="absolute inset-0 flex items-center justify-center text-[10px] font-black">
-                                          {renderProgress}%
-                                        </div>
-                                      </div>
-                                      <h5 className="text-xl font-black uppercase italic tracking-tighter mb-4">Exportando Motor Elite</h5>
-                                      <div className="w-full bg-white/10 h-3 rounded-full overflow-hidden max-w-[240px] mb-8">
-                                        <motion.div 
-                                          className="h-full bg-gradient-to-r from-blue-600 to-indigo-600"
-                                          animate={{ width: `${renderProgress}%` }}
-                                        />
-                                      </div>
-                                      <div className="flex flex-col items-center gap-2">
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-blue-500 animate-pulse">
-                                          {statusMessage}
-                                        </p>
-                                        <p className="text-[10px] font-medium text-white/30 max-w-[200px] leading-relaxed">
-                                          Não feche a página durante o processamento.
-                                        </p>
-                                      </div>
-                                    </motion.div>
-                                  )}
-                                </AnimatePresence>
-                              </div>
-
-                              <p className="text-white/40 text-[10px] font-bold uppercase tracking-widest text-center mt-4">
-                                Design dinâmico inspirado em campanhas de alta conversão.
-                              </p>
                            </div>
-                           
-                           <button 
-                            onClick={handleDownloadCarousel}
-                            disabled={isRenderingCarousel}
-                            className="w-full bg-blue-600 hover:bg-blue-500 disabled:opacity-30 text-white px-8 py-6 rounded-2xl font-black uppercase text-xs tracking-widest transition-all shadow-xl shadow-blue-600/20 mt-6"
-                           >
-                              {isRenderingCarousel ? "Preparando..." : "Baixar Carrossel (ZIP)"}
-                           </button>
+
+                        {/* ====== CAPTION CARD (Full Width, Second) ====== */}
+                        <div className="bg-white/5 border border-white/10 rounded-[3rem] p-8 md:p-10">
+                          <div className="flex flex-col gap-6">
+                            <div className="flex justify-between items-center">
+                              <h4 className="text-lg font-black tracking-tighter uppercase italic flex items-center gap-3">
+                                <Sparkles className="w-5 h-5 text-blue-500" /> Legenda do Post
+                              </h4>
+                              {caption && (
+                                <button 
+                                  onClick={handleCopyCaption}
+                                  className={cn(
+                                    "px-4 py-2 rounded-xl font-bold text-[10px] tracking-widest transition-all flex items-center gap-2 border",
+                                    isCopied 
+                                      ? "bg-green-500/10 text-green-400 border-green-500/30" 
+                                      : "bg-white/5 text-white/50 border-white/10 hover:bg-white/10 hover:text-white/80"
+                                  )}
+                                >
+                                  {isCopied ? <Check className="w-3 h-3" /> : <Share2 className="w-3 h-3" />}
+                                  {isCopied ? "Copiado!" : "Copiar"}
+                                </button>
+                              )}
+                            </div>
+
+                            <textarea
+                              value={caption}
+                              onChange={(e) => setCaption(e.target.value)}
+                              placeholder="A legenda será gerada automaticamente ao carregar o imóvel..."
+                              className="w-full bg-black/40 border border-white/5 rounded-2xl p-6 text-white/70 text-sm font-medium resize-none focus:outline-none focus:border-blue-500/50 transition-all custom-scrollbar min-h-[200px] md:min-h-[250px]"
+                            />
+                          </div>
                         </div>
                       </motion.div>
                     </motion.div>
