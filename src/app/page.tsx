@@ -462,8 +462,8 @@ export default function ScraperPage() {
       )}>
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-3 group cursor-pointer">
-            <div className="w-10 h-10 border-2 border-blue-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
-              <Instagram className="text-blue-500 w-6 h-6" />
+            <div className="w-10 h-10 border-2 border-blue-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-500 overflow-hidden">
+              <img src="/icons/icon.svg" className="w-8 h-8 object-contain translate-y-[-1px]" alt="Logo" />
             </div>
             <span className="text-2xl font-black tracking-tighter uppercase">
               Post<span className="text-blue-500">Imobiliário</span>
@@ -1103,8 +1103,8 @@ export default function ScraperPage() {
       <footer className="border-t border-white/5 py-24 px-6 bg-black/50 backdrop-blur-3xl">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-10">
           <div className="flex items-center gap-3 opacity-20">
-             <div className="w-8 h-8 border border-white/20 rounded-lg flex items-center justify-center">
-               <Instagram className="w-4 h-4" />
+             <div className="w-8 h-8 border border-white/20 rounded-lg flex items-center justify-center overflow-hidden">
+               <img src="/icons/icon.svg" className="w-6 h-6 object-contain" alt="Logo" />
              </div>
              <span className="font-black tracking-tighter text-xl uppercase">Post Imobiliário</span>
           </div>
