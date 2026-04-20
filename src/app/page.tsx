@@ -354,7 +354,7 @@ export default function ScraperPage() {
       "",
       `🔑 Ref: ${data.id}`,
       "",
-      `#imobiliaria #corretor #imoveis #${bairroTag} #${cityTag} #${typeTag} ${profileTags.join(' ')}`
+      `#imobiliaria #corretor #${typeTag} #${bairroTag}`
     ];
 
     setCaption(lines.join('\n'));
