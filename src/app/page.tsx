@@ -622,7 +622,45 @@ export default function ScraperPage() {
                       ))}
                     </div>
 
-                    {/* Description & Gallery */}
+                    {/* Gallery */}
+                    <div className="bg-white/5 border border-white/10 rounded-[3rem] p-10">
+                      <h3 className="text-xl font-black uppercase tracking-tighter mb-8 italic flex items-center gap-3">
+                        <ImageIcon className="w-5 h-5 text-blue-500" /> Galeria de Fotos ({data.images.length})
+                      </h3>
+                      <div className={cn(
+                        "grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 overflow-hidden transition-all duration-700",
+                        !isGalleryExpanded && "max-h-[400px]"
+                      )}>
+                        {data.images.map((img, i) => (
+                          <div key={i} className="aspect-square rounded-2xl overflow-hidden bg-white/5 border border-white/5 group relative">
+                            <img 
+                              src={cleanImageUrl(img.url)} 
+                              alt={`Imóvel ${i}`}
+                              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                              loading="lazy"
+                            />
+                            {img.subtitle && (
+                              <div className="absolute inset-x-0 bottom-0 bg-black/60 backdrop-blur-sm p-2 text-center">
+                                <p className="text-[8px] font-bold uppercase tracking-tighter text-white/70 truncate">{img.subtitle}</p>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                        {!isGalleryExpanded && data.images.length > 12 && (
+                          <div className="absolute inset-x-10 bottom-10 h-24 bg-gradient-to-t from-[#0d0d0d] to-transparent pointer-events-none" />
+                        )}
+                      </div>
+                      {data.images.length > 12 && (
+                        <button 
+                          onClick={() => setIsGalleryExpanded(!isGalleryExpanded)}
+                          className="mt-8 text-blue-500 text-[10px] font-black underline uppercase tracking-widest hover:text-white transition-colors"
+                        >
+                          {isGalleryExpanded ? "Ver Menos" : "Ver Todas as Fotos"}
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Description & Amenities */}
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
                        <div className="lg:col-span-12 space-y-12">
                           {/* Description with Expand */}
