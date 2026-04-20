@@ -165,7 +165,7 @@ export default function ScraperPage() {
   const [isZipping, setIsZipping] = useState(false);
 
   // Collapse States (Sections)
-  const [isStep2Expanded, setIsStep2Expanded] = useState(true);
+  const [isStep2Expanded, setIsStep2Expanded] = useState(false);
   const [isStep3Expanded, setIsStep3Expanded] = useState(true);
   
   // Content "Show More" States
@@ -211,7 +211,7 @@ export default function ScraperPage() {
     setError(null);
     setData(null);
     setIsGalleryExpanded(false);
-    setIsStep2Expanded(true);
+    setIsStep2Expanded(false);
     setIsStep3Expanded(true);
     setSelectedIndices([]);
     
